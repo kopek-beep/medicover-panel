@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicover Copilot Panel</title>
+    <style>
+        /* ==========================================
+           MICROSOFT FLUENT DESIGN / COPILOT STYLE
+           ========================================== */
+        :root {
+            --bg-page: #faf9f8;
+            --bg-card: #ffffff;
+            --text-main: #242424;
+            --text-secondary: #605e5c;
+            --border-light: #edebe9;
+            --primary-blue: #0f6cbd;
+            --primary-hover: #115ea3;
+            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.06), 0 0 2px rgba(0, 0, 0, 0.04);
+            --radius-main: 12px;
+            --radius-btn: 6px;
+        }
+
+        body { 
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-page); 
+            margin: 0; 
+            padding: 40px 20px; 
+            color: var(--text-main); 
+        }
+
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: var(--bg-card); 
+            padding: 40px; 
+            border-radius: var(--radius-main); 
+            box-shadow: var(--shadow-card); 
+        }
+
+        h1 { 
+            margin-top: 0;
+            font-size: 28px;
+            font-weight: 600;
+            background: linear-gradient(90deg, #0f6cbd 0%, #0078d4 50%, #00b4d8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+
+        h2 { 
+            font-size: 18px; 
+            font-weight: 600; 
+            color: var(--text-main);
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-light); 
+            padding-bottom: 10px; 
+        }
+
+        .form-group { margin-bottom: 20px; }
+        
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            font-size: 13px; 
+            color: var(--text-secondary);
+        }
+
+        select, input { 
+            width: 100%; 
+            padding: 10px 14px; 
+            font-size: 14px; 
+            font-family: inherit;
+            color: var(--text-main);
+            border: 1px solid #d1d1d1; 
+            border-radius: var(--radius-btn); 
+            box-sizing: border-box; 
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 1px var(--primary-blue);
+        }
+
+        /* Styl dla zablokowanego pola Miasto */
+        select:disabled {
+            background-color: #f3f2f1;
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            border-color: var(--border-light);
+        }
+
+        .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
+        .flex-row > div { flex: 1; min-width: 150px; }
+
+        /* Przyciski */
+        button { 
+            background-color: var(--primary-blue); 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            border-radius: var(--radius-btn); 
+            cursor: pointer; 
+            transition: background-color 0.2s ease, transform 0.1s;
+        }
+
+        button:hover { background-color: var(--primary-hover); }
+        button:active { transform: scale(0.98); }
+        
+        button.btn-add {
+            background-color: #ffffff;
+            color: var(--primary-blue);
+            border: 1px solid var(--primary-blue);
+        }
+        button.btn-add:hover { background-color: #f3f2f1; }
+
+        /* Lista Zadań */
+        .task-list { 
+            margin-top: 15px; 
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 16px 20px; 
+            border-radius: 8px; 
+            background: #ffffff;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            transition: transform 0.2s;
+        }
+
+        .task-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .task-info { font-size: 14px; display: flex; align-items: center; gap: 12px;}
+        
+        .task-tag { 
+            display: inline-flex; 
+            align-items: center;
+            justify-content: center;
+            padding: 4px 12px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: 700; 
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .task-details { color: var(--text-secondary); }
+        .task-details b { color: var(--text-main); font-weight: 600; }
+
+        .btn-delete {
+            background: transparent;
+            color: #d13438;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+        .btn-delete:hover {
+            background: #fdf3f4;
+            color: #a4262c;
+        }
+
+        .btn-sync {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            border-radius: 8px;
+            margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(15, 108, 189, 0.2);
+        }
+
+        #status { margin-top: 20px; font-weight: 600; text-align: center; font-size: 14px; }
+        .syncing { opacity: 0.7; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✨ Medicover Copilot Panel</h1>
+
+    <h2>Dodaj nowe zadanie monitorowania</h2>
+    <div class="flex-row">
+        <div class="form-group">
+            <label>Członek rodziny</label>
+            <select id="person">
+                <option value="KAMIL">Kamil</option>
+                <option value="MONIKA">Monika</option>
+                <option value="ADAM">Adam</option>
+                <option value="SZYMON">Szymon</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Miasto</label>
+            <select id="region" disabled>
+                <option value="199">Łódź</option>
+            </select>
+        </div>
+        <div class="form-group" style="flex: 2;">
+            <label>Specjalizacja</label>
+            <select id="service"></select>
+        </div>
+    </div>
+    <button class="btn-add" onclick="addTask()">+ Dodaj do monitorowania</button>
+
+    <h2>Aktywne skanery (Harmonogram)</h2>
+    <div class="task-list" id="taskList"></div>
+
+    <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border-light);">
+    
+    <button id="syncBtn" class="btn-sync" onclick="syncToGithub()">Zapisz i zaktualizuj system</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    // ==========================================
+    // 1. KONFIGURACJA GITHUB (Bez tokenu na starcie)
+    // ==========================================
+    const GITHUB_REPO = "kopek-beep/medicover"; 
+
+    // ==========================================
+    // 2. MAPOWANIE DANYCH (ID -> NAZWA) i KOLORY (FLUENT)
+    // ==========================================
+    const specjalizacje = {
+        "192": "Laryngolog",
+        "5": "Dermatolog",
+        "6": "Okulista",
+        "31": "Internista",
+        "11": "Ortopeda"
+        // Wklej resztę swojego matchingu poniżej
+    };
+
+    const userTheme = {
+        "KAMIL": { color: "#0f6cbd", border: "#c7e0f4" },  
+        "MONIKA": { color: "#c239b3", border: "#f3d1ed" }, 
+        "ADAM": { color: "#107c41", border: "#cbe3d3" },   
+        "SZYMON": { color: "#d83b01", border: "#f6d5c6" }  
+    };
+
+    const serviceSelect = document.getElementById('service');
+    for (const [id, nazwa] of Object.entries(specjalizacje)) {
+        const option = document.createElement('option');
+        option.value = id;
+        option.text = nazwa;
+        serviceSelect.appendChild(option);
+    }
+
+    // ==========================================
+    // 3. LOGIKA APLIKACJI
+    // ==========================================
+    let tasks = JSON.parse(localStorage.getItem('medicover_tasks')) || [];
+
+    function renderTasks() {
+        const list = document.getElementById('taskList');
+        list.innerHTML = '';
+        if (tasks.length === 0) {
+            list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary); background: #fdfdfd; border-radius: 8px; border: 1px dashed #ccc;">Nie monitorujesz obecnie żadnych lekarzy.</div>';
+            return;
+        }
+        tasks.forEach((task, index) => {
+            const theme = userTheme[task.person] || userTheme["KAMIL"];
+            const div = document.createElement('div');
+            div.className = 'task-item';
+            div.style.borderLeft = `5px solid ${theme.color}`;
+            
+            // Konwersja ID regionu na nazwę miasta do wyświetlenia
+            const cityName = task.region === "199" ? "Łódź" : task.region;
+
+            div.innerHTML = `
+                <div class="task-info">
+                    <span class="task-tag" style="background-color: ${theme.color};">${task.person}</span>
+                    <span class="task-details">
+                        Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${specjalizacje[task.service] || "ID: " + task.service}</b>
+                    </span>
+                </div>
+                <button class="btn-delete" onclick="removeTask(${index})">Usuń</button>
+            `;
+            list.appendChild(div);
+        });
+        localStorage.setItem('medicover_tasks', JSON.stringify(tasks));
+    }
+
+    function addTask() {
+        const person = document.getElementById('person').value;
+        const region = document.getElementById('region').value; // Zawsze pobierze "199" (Łódź)
+        const service = document.getElementById('service').value;
+
+        tasks.push({ person, region, service });
+        renderTasks();
+    }
+
+    function removeTask(index) {
+        tasks.splice(index, 1);
+        renderTasks();
+    }
+
+    function generateYaml() {
+        let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '*/30 * * * *'\n  workflow_dispatch:\n\njobs:\n`;
+        const persons = [...new Set(tasks.map(t => t.person))];
+        
+        persons.forEach(person => {
+            yaml += `  check-${person.toLowerCase()}:\n    runs-on: ubuntu-latest\n    timeout-minutes: 5\n    steps:\n`;
+            yaml += `      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n`;
+            yaml += `      - run: pip install uv && uv sync\n`;
+            yaml += `      - name: Przywrocenie sesji (${person})\n        env:\n          MEDICOVER_SESSION: \${{ secrets.MEDICOVER_SESSION_${person} }}\n`;
+            yaml += `        run: mkdir -p data && echo "$MEDICOVER_SESSION" | base64 -d | tar -xz -C data\n`;
+            yaml += `      - name: Szukaj (${person})\n        env:\n`;
+            yaml += `          MEDICOVER_USER: \${{ secrets.MEDICOVER_USER_${person} }}\n`;
+            yaml += `          MEDICOVER_PASS: \${{ secrets.MEDICOVER_PASS_${person} }}\n`;
+            yaml += `          NOTIFIERS_TELEGRAM_TOKEN: \${{ secrets.NOTIFIERS_TELEGRAM_TOKEN }}\n`;
+            yaml += `          NOTIFIERS_TELEGRAM_CHAT_ID: \${{ secrets.NOTIFIERS_TELEGRAM_CHAT_ID }}\n`;
+            yaml += `        run: |\n`;
+            
+            const personTasks = tasks.filter(t => t.person === person);
+            personTasks.forEach(t => {
+                const nazwaLekarza = specjalizacje[t.service] || "Lekarz";
+                yaml += `          uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service} -n telegram -t "[${t.person}] ${nazwaLekarza}"\n`;
+            });
+            yaml += `\n`;
+        });
+        return yaml;
+    }
+
+    async function syncToGithub() {
+        const statusEl = document.getElementById('status');
+        const syncBtn = document.getElementById('syncBtn');
+        
+        if (tasks.length === 0) { 
+            alert("Nie masz żadnych zadań na liście!"); 
+            return; 
+        }
+
+        // ZAPYTANIE O TOKEN DOPIERO TUTAJ (PRZY KLIKNIĘCIU ZAPISZ)
+        let GITHUB_TOKEN = localStorage.getItem("medicover_gh_token");
+        if (!GITHUB_TOKEN) {
+            GITHUB_TOKEN = prompt("Bezpieczeństwo: Wklej swój GitHub Personal Access Token (PAT):");
+            if (!GITHUB_TOKEN) {
+                alert("Aby zaktualizować bota, musisz podać token!");
+                return;
+            }
+            localStorage.setItem("medicover_gh_token", GITHUB_TOKEN);
+        }
+
+        statusEl.innerHTML = "<span style='color: var(--primary-blue);'>Łączenie z usługami chmurowymi GitHub...</span>";
+        syncBtn.classList.add('syncing');
+        syncBtn.innerText = "Synchronizowanie...";
+
+        const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/.github/workflows/checker.yml`;
+        const headers = { "Authorization": `token ${GITHUB_TOKEN}`, "Accept": "application/vnd.github.v3+json" };
+
+        try {
+            let sha = "";
+            const getRes = await fetch(url, { headers });
+            if (getRes.ok) sha = (await getRes.json()).sha;
+
+            const base64Content = btoa(unescape(encodeURIComponent(generateYaml())));
+            const body = { message: "Aktualizacja monitoringu wizyt (Medicover Copilot)", content: base64Content };
+            if (sha) body.sha = sha;
+
+            const putRes = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body) });
+            
+            if (putRes.ok) {
+                statusEl.innerHTML = "<span style='color: #107c41;'>Sukces! Twój agent chmurowy został zaktualizowany. Zmiany wejdą w życie w ciągu 30 minut.</span>";
+            } else {
+                statusEl.innerHTML = `<span style='color: #d13438;'>Błąd aktualizacji: ${(await putRes.json()).message}</span>`;
+                if (putRes.status === 401) {
+                    localStorage.removeItem("medicover_gh_token");
+                    statusEl.innerHTML += "<br>Token był nieprawidłowy. Kliknij 'Zapisz' ponownie, aby wpisać poprawny token.";
+                }
+            }
+        } catch (error) {
+            statusEl.innerHTML = `<span style='color: #d13438;'>Błąd połączenia: ${error.message}</span>`;
+        } finally {
+            syncBtn.classList.remove('syncing');
+            syncBtn.innerText = "Zapisz i zaktualizuj system";
+        }
+    }
+
+    renderTasks();
+</script>
+
+</body>
+</html>
