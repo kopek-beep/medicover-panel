@@ -87,7 +87,6 @@
             box-shadow: 0 0 0 1px var(--primary-blue);
         }
 
-        /* Styl dla zablokowanego pola Miasto */
         select:disabled {
             background-color: #f3f2f1;
             color: var(--text-secondary);
@@ -98,7 +97,6 @@
         .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
         .flex-row > div { flex: 1; min-width: 150px; }
 
-        /* Przyciski */
         button { 
             background-color: var(--primary-blue); 
             color: white; 
@@ -121,7 +119,6 @@
         }
         button.btn-add:hover { background-color: #f3f2f1; }
 
-        /* Lista Zadań */
         .task-list { 
             margin-top: 15px; 
             display: flex;
@@ -227,20 +224,31 @@
 
 <script>
     // ==========================================
-    // 1. KONFIGURACJA GITHUB (Bez tokenu na starcie)
+    // 1. KONFIGURACJA GITHUB
     // ==========================================
     const GITHUB_REPO = "kopek-beep/medicover"; 
 
     // ==========================================
-    // 2. MAPOWANIE DANYCH (ID -> NAZWA) i KOLORY (FLUENT)
+    // 2. SPECJALIZACJE I DYNAMIKA LISTY
     // ==========================================
-    const specjalizacje = {
+    // Wszystkie możliwe specjalizacje w systemie Medicover dla całej rodziny
+    const wszystkieSpecjalizacje = {
         "192": "Laryngolog",
         "5": "Dermatolog",
         "6": "Okulista",
         "31": "Internista",
-        "11": "Ortopeda"
-        // Wklej resztę swojego matchingu poniżej
+        "11": "Ortopeda",
+        "42": "Pediatra", 
+        "88": "Kardiolog",
+        "178": "Alergolog - odczulanie" // <--- Dodana nowa specjalizacja
+    };
+
+    // Która osoba ma dostęp do których ID lekarzy
+    const dostepneDlaOsoby = {
+        "KAMIL": ["192", "5", "6", "31", "11", "178"], // <--- Dodano 178 do profilu Kamila
+        "MONIKA": ["192", "5", "6", "31", "88", "178"], // <--- Dodano 178 do profilu Moniki
+        "ADAM": ["6", "42"], 
+        "SZYMON": ["192", "6", "42"]
     };
 
     const userTheme = {
@@ -250,13 +258,31 @@
         "SZYMON": { color: "#d83b01", border: "#f6d5c6" }  
     };
 
+    // Logika odświeżająca listę rozwijaną w zależności od wybranej osoby
+    const personSelect = document.getElementById('person');
     const serviceSelect = document.getElementById('service');
-    for (const [id, nazwa] of Object.entries(specjalizacje)) {
-        const option = document.createElement('option');
-        option.value = id;
-        option.text = nazwa;
-        serviceSelect.appendChild(option);
+
+    function odswiezSpecjalizacje() {
+        const wybranaOsoba = personSelect.value;
+        const dostepneID = dostepneDlaOsoby[wybranaOsoba] || [];
+
+        // Wyczyść obecną listę specjalizacji
+        serviceSelect.innerHTML = '';
+
+        // Zbuduj nową listę tylko dla wybranej osoby
+        dostepneID.forEach(id => {
+            const option = document.createElement('option');
+            option.value = id;
+            option.text = wszystkieSpecjalizacje[id] || "ID: " + id;
+            serviceSelect.appendChild(option);
+        });
     }
+
+    // Nasłuchuj zmian - kiedy zmienisz osobę na liście, odpal odświeżanie
+    personSelect.addEventListener('change', odswiezSpecjalizacje);
+    
+    // Uruchom odświeżanie od razu przy starcie strony (żeby na liście były dane dla Kamila)
+    odswiezSpecjalizacje();
 
     // ==========================================
     // 3. LOGIKA APLIKACJI
@@ -276,14 +302,13 @@
             div.className = 'task-item';
             div.style.borderLeft = `5px solid ${theme.color}`;
             
-            // Konwersja ID regionu na nazwę miasta do wyświetlenia
             const cityName = task.region === "199" ? "Łódź" : task.region;
 
             div.innerHTML = `
                 <div class="task-info">
                     <span class="task-tag" style="background-color: ${theme.color};">${task.person}</span>
                     <span class="task-details">
-                        Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${specjalizacje[task.service] || "ID: " + task.service}</b>
+                        Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${wszystkieSpecjalizacje[task.service] || "ID: " + task.service}</b>
                     </span>
                 </div>
                 <button class="btn-delete" onclick="removeTask(${index})">Usuń</button>
@@ -295,7 +320,7 @@
 
     function addTask() {
         const person = document.getElementById('person').value;
-        const region = document.getElementById('region').value; // Zawsze pobierze "199" (Łódź)
+        const region = document.getElementById('region').value; // Zawsze "199"
         const service = document.getElementById('service').value;
 
         tasks.push({ person, region, service });
@@ -326,7 +351,7 @@
             
             const personTasks = tasks.filter(t => t.person === person);
             personTasks.forEach(t => {
-                const nazwaLekarza = specjalizacje[t.service] || "Lekarz";
+                const nazwaLekarza = wszystkieSpecjalizacje[t.service] || "Lekarz";
                 yaml += `          uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service} -n telegram -t "[${t.person}] ${nazwaLekarza}"\n`;
             });
             yaml += `\n`;
@@ -343,7 +368,6 @@
             return; 
         }
 
-        // ZAPYTANIE O TOKEN DOPIERO TUTAJ (PRZY KLIKNIĘCIU ZAPISZ)
         let GITHUB_TOKEN = localStorage.getItem("medicover_gh_token");
         if (!GITHUB_TOKEN) {
             GITHUB_TOKEN = prompt("Bezpieczeństwo: Wklej swój GitHub Personal Access Token (PAT):");
