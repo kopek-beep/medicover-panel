@@ -231,7 +231,6 @@
     // ==========================================
     // 2. SPECJALIZACJE I DYNAMIKA LISTY
     // ==========================================
-    // Wszystkie możliwe specjalizacje wyciągnięte z logów Medicover
     const wszystkieSpecjalizacje = {
         "176": "Alergolog dorośli",
         "178": "Alergolog dorośli odczulanie",
@@ -299,7 +298,6 @@
         "76798": "Urologia - pobranie wymazu u mężczyzn przez pielęgniarkę"
     };
 
-    // Filtrujemy dostęp per profil (Dzieci/Dorośli/Kobiety)
     const dostepneDlaOsoby = {
         "KAMIL": ["176", "178", "11682", "2", "1190", "3", "99", "182", "5", "27962", "10864", "47068", "112", "9", "19046", "63748", "39836", "10", "87430", "192", "96", "16234", "62742", "16236", "486", "9976", "1586", "27964", "3004", "16", "198", "19054", "114", "28766", "163", "27158", "20056", "28770", "24", "25", "48914", "41", "52106", "23504", "22890", "30", "76798"],
         "MONIKA": ["176", "178", "11682", "2", "1190", "3", "99", "182", "5", "27962", "46066", "4800", "64948", "4798", "94448", "89834", "46068", "10244", "116730", "116732", "72380", "10864", "47068", "112", "9", "19046", "63748", "39836", "10", "87430", "192", "96", "16234", "62742", "16236", "486", "9976", "1586", "27964", "3004", "16", "198", "19054", "114", "28766", "163", "6254", "105898", "105900", "97064", "27158", "20056", "28770", "24", "25", "48914", "41", "52110", "52106", "23504", "22890"],
@@ -314,7 +312,6 @@
         "SZYMON": { color: "#d83b01", border: "#f6d5c6" }  
     };
 
-    // Odświeżanie specjalizacji (Z GWARANCJĄ ALFABETYCZNEGO UKŁADU W PRZEGLĄDARCE)
     const personSelect = document.getElementById('person');
     const serviceSelect = document.getElementById('service');
 
@@ -324,7 +321,6 @@
 
         serviceSelect.innerHTML = '';
 
-        // Tworzymy tablicę obiektów z nazwami, by poprawnie ułożyć je polskim alfabetem
         const opcje = dostepneID.map(id => ({ 
             id: id, 
             nazwa: wszystkieSpecjalizacje[id] || "ID: " + id 
@@ -379,7 +375,7 @@
 
     function addTask() {
         const person = document.getElementById('person').value;
-        const region = document.getElementById('region').value; // Zawsze "199"
+        const region = document.getElementById('region').value; 
         const service = document.getElementById('service').value;
 
         tasks.push({ person, region, service });
@@ -399,11 +395,12 @@
             yaml += `  check-${person.toLowerCase()}:\n    runs-on: ubuntu-latest\n    timeout-minutes: 5\n    steps:\n`;
             yaml += `      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n`;
             yaml += `      - run: pip install uv && uv sync\n`;
-            yaml += `      - name: Przywrocenie sesji (${person})\n        env:\n          MEDICOVER_SESSION: \${{ secrets.MEDICOVER_SESSION_${person} }}\n`;
+            // ZMIANA: Usunięto _${person} - używamy bazowych sekretów dla całego konta
+            yaml += `      - name: Przywrocenie sesji (${person})\n        env:\n          MEDICOVER_SESSION: \${{ secrets.MEDICOVER_SESSION }}\n`;
             yaml += `        run: mkdir -p data && echo "$MEDICOVER_SESSION" | base64 -d | tar -xz -C data\n`;
             yaml += `      - name: Szukaj (${person})\n        env:\n`;
-            yaml += `          MEDICOVER_USER: \${{ secrets.MEDICOVER_USER_${person} }}\n`;
-            yaml += `          MEDICOVER_PASS: \${{ secrets.MEDICOVER_PASS_${person} }}\n`;
+            yaml += `          MEDICOVER_USER: \${{ secrets.MEDICOVER_USER }}\n`;
+            yaml += `          MEDICOVER_PASS: \${{ secrets.MEDICOVER_PASS }}\n`;
             yaml += `          NOTIFIERS_TELEGRAM_TOKEN: \${{ secrets.NOTIFIERS_TELEGRAM_TOKEN }}\n`;
             yaml += `          NOTIFIERS_TELEGRAM_CHAT_ID: \${{ secrets.NOTIFIERS_TELEGRAM_CHAT_ID }}\n`;
             yaml += `        run: |\n`;
