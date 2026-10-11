@@ -6,56 +6,86 @@
     <title>Medicover Copilot Panel</title>
     <style>
         /* ==========================================
-           MICROSOFT FLUENT DESIGN / COPILOT STYLE
+           MICROSOFT COPILOT / FLUENT DESIGN 2 STYLE
            ========================================== */
         :root {
-            --bg-page: #faf9f8;
-            --bg-card: #ffffff;
+            --bg-page: #f3f2f1;
             --text-main: #242424;
             --text-secondary: #605e5c;
-            --border-light: #edebe9;
+            --border-light: rgba(225, 223, 221, 0.6);
             --primary-blue: #0f6cbd;
             --primary-hover: #115ea3;
-            --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.06), 0 0 2px rgba(0, 0, 0, 0.04);
-            --radius-main: 12px;
-            --radius-btn: 6px;
+            --shadow-soft: 0 8px 32px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.08);
+            --radius-main: 16px;
+            --radius-btn: 8px;
+            --gradient-copilot: linear-gradient(135deg, #115ea3 0%, #c239b3 50%, #00b4d8 100%);
+            --gradient-btn: linear-gradient(135deg, #0f6cbd 0%, #0078d4 100%);
         }
 
         body { 
-            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; 
+            /* Użycie czcionek systemowych z Windows 11 (Copilot) */
+            font-family: "Segoe UI Variable", "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg-page); 
             margin: 0; 
-            padding: 40px 20px; 
+            padding: 50px 20px; 
             color: var(--text-main); 
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        /* Kolorowe chmury w tle (Efekt AI Aura) */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -10%; left: -5%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(15, 108, 189, 0.12) 0%, transparent 70%);
+            z-index: -1;
+        }
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -10%; right: -5%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(194, 57, 179, 0.1) 0%, rgba(0, 180, 216, 0.08) 50%, transparent 70%);
+            z-index: -1;
         }
 
         .container { 
-            max-width: 800px; 
+            max-width: 850px; 
             margin: 0 auto; 
-            background: var(--bg-card); 
-            padding: 40px; 
+            background: rgba(255, 255, 255, 0.75); /* Półprzezroczyste tło */
+            backdrop-filter: blur(20px); /* Szronione szkło (Glassmorphism) */
+            -webkit-backdrop-filter: blur(20px);
+            padding: 45px; 
             border-radius: var(--radius-main); 
-            box-shadow: var(--shadow-card); 
+            box-shadow: var(--shadow-soft); 
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         h1 { 
             margin-top: 0;
-            font-size: 28px;
-            font-weight: 600;
-            background: linear-gradient(90deg, #0f6cbd 0%, #0078d4 50%, #00b4d8 100%);
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: var(--gradient-copilot);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         h2 { 
-            font-size: 18px; 
+            font-size: 17px; 
             font-weight: 600; 
             color: var(--text-main);
-            margin-top: 30px;
-            margin-bottom: 15px;
+            margin-top: 35px;
+            margin-bottom: 20px;
             border-bottom: 1px solid var(--border-light); 
-            padding-bottom: 10px; 
+            padding-bottom: 12px; 
         }
 
         .form-group { margin-bottom: 20px; }
@@ -70,101 +100,111 @@
 
         select, input { 
             width: 100%; 
-            padding: 10px 14px; 
+            padding: 12px 16px; 
             font-size: 14px; 
             font-family: inherit;
             color: var(--text-main);
             border: 1px solid #d1d1d1; 
             border-radius: var(--radius-btn); 
             box-sizing: border-box; 
-            background-color: #ffffff;
-            transition: all 0.2s ease;
+            background-color: rgba(255, 255, 255, 0.9);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.01);
         }
 
         select:focus, input:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 1px var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(15, 108, 189, 0.15); /* Niebieska poświata Microsoftu */
+            background-color: #ffffff;
         }
 
         select:disabled {
             background-color: #f3f2f1;
-            color: var(--text-secondary);
+            color: #a19f9d;
             cursor: not-allowed;
-            border-color: var(--border-light);
+            border-color: #e1dfdd;
         }
 
         .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
         .flex-row > div { flex: 1; min-width: 150px; }
 
         button { 
-            background-color: var(--primary-blue); 
-            color: white; 
+            font-family: inherit;
             border: none; 
-            padding: 10px 20px; 
+            padding: 12px 24px; 
             font-size: 14px; 
             font-weight: 600; 
             border-radius: var(--radius-btn); 
             cursor: pointer; 
-            transition: background-color 0.2s ease, transform 0.1s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        button:hover { background-color: var(--primary-hover); }
-        button:active { transform: scale(0.98); }
+        button:active { transform: scale(0.97); }
         
         button.btn-add {
             background-color: #ffffff;
             color: var(--primary-blue);
             border: 1px solid var(--primary-blue);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        button.btn-add:hover { background-color: #f3f2f1; }
+        button.btn-add:hover { 
+            background-color: #f3f2f1; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
 
         .task-list { 
             margin-top: 15px; 
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
         }
 
         .task-item { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding: 16px 20px; 
-            border-radius: 8px; 
-            background: #ffffff;
+            padding: 18px 24px; 
+            border-radius: var(--radius-btn); 
+            background: rgba(255, 255, 255, 0.8);
             border: 1px solid var(--border-light);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .task-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            background: #ffffff;
         }
 
-        .task-info { font-size: 14px; display: flex; align-items: center; gap: 12px;}
+        .task-info { font-size: 14px; display: flex; align-items: center; gap: 16px;}
         
         .task-tag { 
             display: inline-flex; 
             align-items: center;
             justify-content: center;
-            padding: 4px 12px; 
+            padding: 5px 14px; 
             border-radius: 20px; 
             font-size: 12px; 
-            font-weight: 700; 
+            font-weight: 600; 
             letter-spacing: 0.5px;
             color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .task-details { color: var(--text-secondary); }
+        .task-details { color: var(--text-secondary); line-height: 1.4; }
         .task-details b { color: var(--text-main); font-weight: 600; }
 
         .btn-delete {
             background: transparent;
             color: #d13438;
-            padding: 6px 12px;
-            border-radius: 4px;
+            padding: 8px 12px;
+            border-radius: 6px;
         }
         .btn-delete:hover {
             background: #fdf3f4;
@@ -173,34 +213,74 @@
 
         .btn-sync {
             width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            border-radius: 8px;
-            margin-top: 10px;
-            box-shadow: 0 4px 10px rgba(15, 108, 189, 0.2);
+            padding: 16px;
+            font-size: 15px;
+            border-radius: var(--radius-btn);
+            margin-top: 15px;
+            background: var(--gradient-btn);
+            color: white;
+            box-shadow: 0 4px 12px rgba(15, 108, 189, 0.25);
+        }
+        .btn-sync:hover {
+            box-shadow: 0 6px 16px rgba(15, 108, 189, 0.35);
+            filter: brightness(1.05);
         }
 
         .btn-load {
             width: 100%;
-            padding: 14px;
-            font-size: 16px;
-            border-radius: 8px;
-            margin-top: 10px;
-            background-color: #f3f2f1;
+            padding: 16px;
+            font-size: 15px;
+            border-radius: var(--radius-btn);
+            margin-top: 12px;
+            background-color: rgba(255, 255, 255, 0.6);
             color: var(--text-main);
-            border: 1px solid #d1d1d1;
+            border: 1px solid var(--border-light);
+            backdrop-filter: blur(5px);
+        }
+        .btn-load:hover { 
+            background-color: #ffffff; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        .btn-load:hover { background-color: #edebe9; }
-
-        #status { margin-top: 20px; font-weight: 600; text-align: center; font-size: 14px; }
+        #status { 
+            margin-top: 24px; 
+            font-weight: 600; 
+            text-align: center; 
+            font-size: 14px; 
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
         .syncing { opacity: 0.7; pointer-events: none; }
+        
+        .empty-state {
+            padding: 30px; 
+            text-align: center; 
+            color: var(--text-secondary); 
+            background: rgba(253, 253, 253, 0.5); 
+            border-radius: var(--radius-btn); 
+            border: 1px dashed #c8c6c4;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>✨ Medicover Copilot Panel</h1>
+    <h1>
+        <!-- Ikona Copilota (Sparkles) w SVG -->
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#115ea3" />
+                    <stop offset="50%" stop-color="#c239b3" />
+                    <stop offset="100%" stop-color="#00b4d8" />
+                </linearGradient>
+            </defs>
+            <path d="M19 8l-1.5-3.5L14 3l3.5-1.5L19 0l1.5 3.5L24 5l-3.5 1.5L19 8zm-8 16l-3-7-7-3 7-3 3-7 3 7 7 3-7 3-3 7zm0-5.5l1.5-3.5L16 12l-3.5-1.5L11 7l-1.5 3.5L6 12l3.5 1.5L11 18.5z"/>
+        </svg>
+        Medicover Copilot Panel
+    </h1>
 
     <h2>Dodaj nowe zadanie monitorowania</h2>
     <div class="flex-row">
@@ -224,15 +304,24 @@
             <select id="service"></select>
         </div>
     </div>
-    <button class="btn-add" onclick="addTask()">+ Dodaj do monitorowania</button>
+    <button class="btn-add" onclick="addTask()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Dodaj do monitorowania
+    </button>
 
     <h2>Aktywne skanery (Harmonogram)</h2>
     <div class="task-list" id="taskList"></div>
 
-    <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border-light);">
+    <hr style="margin: 45px 0 35px 0; border: 0; border-top: 1px solid var(--border-light);">
     
-    <button id="syncBtn" class="btn-sync" onclick="syncToGithub()">☁️ Zapisz i zaktualizuj system</button>
-    <button id="loadBtn" class="btn-load" onclick="loadFromGithub()">⬇️ Wczytaj aktualne dane z GitHuba</button>
+    <button id="syncBtn" class="btn-sync" onclick="syncToGithub()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+        Zapisz i zaktualizuj system
+    </button>
+    <button id="loadBtn" class="btn-load" onclick="loadFromGithub()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Wczytaj aktualne dane z GitHuba
+    </button>
     <div id="status"></div>
 </div>
 
@@ -319,11 +408,12 @@
         "SZYMON": ["76796", "192", "198", "114", "28766", "3", "23504", "22890", "19054", "47068", "112", "16234", "2", "163"]
     };
 
+    // Paleta Copilota
     const userTheme = {
-        "KAMIL": { color: "#0f6cbd", border: "#c7e0f4" },  
-        "MONIKA": { color: "#c239b3", border: "#f3d1ed" }, 
-        "ADAM": { color: "#107c41", border: "#cbe3d3" },   
-        "SZYMON": { color: "#d83b01", border: "#f6d5c6" }  
+        "KAMIL": { color: "#0f6cbd" },  
+        "MONIKA": { color: "#c239b3" }, 
+        "ADAM": { color: "#107c41" },   
+        "SZYMON": { color: "#d83b01" }  
     };
 
     const personSelect = document.getElementById('person');
@@ -362,7 +452,7 @@
         const list = document.getElementById('taskList');
         list.innerHTML = '';
         if (tasks.length === 0) {
-            list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-secondary); background: #fdfdfd; border-radius: 8px; border: 1px dashed #ccc;">Nie monitorujesz obecnie żadnych lekarzy.</div>';
+            list.innerHTML = '<div class="empty-state">Nie monitorujesz obecnie żadnych lekarzy.<br><span style="font-size: 12px; margin-top:5px; display:inline-block;">Dodaj specjalizację powyżej, aby rozpocząć.</span></div>';
             return;
         }
         tasks.forEach((task, index) => {
@@ -380,7 +470,9 @@
                         Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${wszystkieSpecjalizacje[task.service] || "ID: " + task.service}</b>
                     </span>
                 </div>
-                <button class="btn-delete" onclick="removeTask(${index})">Usuń</button>
+                <button class="btn-delete" onclick="removeTask(${index})">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
             `;
             list.appendChild(div);
         });
@@ -391,6 +483,13 @@
         const person = document.getElementById('person').value;
         const region = document.getElementById('region').value; 
         const service = document.getElementById('service').value;
+
+        // Sprawdzanie czy już jest na liście, żeby zapobiec duplikatom
+        const isDuplicate = tasks.some(t => t.person === person && t.service === service);
+        if(isDuplicate) {
+            alert("Ta osoba ma już ustawiony monitoring na tego lekarza!");
+            return;
+        }
 
         tasks.push({ person, region, service });
         renderTasks();
@@ -403,35 +502,35 @@
 
     function generateYaml() {
         let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '*/30 * * * *'\n  workflow_dispatch:\n\njobs:\n`;
-        const persons = [...new Set(tasks.map(t => t.person))];
-        
-        persons.forEach(person => {
-            yaml += `  check-${person.toLowerCase()}:\n    runs-on: ubuntu-latest\n    timeout-minutes: 5\n    steps:\n`;
-            yaml += `      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n`;
-            yaml += `      - run: pip install uv && uv sync\n`;
-            yaml += `      - name: Przywrocenie sesji (${person})\n        env:\n          MEDICOVER_SESSION: \${{ secrets.MEDICOVER_SESSION }}\n`;
-            yaml += `        run: mkdir -p data && echo "$MEDICOVER_SESSION" | base64 -d | tar -xz -C data\n`;
-            yaml += `      - name: Szukaj (${person})\n        env:\n`;
-            yaml += `          MEDICOVER_USER: \${{ secrets.MEDICOVER_USER }}\n`;
-            yaml += `          MEDICOVER_PASS: \${{ secrets.MEDICOVER_PASS }}\n`;
-            yaml += `          NOTIFIERS_TELEGRAM_TOKEN: \${{ secrets.NOTIFIERS_TELEGRAM_TOKEN }}\n`;
-            yaml += `          NOTIFIERS_TELEGRAM_CHAT_ID: \${{ secrets.NOTIFIERS_TELEGRAM_CHAT_ID }}\n`;
-            yaml += `        run: |\n`;
+        yaml += `  check-slots:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n`;
+        yaml += `      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n`;
+        yaml += `      - run: pip install uv && uv sync\n`;
+        yaml += `      - name: Przywrocenie sesji\n        env:\n          MEDICOVER_SESSION: \${{ secrets.MEDICOVER_SESSION }}\n`;
+        yaml += `        run: mkdir -p data && echo "$MEDICOVER_SESSION" | base64 -d | tar -xz -C data\n`;
+        yaml += `      - name: Szukaj wizyt\n        env:\n`;
+        yaml += `          MEDICOVER_USER: \${{ secrets.MEDICOVER_USER }}\n`;
+        yaml += `          MEDICOVER_PASS: \${{ secrets.MEDICOVER_PASS }}\n`;
+        yaml += `          NOTIFIERS_TELEGRAM_TOKEN: \${{ secrets.NOTIFIERS_TELEGRAM_TOKEN }}\n`;
+        yaml += `          NOTIFIERS_TELEGRAM_CHAT_ID: \${{ secrets.NOTIFIERS_TELEGRAM_CHAT_ID }}\n`;
+        yaml += `        run: |\n`;
+
+        tasks.forEach((t, index) => {
+            const nazwaLekarza = wszystkieSpecjalizacje[t.service] || "Lekarz";
+            yaml += `          uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service} -n telegram -t "[${t.person}] ${nazwaLekarza}"\n`;
             
-            const personTasks = tasks.filter(t => t.person === person);
-            personTasks.forEach(t => {
-                const nazwaLekarza = wszystkieSpecjalizacje[t.service] || "Lekarz";
-                yaml += `          uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service} -n telegram -t "[${t.person}] ${nazwaLekarza}"\n`;
-            });
-            yaml += `\n`;
+            if (index < tasks.length - 1) {
+                yaml += `          sleep 5\n`;
+            }
         });
+        
+        yaml += `\n`;
         return yaml;
     }
 
     async function getGithubToken() {
         let token = localStorage.getItem("medicover_gh_token");
         if (!token) {
-            token = prompt("Bezpieczeństwo: Wklej swój GitHub Personal Access Token (PAT):");
+            token = prompt("🔐 Bezpieczeństwo: Wklej swój GitHub Personal Access Token (PAT):");
             if (token) localStorage.setItem("medicover_gh_token", token);
         }
         return token;
@@ -452,9 +551,9 @@
             return;
         }
 
-        statusEl.innerHTML = "<span style='color: var(--primary-blue);'>Łączenie z usługami chmurowymi GitHub...</span>";
+        statusEl.style.background = "rgba(15, 108, 189, 0.1)";
+        statusEl.innerHTML = "<span style='color: var(--primary-blue);'>☁️ Łączenie z usługami chmurowymi GitHub...</span>";
         syncBtn.classList.add('syncing');
-        syncBtn.innerText = "Synchronizowanie...";
 
         const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/.github/workflows/checker.yml`;
         const headers = { "Authorization": `token ${GITHUB_TOKEN}`, "Accept": "application/vnd.github.v3+json" };
@@ -471,19 +570,21 @@
             const putRes = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body) });
             
             if (putRes.ok) {
-                statusEl.innerHTML = "<span style='color: #107c41;'>Sukces! Twój agent chmurowy został zaktualizowany.</span>";
+                statusEl.style.background = "rgba(16, 124, 65, 0.1)";
+                statusEl.innerHTML = "<span style='color: #107c41;'>✨ Sukces! Twój agent chmurowy został zaktualizowany. Zmiany wejdą w życie w ciągu 30 minut.</span>";
             } else {
-                statusEl.innerHTML = `<span style='color: #d13438;'>Błąd aktualizacji: ${(await putRes.json()).message}</span>`;
+                statusEl.style.background = "rgba(209, 52, 56, 0.1)";
+                statusEl.innerHTML = `<span style='color: #d13438;'>❌ Błąd aktualizacji: ${(await putRes.json()).message}</span>`;
                 if (putRes.status === 401) {
                     localStorage.removeItem("medicover_gh_token");
                     statusEl.innerHTML += "<br>Token był nieprawidłowy. Kliknij 'Zapisz' ponownie, aby wpisać poprawny token.";
                 }
             }
         } catch (error) {
-            statusEl.innerHTML = `<span style='color: #d13438;'>Błąd połączenia: ${error.message}</span>`;
+            statusEl.style.background = "rgba(209, 52, 56, 0.1)";
+            statusEl.innerHTML = `<span style='color: #d13438;'>❌ Błąd połączenia: ${error.message}</span>`;
         } finally {
             syncBtn.classList.remove('syncing');
-            syncBtn.innerText = "☁️ Zapisz i zaktualizuj system";
         }
     }
 
@@ -497,9 +598,9 @@
             return;
         }
 
-        statusEl.innerHTML = "<span style='color: var(--primary-blue);'>Pobieranie konfiguracji z GitHuba...</span>";
+        statusEl.style.background = "rgba(15, 108, 189, 0.1)";
+        statusEl.innerHTML = "<span style='color: var(--primary-blue);'>⬇️ Pobieranie konfiguracji z GitHuba...</span>";
         loadBtn.classList.add('syncing');
-        loadBtn.innerText = "Pobieranie...";
 
         const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/.github/workflows/checker.yml`;
         const headers = { "Authorization": `token ${GITHUB_TOKEN}`, "Accept": "application/vnd.github.v3+json" };
@@ -510,10 +611,9 @@
                 const data = await getRes.json();
                 const decodedContent = decodeURIComponent(escape(atob(data.content)));
                 
-                // Wyciągamy zadania na podstawie linijek kodu w yaml
                 const regex = /find-appointment -r (\d+) -s (\d+) -n telegram -t "\[(.*?)\]/g;
                 let match;
-                tasks = []; // Czyścimy obecną listę w pamięci
+                tasks = []; 
                 
                 while ((match = regex.exec(decodedContent)) !== null) {
                     const region = match[1];
@@ -523,20 +623,23 @@
                 }
                 
                 renderTasks();
-                statusEl.innerHTML = "<span style='color: #107c41;'>Sukces! Wczytano dane z pliku na GitHubie.</span>";
+                statusEl.style.background = "rgba(16, 124, 65, 0.1)";
+                statusEl.innerHTML = "<span style='color: #107c41;'>✨ Sukces! Wczytano najnowsze dane z GitHuba.</span>";
             } else if (getRes.status === 404) {
-                statusEl.innerHTML = "<span style='color: var(--text-secondary);'>Brak aktywnego pliku na GitHubie. Dodaj lekarzy i zapisz system.</span>";
+                statusEl.style.background = "rgba(96, 94, 92, 0.1)";
+                statusEl.innerHTML = "<span style='color: var(--text-secondary);'>Brak pliku na GitHubie. Dodaj lekarzy i kliknij Zapisz.</span>";
                 tasks = [];
                 renderTasks();
             } else {
-                statusEl.innerHTML = `<span style='color: #d13438;'>Błąd: ${(await getRes.json()).message}</span>`;
+                statusEl.style.background = "rgba(209, 52, 56, 0.1)";
+                statusEl.innerHTML = `<span style='color: #d13438;'>❌ Błąd: ${(await getRes.json()).message}</span>`;
                 if (getRes.status === 401) localStorage.removeItem("medicover_gh_token");
             }
         } catch (error) {
-            statusEl.innerHTML = `<span style='color: #d13438;'>Błąd połączenia: ${error.message}</span>`;
+            statusEl.style.background = "rgba(209, 52, 56, 0.1)";
+            statusEl.innerHTML = `<span style='color: #d13438;'>❌ Błąd połączenia: ${error.message}</span>`;
         } finally {
             loadBtn.classList.remove('syncing');
-            loadBtn.innerText = "⬇️ Wczytaj aktualne dane z GitHuba";
         }
     }
 
