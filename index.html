@@ -179,13 +179,6 @@
             margin-top: 10px;
             box-shadow: 0 4px 10px rgba(15, 108, 189, 0.2);
         }
-        
-        .btn-fetch {
-            background-color: #605e5c;
-            margin-top: 10px;
-            box-shadow: none;
-        }
-        .btn-fetch:hover { background-color: #484644; }
 
         #status { margin-top: 20px; font-weight: 600; text-align: center; font-size: 14px; }
         .syncing { opacity: 0.7; pointer-events: none; }
@@ -195,3 +188,81 @@
 
 <div class="container">
     <h1>✨ Medicover Copilot Panel</h1>
+
+    <h2>Dodaj nowe zadanie monitorowania</h2>
+    <div class="flex-row">
+        <div class="form-group">
+            <label>Członek rodziny</label>
+            <select id="person">
+                <option value="KAMIL">Kamil</option>
+                <option value="MONIKA">Monika</option>
+                <option value="ADAM">Adam</option>
+                <option value="SZYMON">Szymon</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Miasto</label>
+            <select id="region" disabled>
+                <option value="199">Łódź</option>
+            </select>
+        </div>
+        <div class="form-group" style="flex: 2;">
+            <label>Specjalizacja</label>
+            <select id="service"></select>
+        </div>
+    </div>
+    <button class="btn-add" onclick="addTask()">+ Dodaj do monitorowania</button>
+
+    <h2>Aktywne skanery (Harmonogram)</h2>
+    <div class="task-list" id="taskList"></div>
+
+    <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border-light);">
+    
+    <button id="syncBtn" class="btn-sync" onclick="syncToGithub()">Zapisz i zaktualizuj system</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    // ==========================================
+    // 1. KONFIGURACJA GITHUB
+    // ==========================================
+    const GITHUB_REPO = "kopek-beep/medicover"; 
+
+    // ==========================================
+    // 2. SPECJALIZACJE I DYNAMIKA LISTY
+    // ==========================================
+    const wszystkieSpecjalizacje = {
+        "176": "Alergolog dorośli",
+        "178": "Alergolog dorośli odczulanie",
+        "11682": "Badanie dna oka - dorośli",
+        "76796": "Badanie dna oka - dzieci",
+        "2": "Chirurg dorośli",
+        "1190": "Choroby zakaźne dorośli",
+        "3": "Dermatolog dorośli",
+        "99": "Diabetolog",
+        "182": "Dietetyk dorośli",
+        "5": "Endokrynolog dorośli",
+        "27962": "Endokrynolog dorośli - porada telefoniczna",
+        "46066": "Ginekolog - kwalifikacja do założenia wkładki",
+        "4800": "Ginekolog - prowadzenie ciąży",
+        "64948": "Ginekolog - założenie wkładki",
+        "4798": "Ginekolog dorośli",
+        "94448": "Ginekologia - awaryjna antykoncepcja - porada tel. u położnej",
+        "89834": "Ginekologia - badania w ciąży - porada telefoniczna u położnej",
+        "46068": "Ginekologia - infekcja intymna u położnej",
+        "10244": "Ginekologia - pobranie wymazu",
+        "116730": "Ginekologia - porada poporodowa u położnej - porada telefoniczna",
+        "116732": "Ginekologia - porada poporodowa u położnej",
+        "72380": "Ginekologia - przygotowanie do ciąży u położnej",
+        "10864": "Hematolog - Szpital",
+        "47068": "Higienizacja 4w1",
+        "112": "Higienizacja standardowa",
+        "9": "Internista",
+        "19046": "Internista - porada telefoniczna",
+        "63748": "Invisalign",
+        "39836": "Invisalign - leczenie",
+        "10": "Kardiolog dorośli",
+        "87430": "Kwalifikacja i szczepienie dorośli – specjalista med.",
+        "192": "Laryngolog dorośli",
+        "96": "Logopeda dorośli",
+        "16234": "Medicover Express - przeziębienie,
