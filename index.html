@@ -231,24 +231,80 @@
     // ==========================================
     // 2. SPECJALIZACJE I DYNAMIKA LISTY
     // ==========================================
-    // Wszystkie możliwe specjalizacje w systemie Medicover dla całej rodziny
+    // Wszystkie możliwe specjalizacje wyciągnięte z logów Medicover
     const wszystkieSpecjalizacje = {
-        "192": "Laryngolog",
-        "5": "Dermatolog",
-        "6": "Okulista",
-        "31": "Internista",
-        "11": "Ortopeda",
-        "42": "Pediatra", 
-        "88": "Kardiolog",
-        "178": "Alergolog - odczulanie" // <--- Dodana nowa specjalizacja
+        "176": "Alergolog dorośli",
+        "178": "Alergolog dorośli odczulanie",
+        "11682": "Badanie dna oka - dorośli",
+        "76796": "Badanie dna oka - dzieci",
+        "2": "Chirurg dorośli",
+        "1190": "Choroby zakaźne dorośli",
+        "3": "Dermatolog dorośli",
+        "99": "Diabetolog",
+        "182": "Dietetyk dorośli",
+        "5": "Endokrynolog dorośli",
+        "27962": "Endokrynolog dorośli - porada telefoniczna",
+        "46066": "Ginekolog - kwalifikacja do założenia wkładki",
+        "4800": "Ginekolog - prowadzenie ciąży",
+        "64948": "Ginekolog - założenie wkładki",
+        "4798": "Ginekolog dorośli",
+        "94448": "Ginekologia - awaryjna antykoncepcja - porada tel. u położnej",
+        "89834": "Ginekologia - badania w ciąży - porada telefoniczna u położnej",
+        "46068": "Ginekologia - infekcja intymna u położnej",
+        "10244": "Ginekologia - pobranie wymazu",
+        "116730": "Ginekologia - porada poporodowa u położnej - porada telefoniczna",
+        "116732": "Ginekologia - porada poporodowa u położnej",
+        "72380": "Ginekologia - przygotowanie do ciąży u położnej",
+        "10864": "Hematolog - Szpital",
+        "47068": "Higienizacja 4w1",
+        "112": "Higienizacja standardowa",
+        "9": "Internista",
+        "19046": "Internista - porada telefoniczna",
+        "63748": "Invisalign",
+        "39836": "Invisalign - leczenie",
+        "10": "Kardiolog dorośli",
+        "87430": "Kwalifikacja i szczepienie dorośli – specjalista med.",
+        "192": "Laryngolog dorośli",
+        "96": "Logopeda dorośli",
+        "16234": "Medicover Express - przeziębienie, grypa",
+        "62742": "Medicover Express - szcz. grypa - dorośli - specjalista med.",
+        "16236": "Medicover Express - szczepienia dorośli",
+        "486": "Medicover Express - szczepienia grypa",
+        "9976": "Medycyna podróży - dorośli",
+        "1586": "Medycyna Rodzinna - dorośli",
+        "27964": "Medycyna Rodzinna - dorośli - porada telefoniczna",
+        "3004": "Mykologia - pobranie u pielęgniarki",
+        "16": "Neurolog dorośli",
+        "198": "Okulista dorośli",
+        "19054": "Okulistyka - badanie wzroku",
+        "114": "Ortodonta",
+        "28766": "Ortodonta - leczenie",
+        "163": "Ortopeda dorośli",
+        "6254": "Pobranie HPV / Cytologia",
+        "105898": "Położna - infekcje pęcherza moczowego",
+        "105900": "Położna - infekcje pęcherza moczowego - porada telefoniczna",
+        "97064": "Położna - wizyta profilaktyczna",
+        "27158": "Poradnia Bólu Pleców i Układu Ruchu - dorośli",
+        "20056": "Poradnia Leczenia Boreliozy",
+        "28770": "Protetyk - leczenie",
+        "24": "Psychiatra dorośli",
+        "25": "Psycholog dorośli",
+        "48914": "Psycholog dorośli - porada telefoniczna",
+        "41": "Pulmonolog dorośli",
+        "52110": "Punkt Pobrań - ciężarne",
+        "52106": "Punkt Pobrań - dorośli",
+        "23504": "Stomatolog - leczenie",
+        "22890": "Stomatolog - przegląd",
+        "30": "Urolog dorośli",
+        "76798": "Urologia - pobranie wymazu u mężczyzn przez pielęgniarkę"
     };
 
-    // Która osoba ma dostęp do których ID lekarzy
+    // Filtrujemy dostęp per profil (Dzieci/Dorośli/Kobiety)
     const dostepneDlaOsoby = {
-        "KAMIL": ["192", "5", "6", "31", "11", "178"], // <--- Dodano 178 do profilu Kamila
-        "MONIKA": ["192", "5", "6", "31", "88", "178"], // <--- Dodano 178 do profilu Moniki
-        "ADAM": ["6", "42"], 
-        "SZYMON": ["192", "6", "42"]
+        "KAMIL": ["176", "178", "11682", "2", "1190", "3", "99", "182", "5", "27962", "10864", "47068", "112", "9", "19046", "63748", "39836", "10", "87430", "192", "96", "16234", "62742", "16236", "486", "9976", "1586", "27964", "3004", "16", "198", "19054", "114", "28766", "163", "27158", "20056", "28770", "24", "25", "48914", "41", "52106", "23504", "22890", "30", "76798"],
+        "MONIKA": ["176", "178", "11682", "2", "1190", "3", "99", "182", "5", "27962", "46066", "4800", "64948", "4798", "94448", "89834", "46068", "10244", "116730", "116732", "72380", "10864", "47068", "112", "9", "19046", "63748", "39836", "10", "87430", "192", "96", "16234", "62742", "16236", "486", "9976", "1586", "27964", "3004", "16", "198", "19054", "114", "28766", "163", "6254", "105898", "105900", "97064", "27158", "20056", "28770", "24", "25", "48914", "41", "52110", "52106", "23504", "22890"],
+        "ADAM": ["76796", "192", "198", "114", "28766", "3", "23504", "22890", "19054", "47068", "112", "16234", "2", "163"],
+        "SZYMON": ["76796", "192", "198", "114", "28766", "3", "23504", "22890", "19054", "47068", "112", "16234", "2", "163"]
     };
 
     const userTheme = {
@@ -258,7 +314,7 @@
         "SZYMON": { color: "#d83b01", border: "#f6d5c6" }  
     };
 
-    // Logika odświeżająca listę rozwijaną w zależności od wybranej osoby
+    // Odświeżanie specjalizacji (Z GWARANCJĄ ALFABETYCZNEGO UKŁADU W PRZEGLĄDARCE)
     const personSelect = document.getElementById('person');
     const serviceSelect = document.getElementById('service');
 
@@ -266,22 +322,25 @@
         const wybranaOsoba = personSelect.value;
         const dostepneID = dostepneDlaOsoby[wybranaOsoba] || [];
 
-        // Wyczyść obecną listę specjalizacji
         serviceSelect.innerHTML = '';
 
-        // Zbuduj nową listę tylko dla wybranej osoby
-        dostepneID.forEach(id => {
+        // Tworzymy tablicę obiektów z nazwami, by poprawnie ułożyć je polskim alfabetem
+        const opcje = dostepneID.map(id => ({ 
+            id: id, 
+            nazwa: wszystkieSpecjalizacje[id] || "ID: " + id 
+        }));
+        
+        opcje.sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl'));
+
+        opcje.forEach(opcja => {
             const option = document.createElement('option');
-            option.value = id;
-            option.text = wszystkieSpecjalizacje[id] || "ID: " + id;
+            option.value = opcja.id;
+            option.text = opcja.nazwa;
             serviceSelect.appendChild(option);
         });
     }
 
-    // Nasłuchuj zmian - kiedy zmienisz osobę na liście, odpal odświeżanie
     personSelect.addEventListener('change', odswiezSpecjalizacje);
-    
-    // Uruchom odświeżanie od razu przy starcie strony (żeby na liście były dane dla Kamila)
     odswiezSpecjalizacje();
 
     // ==========================================
