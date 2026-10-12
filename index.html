@@ -24,7 +24,6 @@
         }
 
         body { 
-            /* Użycie czcionek systemowych z Windows 11 (Copilot) */
             font-family: "Segoe UI Variable", "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg-page); 
             margin: 0; 
@@ -36,7 +35,6 @@
             box-sizing: border-box;
         }
 
-        /* Kolorowe chmury w tle (Efekt AI Aura) */
         body::before {
             content: '';
             position: absolute;
@@ -55,8 +53,8 @@
         .container { 
             max-width: 850px; 
             margin: 0 auto; 
-            background: rgba(255, 255, 255, 0.75); /* Półprzezroczyste tło */
-            backdrop-filter: blur(20px); /* Szronione szkło (Glassmorphism) */
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 45px; 
             border-radius: var(--radius-main); 
@@ -88,7 +86,7 @@
             padding-bottom: 12px; 
         }
 
-        .form-group { margin-bottom: 20px; }
+        .form-group { margin-bottom: 16px; }
         
         label { 
             display: block; 
@@ -115,7 +113,7 @@
         select:focus, input:focus {
             outline: none;
             border-color: var(--primary-blue);
-            box-shadow: 0 0 0 3px rgba(15, 108, 189, 0.15); /* Niebieska poświata Microsoftu */
+            box-shadow: 0 0 0 3px rgba(15, 108, 189, 0.15);
             background-color: #ffffff;
         }
 
@@ -126,7 +124,7 @@
             border-color: #e1dfdd;
         }
 
-        .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
+        .flex-row { display: flex; gap: 16px; flex-wrap: wrap; }
         .flex-row > div { flex: 1; min-width: 150px; }
 
         button { 
@@ -151,6 +149,7 @@
             color: var(--primary-blue);
             border: 1px solid var(--primary-blue);
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            margin-top: 10px;
         }
         button.btn-add:hover { 
             background-color: #f3f2f1; 
@@ -168,7 +167,7 @@
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding: 18px 24px; 
+            padding: 16px 20px; 
             border-radius: var(--radius-btn); 
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid var(--border-light);
@@ -177,7 +176,7 @@
         }
 
         .task-item:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
             background: #ffffff;
         }
@@ -268,7 +267,6 @@
 
 <div class="container">
     <h1>
-        <!-- Ikona Copilota (Sparkles) w SVG -->
         <svg width="32" height="32" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -283,6 +281,8 @@
     </h1>
 
     <h2>Dodaj nowe zadanie monitorowania</h2>
+    
+    <!-- Rząd 1: Pacjent, Miasto, Specjalizacja -->
     <div class="flex-row">
         <div class="form-group">
             <label>Członek rodziny</label>
@@ -304,6 +304,23 @@
             <select id="service"></select>
         </div>
     </div>
+
+    <!-- Rząd 2: Lekarz i Zakres dat -->
+    <div class="flex-row">
+        <div class="form-group" style="flex: 2;">
+            <label>Preferowany lekarz</label>
+            <input type="text" id="doctorName" value="Wszyscy" placeholder="np. Kowalski lub Wszyscy">
+        </div>
+        <div class="form-group">
+            <label>Data od</label>
+            <input type="date" id="startDate">
+        </div>
+        <div class="form-group">
+            <label>Data do (opcjonalnie)</label>
+            <input type="date" id="endDate">
+        </div>
+    </div>
+
     <button class="btn-add" onclick="addTask()">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
         Dodaj do monitorowania
@@ -402,14 +419,14 @@
         "76798": "Urologia - pobranie wymazu u mężczyzn przez pielęgniarkę"
     };
 
+    // Specjalizacje przypisane do osób
     const dostepneDlaOsoby = {
         "KAMIL": ["176", "178", "11682", "2", "1190", "3", "99", "182", "5", "27962", "10864", "47068", "112", "9", "19046", "63748", "39836", "10", "87430", "192", "96", "16234", "62742", "16236", "486", "9976", "1586", "27964", "3004", "16", "198", "19054", "114", "28766", "163", "27158", "20056", "28770", "24", "25", "48914", "41", "52106", "23504", "22890", "30", "76798"],
         "MONIKA": ["176", "178", "11682", "2", "1190", "3", "99", "182", "5", "27962", "46066", "4800", "64948", "4798", "94448", "89834", "46068", "10244", "116730", "116732", "72380", "10864", "47068", "112", "9", "19046", "63748", "39836", "10", "87430", "192", "96", "16234", "62742", "16236", "486", "9976", "1586", "27964", "3004", "16", "198", "19054", "114", "28766", "163", "6254", "105898", "105900", "97064", "27158", "20056", "28770", "24", "25", "48914", "41", "52110", "52106", "23504", "22890"],
-        "ADAM": ["200", "76796", "192", "198", "114", "28766", "3", "23504", "22890", "19054", "47068", "112", "16234", "2", "163"],
-        "SZYMON": ["200", "76796", "192", "198", "114", "28766", "3", "23504", "22890", "19054", "47068", "112", "16234", "2", "163"]
+        "ADAM": ["200", "76796"],
+        "SZYMON": ["200", "76796"]
     };
 
-    // Paleta Copilota
     const userTheme = {
         "KAMIL": { color: "#0f6cbd" },  
         "MONIKA": { color: "#c239b3" }, 
@@ -420,16 +437,41 @@
     const personSelect = document.getElementById('person');
     const serviceSelect = document.getElementById('service');
 
+    function getTodayString() {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function ustawDzisiejszaDate() {
+        document.getElementById('startDate').value = getTodayString();
+    }
+
     function odswiezSpecjalizacje() {
         const wybranaOsoba = personSelect.value;
+        const isChild = (wybranaOsoba === "ADAM" || wybranaOsoba === "SZYMON");
         const dostepneID = dostepneDlaOsoby[wybranaOsoba] || [];
 
         serviceSelect.innerHTML = '';
 
-        const opcje = dostepneID.map(id => ({ 
-            id: id, 
-            nazwa: wszystkieSpecjalizacje[id] || "ID: " + id 
-        }));
+        // Dynamiczne wykluczanie:
+        // Dzieci: brak pozycji ze słowem "dorośli"
+        // Dorośli: brak pozycji ze słowami "dzieci" lub "dziecięcy"
+        const opcje = dostepneID
+            .filter(id => {
+                const nazwa = (wszystkieSpecjalizacje[id] || "").toLowerCase();
+                if (isChild) {
+                    return !nazwa.includes("dorośli");
+                } else {
+                    return !nazwa.includes("dzieci") && !nazwa.includes("dziecięcy");
+                }
+            })
+            .map(id => ({ 
+                id: id, 
+                nazwa: wszystkieSpecjalizacje[id] || "ID: " + id 
+            }));
         
         opcje.sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl'));
 
@@ -443,6 +485,7 @@
 
     personSelect.addEventListener('change', odswiezSpecjalizacje);
     odswiezSpecjalizacje();
+    ustawDzisiejszaDate();
 
     // ==========================================
     // 3. LOGIKA APLIKACJI
@@ -463,13 +506,26 @@
             div.style.borderLeft = `5px solid ${theme.color}`;
             
             const cityName = task.region === "199" ? "Łódź" : task.region;
+            const docName = (task.doctorName && task.doctorName.toLowerCase() !== "wszyscy") ? task.doctorName : "Wszyscy";
+            
+            let dateRangeText = "od dziś (bez limitu)";
+            if (task.startDate && task.endDate) {
+                dateRangeText = `${task.startDate} do ${task.endDate}`;
+            } else if (task.startDate) {
+                dateRangeText = `od ${task.startDate}`;
+            } else if (task.endDate) {
+                dateRangeText = `do ${task.endDate}`;
+            }
 
             div.innerHTML = `
                 <div class="task-info">
                     <span class="task-tag" style="background-color: ${theme.color};">${task.person}</span>
-                    <span class="task-details">
-                        Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${wszystkieSpecjalizacje[task.service] || "ID: " + task.service}</b>
-                    </span>
+                    <div class="task-details">
+                        <div>Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${wszystkieSpecjalizacje[task.service] || "ID: " + task.service}</b></div>
+                        <div style="font-size: 12px; margin-top: 4px; color: var(--text-secondary);">
+                            Lekarz: <b>${docName}</b> &nbsp;&bull;&nbsp; Termin: <b>${dateRangeText}</b>
+                        </div>
+                    </div>
                 </div>
                 <button class="btn-delete" onclick="removeTask(${index})">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
@@ -484,16 +540,31 @@
         const person = document.getElementById('person').value;
         const region = document.getElementById('region').value; 
         const service = document.getElementById('service').value;
+        
+        let doctorInput = document.getElementById('doctorName').value.trim();
+        const doctorName = (doctorInput === "" || doctorInput.toLowerCase() === "wszyscy") ? "Wszyscy" : doctorInput;
+        
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
 
-        // Sprawdzanie czy już jest na liście, żeby zapobiec duplikatom
-        const isDuplicate = tasks.some(t => t.person === person && t.service === service);
-        if(isDuplicate) {
-            alert("Ta osoba ma już ustawiony monitoring na tego lekarza!");
+        const isDuplicate = tasks.some(t => 
+            t.person === person && 
+            t.service === service && 
+            (t.doctorName || "Wszyscy") === doctorName &&
+            (t.startDate || "") === startDate &&
+            (t.endDate || "") === endDate
+        );
+        if (isDuplicate) {
+            alert("Identyczne zadanie monitorowania już istnieje na liście!");
             return;
         }
 
-        tasks.push({ person, region, service });
+        tasks.push({ person, region, service, doctorName, startDate, endDate });
         renderTasks();
+
+        document.getElementById('doctorName').value = "Wszyscy";
+        ustawDzisiejszaDate();
+        document.getElementById('endDate').value = "";
     }
 
     function removeTask(index) {
@@ -517,7 +588,20 @@
 
         tasks.forEach((t, index) => {
             const nazwaLekarza = wszystkieSpecjalizacje[t.service] || "Lekarz";
-            yaml += `          uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service} -n telegram -t "[${t.person}] ${nazwaLekarza}"\n`;
+            let cmd = `          uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service}`;
+            
+            if (t.doctorName && t.doctorName.toLowerCase() !== "wszyscy") {
+                cmd += ` --doctor-name "${t.doctorName}"`;
+            }
+            if (t.startDate) {
+                cmd += ` -f "${t.startDate}"`;
+            }
+            if (t.endDate) {
+                cmd += ` -e "${t.endDate}"`;
+            }
+
+            cmd += ` -n telegram -t "[${t.person}] ${nazwaLekarza}"\n`;
+            yaml += cmd;
             
             if (index < tasks.length - 1) {
                 yaml += `          sleep 5\n`;
@@ -612,15 +696,29 @@
                 const data = await getRes.json();
                 const decodedContent = decodeURIComponent(escape(atob(data.content)));
                 
-                const regex = /find-appointment -r (\d+) -s (\d+) -n telegram -t "\[(.*?)\]/g;
-                let match;
-                tasks = []; 
+                tasks = [];
+                const lines = decodedContent.split('\n');
                 
-                while ((match = regex.exec(decodedContent)) !== null) {
-                    const region = match[1];
-                    const service = match[2];
-                    const person = match[3];
-                    tasks.push({ person, region, service });
+                for (let line of lines) {
+                    if (line.includes('find-appointment')) {
+                        const regionMatch = line.match(/-r\s+(\d+)/);
+                        const serviceMatch = line.match(/-s\s+(\d+)/);
+                        const personMatch = line.match(/-t\s+"\[(.*?)\]/);
+                        const docMatch = line.match(/--doctor-name\s+"([^"]+)"/);
+                        const startMatch = line.match(/-f\s+"([^"]+)"/);
+                        const endMatch = line.match(/-e\s+"([^"]+)"/);
+
+                        if (regionMatch && serviceMatch && personMatch) {
+                            tasks.push({
+                                region: regionMatch[1],
+                                service: serviceMatch[1],
+                                person: personMatch[1],
+                                doctorName: docMatch ? docMatch[1] : "Wszyscy",
+                                startDate: startMatch ? startMatch[1] : "",
+                                endDate: endMatch ? endMatch[1] : ""
+                            });
+                        }
+                    }
                 }
                 
                 renderTasks();
