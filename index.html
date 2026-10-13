@@ -224,16 +224,45 @@
         }
 
         select:disabled, input:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
         
-        /* Kolorowanie krawędzi pól w zależności od wybranej osoby */
         select#person { border-left-width: 6px; }
         select#person option { font-weight: 600; }
 
         .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
         .flex-row > div { flex: 1; min-width: 180px; }
+
+        .schedule-box {
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-element);
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .cron-preview {
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-top: 12px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .cron-badge {
+            font-family: monospace;
+            background: rgba(13, 110, 253, 0.1);
+            color: var(--primary-blue);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+        }
 
         button { 
             font-family: inherit;
@@ -287,7 +316,6 @@
             overflow: hidden;
         }
 
-        /* Kolorowy pasek po lewej stronie zadania */
         .task-item::before {
             content: '';
             position: absolute;
@@ -463,10 +491,45 @@
         Aktywuj Radar
     </button>
 
-    <h2>Aktywne Radary (Harmonogram)</h2>
+    <h2>Aktywne Radary (Lista zadań)</h2>
     <div class="task-list" id="taskList"></div>
 
-    <hr style="margin: 50px 0 40px 0; border: 0; border-top: 2px solid var(--border-color);">
+    <h2>Konfiguracja czasu pracy Radaru (Czas Polski)</h2>
+    <div class="schedule-box">
+        <div class="flex-row">
+            <div class="form-group">
+                <label>Częstotliwość sprawdzania</label>
+                <select id="scanInterval" onchange="updateScheduleSettings()">
+                    <option value="10">Co 10 minut (intensywne)</option>
+                    <option value="15">Co 15 minut (optymalne)</option>
+                    <option value="20">Co 20 minut</option>
+                    <option value="30" selected>Co 30 minut (bezpieczne)</option>
+                    <option value="60">Co 60 minut (oszczędne)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tryb pracy</label>
+                <select id="scanMode" onchange="updateScheduleSettings()">
+                    <option value="window" selected>Wybrane godziny (oszczędza limit)</option>
+                    <option value="24h">Całą dobę (24/7)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Start (Od godz.)</label>
+                <select id="hourStart" onchange="updateScheduleSettings()"></select>
+            </div>
+            <div class="form-group">
+                <label>Koniec (Do godz.)</label>
+                <select id="hourEnd" onchange="updateScheduleSettings()"></select>
+            </div>
+        </div>
+        <div class="cron-preview">
+            <span id="scheduleSummary">Podsumowanie czasu pracy...</span>
+            <span>Kod GitHub (UTC): <span class="cron-badge" id="cronPreviewText">*/30 * * * *</span></span>
+        </div>
+    </div>
+
+    <hr style="margin: 40px 0 30px 0; border: 0; border-top: 2px solid var(--border-color);">
     
     <button id="syncBtn" class="btn-sync" onclick="syncToGithub()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
@@ -586,7 +649,6 @@
         "SZYMON": ["200", "76796"]
     };
 
-    // Przypisane kolory akcentów dla członków rodziny
     const userTheme = {
         "KAMIL": { color: "#0d6efd" },  
         "MONIKA": { color: "#d63384" }, 
@@ -652,7 +714,163 @@
     ustawDzisiejszaDate();
 
     // ==========================================
-    // 3. LOGIKA APLIKACJI
+    // 3. OBSŁUGA HARMONOGRAMU (CZAS POLSKI -> UTC CRON)
+    // ==========================================
+    const hourStartSelect = document.getElementById('hourStart');
+    const hourEndSelect = document.getElementById('hourEnd');
+    const scanIntervalSelect = document.getElementById('scanInterval');
+    const scanModeSelect = document.getElementById('scanMode');
+
+    // Wypełnienie godzin 00:00 - 23:00
+    for (let h = 0; h < 24; h++) {
+        const label = String(h).padStart(2, '0') + ":00";
+        const opt1 = document.createElement('option');
+        opt1.value = h;
+        opt1.text = label;
+        hourStartSelect.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = h;
+        opt2.text = String(h).padStart(2, '0') + ":59";
+        hourEndSelect.appendChild(opt2);
+    }
+
+    // Pobranie aktualnego przesunięcia czasu polskiego względem UTC (np. +2 latem, +1 zimą)
+    function getPolandUtcOffsetHours() {
+        return -Math.round(new Date().getTimezoneOffset() / 60);
+    }
+
+    function initScheduleFromStorage() {
+        const saved = JSON.parse(localStorage.getItem('medicover_schedule')) || {
+            interval: "30",
+            mode: "window",
+            start: 7,
+            end: 23
+        };
+        scanIntervalSelect.value = saved.interval || "30";
+        scanModeSelect.value = saved.mode || "window";
+        hourStartSelect.value = saved.start !== undefined ? saved.start : 7;
+        hourEndSelect.value = saved.end !== undefined ? saved.end : 23;
+        updateScheduleSettings();
+    }
+
+    function buildCronExpression() {
+        const interval = parseInt(scanIntervalSelect.value, 10);
+        const mode = scanModeSelect.value;
+        const startPL = parseInt(hourStartSelect.value, 10);
+        const endPL = parseInt(hourEndSelect.value, 10);
+
+        const minPart = interval === 60 ? "0" : `*/${interval}`;
+
+        if (mode === "24h") {
+            return `${minPart} * * * *`;
+        }
+
+        // Wyliczamy wszystkie aktywne godziny w czasie polskim (obsługuje przejście przez północ, np. 07:00 -> 01:59)
+        const plHours = [];
+        let curr = startPL;
+        while (true) {
+            plHours.push(curr);
+            if (curr === endPL) break;
+            curr = (curr + 1) % 24;
+            if (plHours.length >= 24) break;
+        }
+
+        if (plHours.length === 24) {
+            return `${minPart} * * * *`;
+        }
+
+        const offset = getPolandUtcOffsetHours();
+        const utcHours = plHours.map(h => (h - offset + 24) % 24);
+
+        return `${minPart} ${utcHours.join(',')} * * *`;
+    }
+
+    function updateScheduleSettings() {
+        const mode = scanModeSelect.value;
+        hourStartSelect.disabled = (mode === "24h");
+        hourEndSelect.disabled = (mode === "24h");
+
+        const interval = scanIntervalSelect.value;
+        const startPL = parseInt(hourStartSelect.value, 10);
+        const endPL = parseInt(hourEndSelect.value, 10);
+
+        localStorage.setItem('medicover_schedule', JSON.stringify({
+            interval: interval,
+            mode: mode,
+            start: startPL,
+            end: endPL
+        }));
+
+        const cronExpr = buildCronExpression();
+        document.getElementById('cronPreviewText').textContent = cronExpr;
+
+        const offset = getPolandUtcOffsetHours();
+        const startLabel = String(startPL).padStart(2, '0') + ":00";
+        const endLabel = String(endPL).padStart(2, '0') + ":59";
+
+        if (mode === "24h") {
+            document.getElementById('scheduleSummary').innerHTML = 
+                `Skanowanie <b>całą dobę (24/7)</b> co <b>${interval} min</b>.`;
+        } else {
+            document.getElementById('scheduleSummary').innerHTML = 
+                `Aktywne od <b>${startLabel}</b> do <b>${endLabel}</b> czasu polskiego (UTC+${offset}), sprawdzanie co <b>${interval} min</b>.`;
+        }
+    }
+
+    function parseCronFromGithub(cronStr) {
+        const parts = cronStr.trim().split(/\s+/);
+        if (parts.length < 2) return;
+
+        const minPart = parts[0];
+        const hourPart = parts[1];
+
+        let interval = "30";
+        if (minPart === "0") {
+            interval = "60";
+        } else if (minPart.startsWith("*/")) {
+            interval = minPart.replace("*/", "");
+        }
+
+        if (["10", "15", "20", "30", "60"].includes(interval)) {
+            scanIntervalSelect.value = interval;
+        }
+
+        if (hourPart === "*") {
+            scanModeSelect.value = "24h";
+        } else {
+            scanModeSelect.value = "window";
+            const offset = getPolandUtcOffsetHours();
+            let utcHours = [];
+
+            if (hourPart.includes(",")) {
+                utcHours = hourPart.split(",").map(Number);
+            } else if (hourPart.includes("-")) {
+                const [s, e] = hourPart.split("-").map(Number);
+                let c = s;
+                while (true) {
+                    utcHours.push(c);
+                    if (c === e) break;
+                    c = (c + 1) % 24;
+                    if (utcHours.length >= 24) break;
+                }
+            } else if (!isNaN(parseInt(hourPart, 10))) {
+                utcHours = [parseInt(hourPart, 10)];
+            }
+
+            if (utcHours.length > 0) {
+                const plHours = utcHours.map(h => (h + offset + 24) % 24);
+                hourStartSelect.value = plHours[0];
+                hourEndSelect.value = plHours[plHours.length - 1];
+            }
+        }
+        updateScheduleSettings();
+    }
+
+    initScheduleFromStorage();
+
+    // ==========================================
+    // 4. LOGIKA ZADAŃ APLIKACJI
     // ==========================================
     let tasks = JSON.parse(localStorage.getItem('medicover_tasks')) || [];
 
@@ -741,7 +959,8 @@
     }
 
     function generateYaml() {
-        let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '*/30 * * * *'\n  workflow_dispatch:\n\njobs:\n`;
+        const cronExpr = buildCronExpression();
+        let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '${cronExpr}'\n  workflow_dispatch:\n\njobs:\n`;
         yaml += `  check-slots:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n`;
         yaml += `      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n`;
         yaml += `      - run: pip install uv && uv sync\n`;
@@ -794,7 +1013,7 @@
         const syncBtn = document.getElementById('syncBtn');
         
         if (tasks.length === 0) { 
-            alert("Nie masz żadnych zadań na liście. Radar zostanie wyłączony, ale pamiętaj, aby zatrzymać skrypt na GitHubie jeśli chcesz w pełni wyłączyć bota."); 
+            alert("Nie masz żadnych zadań na liście. Dodaj chociaż jedno zadanie, aby zapisać harmonogram."); 
             return; 
         }
 
@@ -817,14 +1036,14 @@
             if (getRes.ok) sha = (await getRes.json()).sha;
 
             const base64Content = btoa(unescape(encodeURIComponent(generateYaml())));
-            const body = { message: "Aktualizacja Radaru", content: base64Content };
+            const body = { message: "Aktualizacja Radaru i harmonogramu", content: base64Content };
             if (sha) body.sha = sha;
 
             const putRes = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body) });
             
             if (putRes.ok) {
                 statusEl.style.color = "#198754";
-                statusEl.innerHTML = "✨ Sukces! Twój system Radar został zaktualizowany w chmurze.";
+                statusEl.innerHTML = "✨ Sukces! Twój system Radar oraz godziny pracy zostały zaktualizowane w chmurze.";
             } else {
                 statusEl.style.color = "#dc3545";
                 statusEl.innerHTML = `❌ Błąd aktualizacji: ${(await putRes.json()).message}`;
@@ -864,6 +1083,12 @@
                 const data = await getRes.json();
                 const decodedContent = decodeURIComponent(escape(atob(data.content)));
                 
+                // Odczyt harmonogramu cron i przeliczenie z UTC na czas polski
+                const cronMatch = decodedContent.match(/cron:\s*'([^']+)'/);
+                if (cronMatch && cronMatch[1]) {
+                    parseCronFromGithub(cronMatch[1]);
+                }
+
                 tasks = [];
                 const lines = decodedContent.split('\n');
                 
@@ -891,7 +1116,7 @@
                 
                 renderTasks();
                 statusEl.style.color = "#198754";
-                statusEl.innerHTML = "✨ Sukces! Wczytano najnowsze dane z GitHuba.";
+                statusEl.innerHTML = "✨ Sukces! Wczytano najnowsze zadania i harmonogram z GitHuba.";
             } else if (getRes.status === 404) {
                 statusEl.style.color = "var(--text-secondary)";
                 statusEl.innerHTML = "Brak pliku na GitHubie. Dodaj lekarzy i kliknij Zapisz.";
