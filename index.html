@@ -151,7 +151,7 @@
         }
 
         .btn-run-now {
-            padding: 9px 16px;
+            padding: 9px 18px;
             font-size: 13px;
             font-weight: 700;
             background: var(--copilot-btn-gradient);
@@ -161,15 +161,6 @@
         }
         .btn-run-now:hover {
             filter: brightness(1.1);
-        }
-
-        .btn-refresh-status {
-            padding: 9px 12px;
-            font-size: 13px;
-            background: var(--bg-input);
-            color: var(--text-main);
-            border: 1px solid var(--border-input);
-            border-radius: 10px;
         }
 
         /* Przełącznik motywu */
@@ -552,7 +543,7 @@
                 width: 100%;
             }
             .btn-run-now {
-                flex: 1;
+                width: 100%;
             }
             .copilot-card {
                 padding: 14px;
@@ -625,12 +616,9 @@
     <div class="live-status-bar">
         <div class="live-status-info">
             <span class="status-dot" id="runDot"></span>
-            <span id="runStatusText">Status chmury: Kliknij odśwież lub wymuś skanowanie</span>
+            <span id="runStatusText">Status chmury: Oczekiwanie na połączenie z GitHubem...</span>
         </div>
         <div class="live-actions">
-            <button class="btn-refresh-status" onclick="checkLastRunStatus()" title="Sprawdź ostatni skan">
-                🔄 Status
-            </button>
             <button class="btn-run-now" id="runNowBtn" onclick="triggerWorkflowNow()">
                 ⚡ Skanuj teraz
             </button>
@@ -1182,7 +1170,9 @@
         return token;
     }
 
-    // 6. STATUS NA ŻYWO I RĘCZNE WYWOŁANIE SKANOWANIA
+    // 6. AUTOMATYCZNY STATUS NA ŻYWO I RĘCZNE WYWOŁANIE SKANOWANIA
+    let fastPollingTimeout = null;
+
     async function checkLastRunStatus() {
         const token = localStorage.getItem("medicover_gh_token");
         const dot = document.getElementById('runDot');
@@ -1193,12 +1183,11 @@
             return;
         }
 
-        text.textContent = "Sprawdzanie statusu na GitHubie...";
         const url = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/runs?per_page=1`;
         const headers = { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" };
 
         try {
-            const res = await fetch(url, { headers });
+            const res = await fetch(url, { headers, cache: "no-store" });
             if (!res.ok) {
                 dot.className = "status-dot error";
                 text.textContent = "Nie udało się pobrać statusu (sprawdź uprawnienia tokenu 'workflow')";
@@ -1219,6 +1208,8 @@
             if (run.status === "in_progress" || run.status === "queued") {
                 dot.className = "status-dot running";
                 text.innerHTML = `<b>Skanowanie w toku...</b> (uruchomiono ${timeAgo})`;
+                clearTimeout(fastPollingTimeout);
+                fastPollingTimeout = setTimeout(checkLastRunStatus, 10000);
             } else if (run.conclusion === "success") {
                 dot.className = "status-dot success";
                 text.innerHTML = `Ostatni skan: <b>${timeAgo}</b> &bull; Status: <b style="color:#107c41;">Sukces</b>`;
@@ -1252,8 +1243,9 @@
 
             if (res.status === 204 || res.ok) {
                 document.getElementById('runDot').className = "status-dot running";
-                document.getElementById('runStatusText').innerHTML = "<b>Zlecono skanowanie!</b> Maszyna startuje (odśwież za ok. 15s).";
-                setTimeout(checkLastRunStatus, 6000);
+                document.getElementById('runStatusText').innerHTML = "<b>Zlecono skanowanie!</b> Maszyna startuje...";
+                clearTimeout(fastPollingTimeout);
+                fastPollingTimeout = setTimeout(checkLastRunStatus, 6000);
             } else {
                 const resMaster = await fetch(url, {
                     method: "POST",
@@ -1262,8 +1254,9 @@
                 });
                 if (resMaster.status === 204 || resMaster.ok) {
                     document.getElementById('runDot').className = "status-dot running";
-                    document.getElementById('runStatusText').innerHTML = "<b>Zlecono skanowanie!</b> Maszyna startuje.";
-                    setTimeout(checkLastRunStatus, 6000);
+                    document.getElementById('runStatusText').innerHTML = "<b>Zlecono skanowanie!</b> Maszyna startuje...";
+                    clearTimeout(fastPollingTimeout);
+                    fastPollingTimeout = setTimeout(checkLastRunStatus, 6000);
                 } else {
                     alert("Błąd uruchamiania! Upewnij się, że Twój token GitHub posiada uprawnienie 'workflow' (Actions).");
                 }
@@ -1408,9 +1401,8 @@
     }
 
     renderTasks();
-    if (localStorage.getItem("medicover_gh_token")) {
-        checkLastRunStatus();
-    }
+    checkLastRunStatus();
+    setInterval(checkLastRunStatus, 30000);
 </script>
 
 </body>
