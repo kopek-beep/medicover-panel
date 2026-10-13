@@ -1,1255 +1,917 @@
-#!/usr/bin/env python
-# PYTHON_ARGCOMPLETE_OK
-
-# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
-# Copyright: (c) 2018, apqlzm - https://github.com/apqlzm/medihunter
-# Copyright: (c) 2025, SteveSteve24 - https://github.com/SteveSteve24/MediCzuwacz
-# Copyright: (c) 2025, rafsaf - https://github.com/rafsaf/medichaser
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-import argparse
-import base64
-import datetime
-import hashlib
-import json
-import logging
-import os
-import pathlib
-import random
-import re
-import select
-import string
-import sys
-import time
-import uuid
-from logging.handlers import RotatingFileHandler
-from typing import Any, cast
-from urllib.parse import parse_qs, quote_plus, unquote_plus, urlparse
-
-import argcomplete
-import requests
-import tenacity
-from dotenv import load_dotenv
-from fake_useragent import UserAgent
-from filelock import FileLock
-from requests.adapters import HTTPAdapter
-from rich.console import Console
-from rich.logging import RichHandler
-from selenium.webdriver.chrome.options import Options as ChromeOptions
-from selenium.webdriver.chrome.webdriver import WebDriver as ChromeDriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium_stealth import stealth
-from urllib3.util import Retry
-
-from notifications import (
-    gotify_notify,
-    prowl_notify,
-    pushbullet_notify,
-    pushover_notify,
-    telegram_notify,
-    xmpp_notify,
-)
-
-CURRENT_PATH = pathlib.Path(__file__).parent.resolve()
-DATA_PATH = CURRENT_PATH / "data"
-DATA_PATH.mkdir(parents=True, exist_ok=True)
-TOKEN_PATH = DATA_PATH / "medicover_token.json"
-TOKEN_LOCK_PATH = DATA_PATH / "medicover_token.lock"
-LOGIN_LOCK_PATH = DATA_PATH / "medicover_login.lock"
-DEVICE_ID_PATH = DATA_PATH / "device_id.json"
-DEVICE_UA_PATH = DATA_PATH / "device_ua.json"
-LOG_FILE = DATA_PATH / "medichaser.log"
-MEDICOVER_LOGIN_URL = "https://login-online24.medicover.pl"
-MEDICOVER_MAIN_URL = "https://online24.medicover.pl"
-MEDICOVER_API_URL = "https://api-gateway-online24.medicover.pl"
-
-DEFAULT_SLOT_SEARCH_TYPE: int = 0
-
-# Load environment variables
-load_dotenv()
-
-token_lock = FileLock(TOKEN_LOCK_PATH, timeout=60)
-login_lock = FileLock(LOGIN_LOCK_PATH, timeout=60)
-
-# Setup logging
-console = Console()
-
-logging.basicConfig(
-    level=os.environ.get("LOG_LEVEL", "INFO").upper(),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        RotatingFileHandler(
-            LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=5
-        ),  # 10 MB
-        RichHandler(rich_tracebacks=True, console=console),
-    ],
-)
-
-log = logging.getLogger("medichaser")
-
-retry_strategy = Retry(
-    total=10,
-    backoff_factor=1,
-    status_forcelist=[500, 502, 503, 504],
-)
-global_adapter = HTTPAdapter(max_retries=retry_strategy)
-
-
-class InvalidGrantError(Exception):
-    """Custom exception for invalid_grant error during token refresh."""
-
-    pass
-
-
-class ExpiredToken(Exception):
-    """Retryable custom exception for expired access token."""
-
-    pass
-
-
-class MFAError(Exception):
-    """Custom exception for MFA-related errors."""
-
-    pass
-
-
-class Authenticator:
-    def __init__(self, username: str, password: str) -> None:
-        self.username = username
-        self.password = password
-        self.session = requests.Session()
-        self.device_id = self._get_or_create_device_id()
-        self.session.cookies.set("__mcc", self.device_id)
-        self.session.mount("https://", global_adapter)
-        self.headers: dict[str, str] = {
-            "Accept": "application/json",
-            "Accept-Encoding": "gzip, deflate, br, zstd",
-            "Accept-Language": "pl",
-            "Connection": "keep-alive",
-            "Origin": MEDICOVER_MAIN_URL,
-            "Sec-Fetch-Dest": "empty",
-            "Sec-Fetch-Mode": "cors",
-            "Sec-Fetch-Site": "same-site",
-            "Sec-GPC": "1",
-            "Sec-Ch-Ua-Mobile": "?0",
-            "Sec-Ch-Ua-Platform": "Linux",
-            "User-Agent": self._get_or_create_ua(),
-        }
-        self.tokenA: str | None = None
-        self.tokenR: str | None = None
-        self.expires_at: int | None = None
-        self.driver: ChromeDriver | None = None
-
-    def _get_or_create_device_id(self) -> str:
-        """Gets the device ID from storage or creates a new one."""
-        if DEVICE_ID_PATH.exists():
-            try:
-                device_id_data = json.loads(DEVICE_ID_PATH.read_text())
-                device_id = device_id_data.get("device_id")
-                if device_id:
-                    log.info(f"Using existing device ID: {device_id}")
-                    return device_id  # type: ignore[no-any-return]
-            except (json.JSONDecodeError, KeyError) as e:
-                log.warning(
-                    f"Could not read device ID file, creating a new one. Error: {e}"
-                )
-        device_id = str(uuid.uuid4())
-        log.info(f"Creating and saving new device ID: {device_id}")
-        DEVICE_ID_PATH.write_text(json.dumps({"device_id": device_id}))
-        return device_id
-
-    def _get_or_create_ua(self) -> str:
-        """Gets the device UA from storage or creates a new one."""
-        if DEVICE_UA_PATH.exists():
-            try:
-                device_ua_data = json.loads(DEVICE_UA_PATH.read_text())
-                device_ua = device_ua_data.get("device_ua")
-                if device_ua:
-                    log.info(f"Using existing device UA: {device_ua}")
-                    return device_ua  # type: ignore[no-any-return]
-            except (json.JSONDecodeError, KeyError) as e:
-                log.warning(
-                    f"Could not read device UA file, creating a new one. Error: {e}"
-                )
-        ua = UserAgent(os="Linux")
-
-        device_ua = ua.random
-        log.info(f"Creating and saving new device UA: {device_ua}")
-        DEVICE_UA_PATH.write_text(json.dumps({"device_ua": device_ua}))
-        return device_ua
-
-    def _load_token_from_storage(self) -> bool:
-        """Loads token from the JSON file if it exists and is valid."""
-        if not TOKEN_PATH.exists():
-            return False
-
-        try:
-            with token_lock:
-                token_data = json.loads(TOKEN_PATH.read_text())
-                self.tokenA = token_data.get("access_token")
-                self.tokenR = token_data.get("refresh_token")
-                self.expires_at = token_data.get("expires_at")
-
-                if not all([self.tokenA, self.tokenR, self.expires_at]):
-                    log.warning("Token file is incomplete. Ignoring.")
-                    TOKEN_PATH.unlink()  # Delete corrupted token file
-                    return False
-
-                if self.expires_at and self.expires_at > int(time.time()):
-                    self.headers["Authorization"] = f"Bearer {self.tokenA}"
-                    log.info("Successfully loaded valid token from storage.")
-                    return True
-                else:
-                    log.info("Token from storage has expired.")
-                    return False
-        except (json.JSONDecodeError, KeyError) as e:
-            log.warning(f"Could not read token file, ignoring. Error: {e}")
-            if TOKEN_PATH.exists():
-                TOKEN_PATH.unlink()
-            return False
-
-    def login_requests(self) -> None:  # pragma: no cover
-        """Login using raw HTTP requests."""
-        log.info("Attempting login via requests.")
-
-        # Step 1: Initial GET to get cookies and CSRF token
-        # PKCE (Proof Key for Code Exchange) Flow
-        code_verifier = "".join(
-            random.choice(string.ascii_uppercase + string.digits) for _ in range(50)
-        )
-        code_challenge = (
-            base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest())
-            .decode()
-            .replace("=", "")
-        )
-        state = uuid.uuid4().hex + uuid.uuid4().hex
-
-        params: dict[str, str | int] = {
-            "client_id": "web",
-            "redirect_uri": f"{MEDICOVER_MAIN_URL}/signin-oidc",
-            "response_type": "code",
-            "scope": "openid offline_access profile",
-            "state": state,
-            "code_challenge": code_challenge,
-            "code_challenge_method": "S256",
-            "response_mode": "query",
-            "ui_locales": "en",
-            "app_version": "3.9.3-beta.1.8",
-            "device_id": self.device_id,
-            "device_name": "Chrome",
-            "ts": int(time.time() * 1000),
-        }
-
-        response = self.session.get(
-            f"{MEDICOVER_LOGIN_URL}/connect/authorize",
-            params=params,
-            headers=self.headers,
-            allow_redirects=False,
-        )
-        response.raise_for_status()
-        next_url = response.headers.get("Location")
-        if not next_url:
-            raise ValueError("Missing Location header in authorize response.")
-        time.sleep(2)
-
-        response = self.session.get(
-            next_url, headers=self.headers, allow_redirects=False
-        )
-        # Extract CSRF token from the HTML form
-        match = re.search(
-            r'<input name="__RequestVerificationToken" type="hidden" value="([^"]+)" />',
-            response.text,
-        )
-        if not match:
-            raise ValueError(
-                "Could not find CSRF token in login page: " + response.text
-            )
-        csrf_token = match.group(1)
-        parsed_url = urlparse(response.url)
-        query_params = parse_qs(parsed_url.query)
-        return_url_values = query_params.get("ReturnUrl")
-        if not return_url_values:
-            raise MFAError("ReturnUrl not found in login page query string.")
-        return_url = return_url_values[0]
-        # Step 2: POST credentials
-        login_data = {
-            "Input.ReturnUrl": return_url,
-            "Input.LoginType": "FullLogin",
-            "Input.Username": self.username,
-            "Input.Password": self.password,
-            "Input.Button": "login",
-            "__RequestVerificationToken": csrf_token,
-        }
-
-        time.sleep(5)
-
-        response = self.session.post(
-            f"{MEDICOVER_LOGIN_URL}/Account/Login?ReturnUrl={return_url}",
-            data=login_data,
-            headers={
-                **self.headers,
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-            },
-            allow_redirects=False,  # We want to handle redirects manually
-        )
-        log.info(
-            f"Login response status: {response.status_code}, text: {response.text}, URL: {response.url}"
-        )
-
-        # Step 3: Handle redirects and potential MFA
-        while response.status_code == 302:
-            redirect_url = response.headers.get("Location")
-            if not redirect_url:
-                raise ValueError("Missing Location header in login redirect response.")
-            if not redirect_url.startswith("https://"):
-                redirect_url = MEDICOVER_LOGIN_URL + redirect_url
-
-            log.info(f"Redirecting to: {redirect_url}")
-
-            # Check if redirect is to MFA
-            if "mfa" in redirect_url.lower():
-                log.info("MFA required, handling MFA process.")
-                response = self._handle_mfa(redirect_url)
-                continue
-
-            time.sleep(2)
-            # Follow the redirect
-            response = self.session.get(
-                redirect_url, headers=self.headers, allow_redirects=False
-            )
-
-            # Check if we have the final code
-            if "code" in redirect_url:
-                parsed_url = urlparse(redirect_url)
-                query_params = parse_qs(parsed_url.query)
-                code = query_params.get("code", [None])[0]
-                if code:
-                    self._exchange_code_for_token(code, code_verifier)
-                    return  # Success!
-
-        # If we are here, something went wrong
-        log.error(f"Login failed. Final status: {response.status_code}")
-        log.error(response.text)
-        raise ValueError("Login failed after handling redirects.")
-
-    def _handle_mfa(self, mfa_url: str) -> requests.Response:  # pragma: no cover
-        """Handles the MFA step of the login process."""
-        log.info("MFA required.")
-
-        # Get the MFA page
-        log.info(f"Fetching MFA page: {mfa_url}")
-        time.sleep(2)
-        response = self.session.get(
-            mfa_url,
-            headers=self.headers,
-            allow_redirects=False,
-        )
-        response.raise_for_status()
-
-        log.info("Csrf token and MfaCodeId extraction from MFA page.")
-        # Extract CSRF token from the HTML form
-        match = re.search(
-            r'<input name="__RequestVerificationToken" type="hidden" value="([^"]+)" />',
-            response.text,
-        )
-        if not match:
-            raise ValueError("Could not find CSRF token in mfa page: " + response.text)
-        csrf_token = match.group(1)
-
-        log.info(f"CSRF token for MFA: {csrf_token}")
-        # Extract MfaCodeId from the cookie
-        log.info("Extracting MfaCodeId from cookies: %s", self.session.cookies)
-
-        mfa_info_cookie_encoded = self.session.cookies.get("MfaInfo")
-        if not mfa_info_cookie_encoded:
-            raise MFAError("MfaInfo cookie not found.")
-
-        mfa_info_cookie = unquote_plus(mfa_info_cookie_encoded)
-
-        log.info(f"MfaInfo cookie: {mfa_info_cookie}")
-        try:
-            mfa_info = json.loads(mfa_info_cookie)
-            mfa_code_id = mfa_info.get("MfaCodeId")
-            if not mfa_code_id:
-                raise MFAError("MfaCodeId not found in MfaInfo cookie.")
-        except json.JSONDecodeError:
-            raise MFAError("Could not decode MfaInfo cookie.")
-        log.info(f"MfaCodeId: {mfa_code_id}")
-
-        # Prompt user for MFA code
-        log.info("Please enter the MFA code sent to your device and press Enter:")
-        rlist, _, _ = select.select([sys.stdin], [], [], 120)
-        if rlist:
-            mfa_code = sys.stdin.readline().rstrip("\n")
-        else:
-            log.error("Error getting MFA code input: Timeout expired.")
-            raise MFAError("Timeout! Failed to get MFA code input.")
-
-        if len(mfa_code) != 6 or not mfa_code.isdigit():
-            log.error("MFA code must be 6 digits.")
-            raise MFAError("Invalid MFA code format.")
-
-        parsed_url = urlparse(mfa_url)
-        query_params = parse_qs(parsed_url.query)
-        return_url_values = query_params.get("ReturnUrl")
-        if not return_url_values:
-            raise MFAError("ReturnUrl not found in MFA URL query string.")
-        return_url = return_url_values[0]
-
-        mfa_data = {
-            "Input.MfaCodeId": mfa_code_id,
-            "Input.ReturnUrl": return_url,
-            "Input.DeviceName": "Chrome",
-            "Input.MfaCode": mfa_code,
-            "Input.IsTrustedDevice": "true",
-            "Input.Channel": "SMS",
-            "Input.Button": "confirm",
-            "__RequestVerificationToken": csrf_token,
-        }
-
-        log.info("Submitting MFA code: %s", mfa_data)
-        time.sleep(2)
-
-        response = self.session.post(
-            f"{MEDICOVER_LOGIN_URL}/Account/Mfa?ReturnUrl={quote_plus(return_url)}",
-            data=mfa_data,
-            headers={
-                **self.headers,
-                "Content-Type": "application/x-www-form-urlencoded",
-                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-            },
-            allow_redirects=False,
-        )
-        log.info(
-            f"MFA response status: {response.status_code}, text: {response.text}, URL: {response.url}, headers: {response.headers}"
-        )
-        response.raise_for_status()
-        return response
-
-    def _exchange_code_for_token(
-        self, code: str, code_verifier: str
-    ) -> None:  # pragma: no cover
-        """Exchanges the authorization code for an access token."""
-        log.info("Exchanging authorization code for token.")
-        token_data = {
-            "client_id": "web",
-            "grant_type": "authorization_code",
-            "code": code,
-            "code_verifier": code_verifier,
-            "redirect_uri": f"{MEDICOVER_MAIN_URL}/signin-oidc",
-        }
-
-        response = self.session.post(
-            f"{MEDICOVER_LOGIN_URL}/connect/token",
-            data=token_data,
-            headers={
-                **self.headers,
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-        )
-        response.raise_for_status()
-
-        data = response.json()
-        if "error" in data:
-            error_description = data.get("error_description", data.get("error"))
-            raise ValueError(f"Failed to get token: {error_description}")
-
-        expires_in = data.get("expires_in")
-        expires_at = int(time.time()) + expires_in if expires_in else None
-        data["expires_at"] = expires_at
-
-        TOKEN_PATH.parent.mkdir(parents=True, exist_ok=True)
-        TOKEN_PATH.write_text(json.dumps(data, indent=4))
-
-        self.tokenA = data.get("access_token")
-        self.tokenR = data.get("refresh_token")
-        self.expires_at = data.get("expires_at")
-        self.headers["Authorization"] = f"Bearer {self.tokenA}"
-        log.info("Successfully obtained and saved tokens.")
-
-    @login_lock
-    @tenacity.retry(
-        stop=tenacity.stop_after_attempt(2),
-        wait=tenacity.wait_fixed(10),
-        retry=tenacity.retry_if_not_exception_type((MFAError, ValueError)),
-        reraise=True,
-    )
-    def login(self) -> None:
-        """Orchestrates the login process."""
-        try:
-            log.info("Attempting to load token from file.")
-            if self._load_token_from_storage():
-                log.info("Attempting to refresh token.")
-                self.refresh_token()
-                return
-
-        except InvalidGrantError:
-            log.warning(
-                "Token refresh failed with invalid grant. Proceeding to full login."
-            )
-        except Exception as e:
-            log.error(f"An unexpected error occurred during token refresh: {e}")
-
-        # Proceed with full login
-        if os.environ.get("SELENIUM_LOGIN"):
-            self.login_selenium()
-        else:
-            self.login_requests()
-
-    def _init_driver(self) -> ChromeDriver:
-        """Initializes the Selenium ChromeDriver if it's not already running."""
-        if self.driver is None:
-            options = ChromeOptions()
-            options.add_argument("--headless")  # Run in headless mode
-            options.add_argument("--disable-gpu")
-            options.add_argument("--no-sandbox")
-            options.add_argument("--disable-dev-shm-usage")
-            options.add_argument(f"user-data-dir={DATA_PATH / 'chrome_profile'}")
-            self.driver = ChromeDriver(options=options)
-            stealth(
-                self.driver,
-                languages=["pl-PL", "pl"],
-                vendor="Google Inc.",
-                platform="Linux",
-                webgl_vendor="Intel Inc.",
-                renderer="Intel Iris OpenGL Engine",
-                fix_hairline=True,
-            )
-            ua = self.driver.execute_cdp_cmd("Browser.getVersion", {})[
-                "userAgent"
-            ].replace("HeadlessChrome", "Chrome")
-            self.headers["User-Agent"] = ua
-
-            log.info(f"Creating and saving new device UA: {ua}")
-            DEVICE_UA_PATH.write_text(json.dumps({"device_ua": ua}))
-
-            log.info(f"Using User-Agent: {ua}")
-
-        assert self.driver is not None
-        return self.driver
-
-    def _quit_driver(self) -> None:
-        """Quits the Selenium ChromeDriver if it's running."""
-        if self.driver:
-            self.driver.quit()
-            self.driver = None
-
-    @token_lock
-    def refresh_token(self) -> None:
-        """Refresh the access token using the refresh token."""
-        if (
-            self.tokenA
-            and self.tokenR
-            and self.expires_at
-            and self.expires_at > int(time.time())
-        ):
-            log.info("access token is still valid, no need to refresh.")
-            return
-
-        if not self.tokenR:
-            log.warning("No refresh token available, cannot refresh access token.")
-            return
-
-        log.info("Refreshing access token...")
-        refresh_token_data = {
-            "grant_type": "refresh_token",
-            "refresh_token": self.tokenR,
-            "scope": "openid offline_access profile",
-            "client_id": "web",
-        }
-        if "Authorization" in self.headers:
-            del self.headers["Authorization"]  # Remove old token if present
-
-        # Use the refresh token to get a new access token
-        response = self.session.post(
-            f"{MEDICOVER_LOGIN_URL}/connect/token",
-            data=refresh_token_data,
-            headers=self.headers,
-            allow_redirects=False,
-        )
-
-        data = response.json()
-        if "error" in data:
-            error = data.get("error")
-            if error == "invalid_grant":
-                log.error(
-                    "Refresh token is invalid or expired. Deleting token file and re-authenticating."
-                )
-                if TOKEN_PATH.exists():
-                    TOKEN_PATH.unlink()
-                raise InvalidGrantError(
-                    "Invalid grant: refresh token is likely expired or revoked."
-                )
-            raise ValueError(
-                f"Failed to refresh token: {response.status_code} {data.get('error_description', response.text)}"
-            )
-
-        # manually set expires_at
-        expires_in = data.get("expires_in")
-        expires_at = int(time.time()) + expires_in if expires_in else None
-        data["expires_at"] = expires_at
-
-        TOKEN_PATH.parent.mkdir(parents=True, exist_ok=True)
-        TOKEN_PATH.write_text(json.dumps(data, indent=4))
-
-        self.tokenA = data.get("access_token")
-        self.tokenR = data.get("refresh_token")
-        self.expires_at = data.get("expires_at")
-        self.headers["Authorization"] = f"Bearer {self.tokenA}"
-
-    def _get_token_from_selenium_storage(self) -> bool:
-        """Retrieves token from browser's localStorage."""
-        driver = self._init_driver()
-        try:
-            token_data = driver.execute_script(
-                f"return localStorage.getItem('oidc.user:{MEDICOVER_LOGIN_URL}/:web');"
-            )
-            if not token_data:
-                log.warning("Token not found in localStorage.")
-                return False
-
-            token_json = json.loads(token_data)
-            TOKEN_PATH.parent.mkdir(parents=True, exist_ok=True)
-            TOKEN_PATH.write_text(json.dumps(token_json, indent=4))
-
-            self.tokenA = token_json.get("access_token")
-            self.tokenR = token_json.get("refresh_token")
-            self.expires_at = token_json.get("expires_at")
-            self.headers["Authorization"] = f"Bearer {self.tokenA}"
-            log.info("Successfully retrieved token from localStorage.")
-            return True
-        except Exception as e:
-            log.error(f"Error retrieving token from localStorage: {e}")
-            log.error(driver.page_source)
-            return False
-
-    def login_selenium(self) -> None:  # pragma: no cover
-        log.info("No valid saved token found, attempting browser login.")
-        self._quit_driver()
-        driver = self._init_driver()
-        wait = WebDriverWait(driver, 8)
-
-        driver.get(MEDICOVER_LOGIN_URL)
-
-        try:
-            # Wait for a URL that indicates we are past the initial redirect
-            wait.until(
-                EC.any_of(
-                    EC.url_contains("/Account/Login"),
-                    EC.url_contains("/home"),
-                    EC.url_contains("signin-oidc"),
-                    EC.url_contains("/signout-callback-oidc"),
-                )
-            )
-        except Exception:
-            log.error("Page did not redirect to a known login or home URL.")
-            log.error(driver.page_source)
-            self._quit_driver()
-            raise
-
-        time.sleep(2)  # Allow time for the page to load
-
-        current_url = driver.current_url
-        log.debug(f"Current URL: {current_url}")
-
-        if "/Account/Login?" in current_url:
-            log.info("On login page, proceeding with login.")
-        elif "/signout-callback-oidc" in current_url:
-            log.info("On signout-callback-oidc page, proceeding with login.")
-            driver.get(f"{MEDICOVER_LOGIN_URL}/Account/Login")
-        else:
-            log.info("Already logged in or on a trusted device. Fetching token...")
-            time.sleep(5)  # Wait for local storage to be populated
-            if self._get_token_from_selenium_storage():
-                self._quit_driver()
-                return
-            else:
-                log.warning(
-                    "Failed to get token from storage, proceeding with manual login."
-                )
-
-        # --- Standard Login Flow ---
-        try:
-            wait.until(EC.presence_of_element_located((By.ID, "cmpwrapper")))
-            driver.execute_script(
-                "document.getElementById('cmpwrapper').remove(); document.body.style.overflow = 'auto';"
-            )
-            log.info("Attempted to remove consent manager overlay")
-        except Exception:
-            log.warning(
-                "Could not remove consent manager overlay, or it was not present."
-            )
-
-        try:
-            username_field = wait.until(
-                EC.presence_of_element_located((By.ID, "usernameInput"))
-            )
-            password_field = wait.until(
-                EC.presence_of_element_located((By.ID, "passwordInput"))
-            )
-            username_field.send_keys(self.username)
-            password_field.send_keys(self.password)
-            login_button = wait.until(
-                EC.element_to_be_clickable((By.ID, "login-button"))
-            )
-            login_button.click()
-        except Exception as e:
-            log.error(f"Error during login form submission: {e}")
-            log.error(driver.page_source)
-            self._quit_driver()
-            raise
-
-        # --- MFA or Final Redirect ---
-        try:
-            wait.until(
-                EC.any_of(
-                    EC.url_contains("/home"),
-                    EC.presence_of_element_located((By.CLASS_NAME, "mfa-pin-group")),
-                )
-            )
-        except Exception:
-            log.error("Did not redirect to MFA or home page.")
-            log.error(driver.page_source)
-            self._quit_driver()
-            raise
-
-        if "/home" in driver.current_url:
-            log.info("Redirected to signin-oidc, MFA likely skipped. Fetching token.")
-            time.sleep(5)  # Wait for local storage to be populated
-            if self._get_token_from_selenium_storage():
-                self._quit_driver()
-                return
-            else:
-                log.error("Failed to get token after signin-oidc redirect.")
-                self._quit_driver()
-                raise ValueError("Failed to retrieve token after signin-oidc redirect.")
-
-        # --- MFA Flow ---
-        log.info("MFA page loaded")
-        try:
-            wait.until(EC.presence_of_element_located((By.ID, "cmpwrapper")))
-            driver.execute_script(
-                "document.getElementById('cmpwrapper').remove(); document.body.style.overflow = 'auto';"
-            )
-            log.info("Attempted to remove consent manager overlay on MFA page")
-        except Exception:
-            log.warning("Could not remove consent manager overlay on MFA page.")
-
-        log.info("Please enter the MFA code sent to your device and press Enter:")
-        rlist, _, _ = select.select([sys.stdin], [], [], 60)
-        if rlist:
-            mfa_code = sys.stdin.readline().rstrip("\n")
-        else:
-            log.error("Error getting MFA code input: Timeout expired.")
-            self._quit_driver()
-            raise MFAError("Timeout! Failed to get MFA code input.")
-
-        if len(mfa_code) != 6 or not mfa_code.isdigit():
-            log.error("MFA code must be 6 digits.")
-            self._quit_driver()
-            raise MFAError("Invalid MFA code format.")
-
-        mfa_inputs = driver.find_elements(By.CSS_SELECTOR, "div.mfa-pin-group input")
-        for i in range(6):
-            mfa_inputs[i].send_keys(mfa_code[i])
-
-        try:
-            trusted_device_checkbox = wait.until(
-                EC.element_to_be_clickable((By.ID, "isTrustedDeviceCheckbox"))
-            )
-            trusted_device_checkbox.click()
-            mfa_button = wait.until(EC.element_to_be_clickable((By.ID, "mfa-button")))
-            mfa_button.click()
-        except Exception as e:
-            log.error(f"Error clicking MFA button: {e}")
-            log.error(driver.page_source)
-            self._quit_driver()
-            raise MFAError("Failed to submit MFA code.")
-
-        time.sleep(5)  # Wait for the page to fully load and token to be stored
-        if not self._get_token_from_selenium_storage():
-            log.error("Failed to retrieve token after MFA.")
-            self._quit_driver()
-            raise MFAError("Failed to retrieve token after MFA.")
-
-        self._quit_driver()
-
-
-class AppointmentFinder:
-    def __init__(self, session: requests.Session, headers: dict[str, str]) -> None:
-        self.session = session
-        self.headers = headers
-
-    def http_get(self, url: str, params: dict[str, Any]) -> dict[str, Any]:
-        response = self.session.get(url, headers=self.headers, params=params)
-        if response.status_code in [401, 403]:
-            log.error("Unauthorized access error: refreshing token.")
-            raise ExpiredToken("Access token expired or invalid")
-        elif response.status_code == 200:
-            return cast(dict[str, Any], response.json())
-        else:
-            log.error(f"Error {response.status_code}: {response.text}")
-            return {}
-
-    def find_appointments(
-        self,
-        region: int,
-        specialty: list[int],
-        clinic: int | None,
-        start_date: datetime.date,
-        end_date: datetime.date | None,
-        language: int | None,
-        doctor: int | None = None,
-        slot_search_type: int | str = DEFAULT_SLOT_SEARCH_TYPE,
-    ) -> list[dict[str, Any]]:
-        appointment_url = (
-            f"{MEDICOVER_API_URL}/appointments/api/search-appointments/slots"
-        )
-        params: dict[str, Any] = {
-            "RegionIds": region,
-            "SpecialtyIds": specialty,
-            "ClinicIds": clinic,
-            "Page": 1,
-            "PageSize": 5000,
-            "StartTime": start_date.isoformat(),
-            "SlotSearchType": slot_search_type,
-            "VisitType": "Center",
-        }
-
-        if language:
-            params["DoctorLanguageIds"] = language
-
-        if doctor:
-            params["DoctorIds"] = doctor
-
-        response_json = self.http_get(appointment_url, params)
-
-        items: list[dict[str, Any]] = response_json.get("items", [])
-
-        if end_date:
-            items = [
-                x
-                for x in items
-                if x.get("appointmentDate")
-                and datetime.datetime.fromisoformat(x["appointmentDate"]).date()
-                <= end_date
-            ]
-
-        return items
-
-    def find_filters(
-        self,
-        region: int | None = None,
-        specialty: list[int] | None = None,
-        slot_search_type: int | str = DEFAULT_SLOT_SEARCH_TYPE,
-    ) -> dict[str, Any]:
-        filters_url = (
-            f"{MEDICOVER_API_URL}/appointments/api/search-appointments/filters"
-        )
-
-        params: dict[str, Any] = {"SlotSearchType": slot_search_type}
-        if region:
-            params["RegionIds"] = region
-        if specialty:
-            params["SpecialtyIds"] = specialty
-
-        response = self.http_get(filters_url, params)
-        return response
-
-
-class Notifier:
-    @staticmethod
-    def format_appointments(appointments: list[dict[str, Any]]) -> str:
-        """Format appointments into a human-readable string."""
-        if not appointments:
-            return "No appointments found."
-
-        # Bierzemy tylko pierwszą, najbliższą wizytę
-        first_appointment = appointments[0]
-        
-        date = first_appointment.get("appointmentDate", "N/A")
-        clinic_info = first_appointment.get("clinic", {}) or {}
-        clinic = clinic_info.get("name", "N/A")
-        doctor_info = first_appointment.get("doctor", {}) or {}
-        doctor = doctor_info.get("name", "N/A")
-        
-        message = (
-            f"📅 Termin: {date}\n"
-            f"🏥 Klinika: {clinic}\n"
-            f"👨‍⚕️ Lekarz: {doctor}\n"
-            + "--------------------------------------------------"
-        )
-        
-        # Jeśli jest więcej wizyt, doklejamy informację na dole
-        if len(appointments) > 1:
-            dodatkowe = len(appointments) - 1
-            message += f"\n💡 (+ {dodatkowe} innych wolnych)"
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediRadar Panel</title>
+    <style>
+        /* ==========================================
+           MEDIRADAR - ZAAWANSOWANY DESIGN (JASNY/CIEMNY)
+           ========================================== */
+        :root {
+            /* Tryb Jasny (Domyślny) */
+            --bg-page: #e9ecef;
+            --bg-container: rgba(255, 255, 255, 0.85);
+            --bg-element: rgba(255, 255, 255, 0.95);
+            --text-main: #212529;
+            --text-secondary: #495057;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --input-border: #ced4da;
+            --primary-blue: #0d6efd;
+            --primary-hover: #0b5ed7;
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.12);
+            --gradient-title: linear-gradient(135deg, #0d6efd 0%, #6f42c1 50%, #0dcaf0 100%);
+            --btn-sync-grad: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            --aurora-1: rgba(13, 110, 253, 0.15);
+            --aurora-2: rgba(111, 66, 193, 0.15);
+            --empty-bg: rgba(248, 249, 250, 0.8);
+            --empty-border: #adb5bd;
             
-        return message
+            --radius-main: 24px;
+            --radius-element: 12px;
+            --transition-speed: 0.3s;
+        }
 
-    @staticmethod
-    @tenacity.retry(
-        stop=tenacity.stop_after_attempt(10),
-        wait=tenacity.wait_exponential(multiplier=2, min=1),
-        reraise=True,
-    )
-    def send_notification(
-        notifier: str | None,
-        title: str | None,
-        appointments: list[dict[str, Any]] | None = None,
-        message: str | None = None,
-    ) -> None:
-        """Send a notification with formatted appointments or custom message.
+        [data-theme="dark"] {
+            /* Tryb Ciemny */
+            --bg-page: #121212;
+            --bg-container: rgba(30, 30, 30, 0.85);
+            --bg-element: rgba(45, 45, 45, 0.95);
+            --text-main: #f8f9fa;
+            --text-secondary: #adb5bd;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --input-border: #495057;
+            --primary-blue: #3d8bfd;
+            --primary-hover: #6ea8fe;
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.5);
+            --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.7);
+            --gradient-title: linear-gradient(135deg, #3d8bfd 0%, #d63384 50%, #0dcaf0 100%);
+            --btn-sync-grad: linear-gradient(135deg, #3d8bfd 0%, #0d6efd 100%);
+            --aurora-1: rgba(61, 139, 253, 0.1);
+            --aurora-2: rgba(214, 51, 132, 0.1);
+            --empty-bg: rgba(33, 37, 41, 0.8);
+            --empty-border: #6c757d;
+        }
 
-        Args:
-            notifier: The notification service to use (e.g., 'pushbullet', 'telegram').
-            title: The notification title.
-            appointments: Optional list of appointments to format and send.
-            message: Optional custom message to send. If both appointments and message
-                    are provided, message takes precedence.
-        """
-        if message is None:
-            if appointments is None:
-                log.warning("No message or appointments provided for notification.")
-                return
-            message = Notifier.format_appointments(appointments)
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-page); 
+            margin: 0; 
+            padding: 50px 20px; 
+            color: var(--text-main); 
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+            box-sizing: border-box;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
 
-        if notifier is None:
-            log.info("No notifier specified, skipping notification.")
-            return
+        /* Dynamiczne tło (Aura) */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 60vw; height: 60vw;
+            z-index: -1;
+            filter: blur(100px);
+            transition: background var(--transition-speed);
+            border-radius: 50%;
+        }
+        body::before {
+            top: -20%; left: -10%;
+            background: radial-gradient(circle, var(--aurora-1) 0%, transparent 70%);
+        }
+        body::after {
+            bottom: -20%; right: -10%;
+            background: radial-gradient(circle, var(--aurora-2) 0%, transparent 70%);
+        }
 
-        log.info("Sending notification to %s with title: %s", notifier, title)
-        if notifier == "pushbullet":
-            pushbullet_notify(message, title)
-        elif notifier == "pushover":
-            pushover_notify(message, title)
-        elif notifier == "telegram":
-            telegram_notify(message, title)
-        elif notifier == "xmpp":
-            xmpp_notify(message)
-        elif notifier == "gotify":
-            gotify_notify(message, title)
-        elif notifier == "prowl":
-            prowl_notify(message, title)
-        log.info("Notification sent successfully.")
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: var(--bg-container);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            padding: 50px; 
+            border-radius: var(--radius-main); 
+            box-shadow: var(--shadow-soft); 
+            border: 1px solid var(--border-color);
+            transition: background var(--transition-speed), border var(--transition-speed), box-shadow var(--transition-speed);
+            position: relative;
+        }
+
+        /* Przełącznik motywu */
+        .theme-switch-wrapper {
+            position: absolute;
+            top: 40px;
+            right: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .theme-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        .theme-switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "☀️";
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #495057;
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+            content: "🌙";
+            background-color: #2d2d2d;
+        }
+
+        h1 { 
+            margin-top: 0;
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: var(--gradient-title);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h2 { 
+            font-size: 18px; 
+            font-weight: 700; 
+            color: var(--text-main);
+            margin-top: 40px;
+            margin-bottom: 25px;
+            padding-bottom: 12px; 
+            border-bottom: 2px solid var(--border-color); 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        
+        label { 
+            display: block; 
+            font-weight: 700; 
+            margin-bottom: 10px; 
+            font-size: 13px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+
+        select, input { 
+            width: 100%; 
+            padding: 14px 18px; 
+            font-size: 15px; 
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--text-main);
+            border: 2px solid var(--input-border); 
+            border-radius: var(--radius-element); 
+            box-sizing: border-box; 
+            background-color: var(--bg-element);
+            transition: all var(--transition-speed);
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.2);
+            background-color: var(--bg-page);
+        }
+
+        select:disabled, input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* Kolorowanie krawędzi pól w zależności od wybranej osoby */
+        select#person { border-left-width: 6px; }
+        select#person option { font-weight: 600; }
+
+        .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
+        .flex-row > div { flex: 1; min-width: 180px; }
+
+        button { 
+            font-family: inherit;
+            border: none; 
+            padding: 14px 28px; 
+            font-size: 15px; 
+            font-weight: 700; 
+            border-radius: var(--radius-element); 
+            cursor: pointer; 
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button:active { transform: scale(0.96); }
+        
+        button.btn-add {
+            background-color: var(--bg-element);
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-top: 15px;
+        }
+        button.btn-add:hover { 
+            background-color: var(--primary-blue); 
+            color: white;
+            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.2);
+        }
+        button.btn-add svg { stroke: currentColor; }
+
+        .task-list { 
+            margin-top: 20px; 
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .task-item { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 20px 24px; 
+            border-radius: var(--radius-element); 
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Kolorowy pasek po lewej stronie zadania */
+        .task-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 6px;
+            background-color: var(--task-color, var(--primary-blue));
+        }
+
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--task-color, var(--primary-blue));
+        }
+
+        .task-info { display: flex; align-items: center; gap: 20px; flex: 1; }
+        
+        .task-tag { 
+            display: inline-flex; 
+            align-items: center;
+            justify-content: center;
+            padding: 6px 16px; 
+            border-radius: 20px; 
+            font-size: 13px; 
+            font-weight: 800; 
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            min-width: 80px;
+        }
+
+        .task-details { color: var(--text-secondary); line-height: 1.6; font-size: 14px;}
+        .task-details b { color: var(--text-main); font-weight: 700; }
+
+        .btn-delete {
+            background: transparent;
+            color: #dc3545;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+        }
+        .btn-delete:hover {
+            background: rgba(220, 53, 69, 0.1);
+            border-color: rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-sync {
+            width: 100%;
+            padding: 18px;
+            font-size: 16px;
+            border-radius: var(--radius-element);
+            margin-top: 20px;
+            background: var(--btn-sync-grad);
+            color: white;
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-sync:hover {
+            box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-load {
+            width: 100%;
+            padding: 16px;
+            font-size: 15px;
+            border-radius: var(--radius-element);
+            margin-top: 15px;
+            background-color: transparent;
+            color: var(--text-main);
+            border: 2px dashed var(--border-color);
+        }
+        .btn-load:hover { 
+            background-color: var(--border-color); 
+        }
+
+        #status { 
+            margin-top: 25px; 
+            font-weight: 700; 
+            text-align: center; 
+            font-size: 15px; 
+            padding: 14px;
+            border-radius: var(--radius-element);
+            transition: all 0.3s ease;
+        }
+        .syncing { opacity: 0.6; pointer-events: none; }
+        
+        .empty-state {
+            padding: 40px; 
+            text-align: center; 
+            color: var(--text-secondary); 
+            background: var(--empty-bg); 
+            border-radius: var(--radius-element); 
+            border: 2px dashed var(--empty-border);
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .empty-state svg {
+            display: block; margin: 0 auto 15px auto; opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Przełącznik Dark Mode -->
+    <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="checkbox_theme">
+            <input type="checkbox" id="checkbox_theme" />
+            <div class="slider round"></div>
+        </label>
+    </div>
+
+    <h1>
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#0d6efd" />
+                    <stop offset="50%" stop-color="#d63384" />
+                    <stop offset="100%" stop-color="#0dcaf0" />
+                </linearGradient>
+            </defs>
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <circle cx="12" cy="12" r="3" fill="url(#grad1)"/>
+        </svg>
+        MediRadar Panel
+    </h1>
+
+    <h2>Dodaj nowe zadanie monitorowania</h2>
+    
+    <!-- Rząd 1: Pacjent, Miasto, Specjalizacja -->
+    <div class="flex-row">
+        <div class="form-group">
+            <label>Członek rodziny</label>
+            <select id="person">
+                <option value="KAMIL">Kamil</option>
+                <option value="MONIKA">Monika</option>
+                <option value="ADAM">Adam</option>
+                <option value="SZYMON">Szymon</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Miasto</label>
+            <select id="region" disabled>
+                <option value="199">Łódź</option>
+            </select>
+        </div>
+        <div class="form-group" style="flex: 2;">
+            <label>Specjalizacja</label>
+            <select id="service"></select>
+        </div>
+    </div>
+
+    <!-- Rząd 2: Lekarz i Zakres dat -->
+    <div class="flex-row">
+        <div class="form-group" style="flex: 2;">
+            <label>Preferowany lekarz</label>
+            <input type="text" id="doctorName" value="Wszyscy" placeholder="np. Kowalski lub Wszyscy">
+        </div>
+        <div class="form-group">
+            <label>Data od</label>
+            <input type="date" id="startDate">
+        </div>
+        <div class="form-group">
+            <label>Data do (opcjonalnie)</label>
+            <input type="date" id="endDate">
+        </div>
+    </div>
+
+    <button class="btn-add" onclick="addTask()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Aktywuj Radar
+    </button>
+
+    <h2>Aktywne Radary (Harmonogram)</h2>
+    <div class="task-list" id="taskList"></div>
+
+    <hr style="margin: 50px 0 40px 0; border: 0; border-top: 2px solid var(--border-color);">
+    
+    <button id="syncBtn" class="btn-sync" onclick="syncToGithub()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+        Zapisz i zaktualizuj system
+    </button>
+    <button id="loadBtn" class="btn-load" onclick="loadFromGithub()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Wczytaj dane z chmury (GitHub)
+    </button>
+    <div id="status"></div>
+</div>
+
+<script>
+    // ==========================================
+    // 0. OBSŁUGA MOTYWU (JASNY/CIEMNY)
+    // ==========================================
+    const toggleSwitch = document.getElementById('checkbox_theme');
+    const currentTheme = localStorage.getItem('theme');
+
+    if (currentTheme) {
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        if (currentTheme === 'dark') toggleSwitch.checked = true;
+    }
+
+    function switchTheme(e) {
+        if (e.target.checked) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+        }    
+    }
+    toggleSwitch.addEventListener('change', switchTheme, false);
 
 
-def display_appointments(appointments: list[dict[str, Any]]) -> None:
-    log.info("")
-    log.info("--------------------------------------------------")
-    if not appointments:
-        log.info("No new appointments found.")
-    else:
-        log.info("New appointments found:")
-        log.info("--------------------------------------------------")
-        for appointment in appointments:
-            date = appointment.get("appointmentDate", "N/A")
-            clinic_info = appointment.get("clinic", {}) or {}
-            clinic = clinic_info.get("name", "N/A")
-            doctor_info = appointment.get("doctor", {}) or {}
-            doctor = doctor_info.get("name", "N/A")
-            specialty_info = appointment.get("specialty", {}) or {}
-            specialty = specialty_info.get("name", "N/A")
-            doctor_languages = appointment.get("doctorLanguages", [])
-            languages = (
-                ", ".join([lang.get("name", "N/A") for lang in doctor_languages])
-                if doctor_languages
-                else "N/A"
-            )
-            log.info(f"Date: {date}")
-            log.info(f"  Clinic: {clinic}")
-            log.info(f"  Doctor: {doctor}")
-            log.info(f"  Specialty: {specialty}")
-            log.info(f"  Languages: {languages}")
-            log.info("--------------------------------------------------")
+    // ==========================================
+    // 1. KONFIGURACJA GITHUB
+    // ==========================================
+    const GITHUB_REPO = "kopek-beep/medicover"; 
 
+    // ==========================================
+    // 2. SPECJALIZACJE I DYNAMIKA LISTY
+    // ==========================================
+    const wszystkieSpecjalizacje = {
+        "176": "Alergolog dorośli",
+        "178": "Alergolog dorośli odczulanie",
+        "11682": "Badanie dna oka - dorośli",
+        "76796": "Badanie dna oka - dzieci",
+        "2": "Chirurg dorośli",
+        "1190": "Choroby zakaźne dorośli",
+        "3": "Dermatolog dorośli",
+        "99": "Diabetolog",
+        "182": "Dietetyk dorośli",
+        "5": "Endokrynolog dorośli",
+        "27962": "Endokrynolog dorośli - porada telefoniczna",
+        "46066": "Ginekolog - kwalifikacja do założenia wkładki",
+        "4800": "Ginekolog - prowadzenie ciąży",
+        "64948": "Ginekolog - założenie wkładki",
+        "4798": "Ginekolog dorośli",
+        "94448": "Ginekologia - awaryjna antykoncepcja - porada tel. u położnej",
+        "89834": "Ginekologia - badania w ciąży - porada telefoniczna u położnej",
+        "46068": "Ginekologia - infekcja intymna u położnej",
+        "10244": "Ginekologia - pobranie wymazu",
+        "116730": "Ginekologia - porada poporodowa u położnej - porada telefoniczna",
+        "116732": "Ginekologia - porada poporodowa u położnej",
+        "72380": "Ginekologia - przygotowanie do ciąży u położnej",
+        "10864": "Hematolog - Szpital",
+        "47068": "Higienizacja 4w1",
+        "112": "Higienizacja standardowa",
+        "9": "Internista",
+        "19046": "Internista - porada telefoniczna",
+        "63748": "Invisalign",
+        "39836": "Invisalign - leczenie",
+        "10": "Kardiolog dorośli",
+        "87430": "Kwalifikacja i szczepienie dorośli – specjalista med.",
+        "192": "Laryngolog dorośli",
+        "96": "Logopeda dorośli",
+        "16234": "Medicover Express - przeziębienie, grypa",
+        "62742": "Medicover Express - szcz. grypa - dorośli - specjalista med.",
+        "16236": "Medicover Express - szczepienia dorośli",
+        "486": "Medicover Express - szczepienia grypa",
+        "9976": "Medycyna podróży - dorośli",
+        "1586": "Medycyna Rodzinna - dorośli",
+        "27964": "Medycyna Rodzinna - dorośli - porada telefoniczna",
+        "3004": "Mykologia - pobranie u pielęgniarki",
+        "16": "Neurolog dorośli",
+        "198": "Okulista dorośli",
+        "200": "Okulista dziecięcy",
+        "19054": "Okulistyka - badanie wzroku",
+        "114": "Ortodonta",
+        "28766": "Ortodonta - leczenie",
+        "163": "Ortopeda dorośli",
+        "6254": "Pobranie HPV / Cytologia",
+        "105898": "Położna - infekcje pęcherza moczowego",
+        "105900": "Położna - infekcje pęcherza moczowego - porada telefoniczna",
+        "97064": "Położna - wizyta profilaktyczna",
+        "27158": "Poradnia Bólu Pleców i Układu Ruchu - dorośli",
+        "20056": "Poradnia Leczenia Boreliozy",
+        "28770": "Protetyk - leczenie",
+        "24": "Psychiatra dorośli",
+        "25": "Psycholog dorośli",
+        "48914": "Psycholog dorośli - porada telefoniczna",
+        "41": "Pulmonolog dorośli",
+        "52110": "Punkt Pobrań - ciężarne",
+        "52106": "Punkt Pobrań - dorośli",
+        "23504": "Stomatolog - leczenie",
+        "22890": "Stomatolog - przegląd",
+        "30": "Urolog dorośli",
+        "76798": "Urologia - pobranie wymazu u mężczyzn przez pielęgniarkę"
+    };
 
-def json_date_serializer(obj: Any) -> str:
-    """JSON serializer for objects not serializable by default json code"""
-    if isinstance(obj, datetime.date | datetime.datetime):
-        return obj.isoformat()
-    raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+    const dostepneDlaOsoby = {
+        "KAMIL": ["176", "178", "11682", "2", "1190", "3", "99", "182", "5", "27962", "10864", "47068", "112", "9", "19046", "63748", "39836", "10", "87430", "192", "96", "16234", "62742", "16236", "486", "9976", "1586", "27964", "3004", "16", "198", "19054", "114", "28766", "163", "27158", "20056", "28770", "24", "25", "48914", "41", "52106", "23504", "22890", "30", "76798"],
+        "MONIKA": ["176", "178", "11682", "2", "1190", "3", "99", "182", "5", "27962", "46066", "4800", "64948", "4798", "94448", "89834", "46068", "10244", "116730", "116732", "72380", "10864", "47068", "112", "9", "19046", "63748", "39836", "10", "87430", "192", "96", "16234", "62742", "16236", "486", "9976", "1586", "27964", "3004", "16", "198", "19054", "114", "28766", "163", "6254", "105898", "105900", "97064", "27158", "20056", "28770", "24", "25", "48914", "41", "52110", "52106", "23504", "22890"],
+        "ADAM": ["200", "76796"],
+        "SZYMON": ["200", "76796"]
+    };
 
+    // Przypisane kolory akcentów dla członków rodziny
+    const userTheme = {
+        "KAMIL": { color: "#0d6efd" },  
+        "MONIKA": { color: "#d63384" }, 
+        "ADAM": { color: "#198754" },   
+        "SZYMON": { color: "#fd7e14" }  
+    };
 
-def parse_slot_search_type(value: str) -> int | str:
-    try:
-        return int(value)
-    except ValueError:
-        return value
+    const personSelect = document.getElementById('person');
+    const serviceSelect = document.getElementById('service');
 
+    function getTodayString() {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
 
-class NextRun:
-    def __init__(self, interval_minutes: int | None = 60) -> None:
-        self.next_run = datetime.datetime.now(tz=datetime.UTC)
-        self.interval_minutes = interval_minutes
+    function ustawDzisiejszaDate() {
+        document.getElementById('startDate').value = getTodayString();
+    }
 
-    def is_time_to_run(self) -> bool:
-        if self.interval_minutes is None:
-            return True
-        now = datetime.datetime.now(tz=datetime.UTC)
-        if now >= self.next_run:
-            self.next_run = now + datetime.timedelta(minutes=self.interval_minutes)
-            return True
-        return False
+    function odswiezKolorSelecta() {
+        const osoba = personSelect.value;
+        const color = userTheme[osoba].color;
+        personSelect.style.borderLeftColor = color;
+    }
 
-    def set_next_run(self) -> None:
-        if self.interval_minutes is None:
-            return
-        self.next_run = datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(
-            minutes=self.interval_minutes
-        )
+    function odswiezSpecjalizacje() {
+        const wybranaOsoba = personSelect.value;
+        const isChild = (wybranaOsoba === "ADAM" || wybranaOsoba === "SZYMON");
+        const dostepneID = dostepneDlaOsoby[wybranaOsoba] || [];
 
+        serviceSelect.innerHTML = '';
+        odswiezKolorSelecta();
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Find appointment slots.")
+        const opcje = dostepneID
+            .filter(id => {
+                const nazwa = (wszystkieSpecjalizacje[id] || "").toLowerCase();
+                if (isChild) {
+                    return !nazwa.includes("dorośli");
+                } else {
+                    return !nazwa.includes("dzieci") && !nazwa.includes("dziecięcy");
+                }
+            })
+            .map(id => ({ 
+                id: id, 
+                nazwa: wszystkieSpecjalizacje[id] || "ID: " + id 
+            }));
+        
+        opcje.sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl'));
 
-    subparsers = parser.add_subparsers(
-        dest="command", required=True, help="Command to execute"
-    )
+        opcje.forEach(opcja => {
+            const option = document.createElement('option');
+            option.value = opcja.id;
+            option.text = opcja.nazwa;
+            serviceSelect.appendChild(option);
+        });
+    }
 
-    find_appointment = subparsers.add_parser(
-        "find-appointment", help="Find appointment"
-    )
-    find_appointment.add_argument(
-        "-r", "--region", required=True, type=int, help="Region ID"
-    )
-    find_appointment.add_argument(
-        "-s",
-        "--specialty",
-        required=True,
-        type=int,
-        action="extend",
-        nargs="+",
-        help="Specialty ID",
-    )
-    find_appointment.add_argument(
-        "-c", "--clinic", required=False, type=int, help="Clinic ID"
-    )
-    find_appointment.add_argument(
-        "-d", "--doctor", required=False, type=int, help="Doctor ID"
-    )
-    find_appointment.add_argument(
-        "--doctor-name",
-        required=False,
-        type=str,
-        default=None,
-        help="Filtruj po nazwisku lekarza",
-    )
-    find_appointment.add_argument(
-        "-f",
-        "--date",
-        type=datetime.date.fromisoformat,
-        default=datetime.date.today(),
-        help="Start date in YYYY-MM-DD format",
-    )
-    find_appointment.add_argument(
-        "-e",
-        "--enddate",
-        type=datetime.date.fromisoformat,
-        help="End date in YYYY-MM-DD format",
-    )
-    find_appointment.add_argument(
-        "-n", "--notification", required=False, help="Notification method"
-    )
-    find_appointment.add_argument(
-        "-t", "--title", required=False, help="Notification title"
-    )
-    find_appointment.add_argument(
-        "-l",
-        "--language",
-        required=False,
-        type=int,
-        help="4=Polski, 6=Angielski, 60=Ukraiński",
-    )
-    find_appointment.add_argument(
-        "-i",
-        "--interval",
-        type=int,
-        default=None,
-        help="Repeat interval in minutes",
-    )
-    find_appointment.add_argument(
-        "-S",
-        "--slot-search-type",
-        default=DEFAULT_SLOT_SEARCH_TYPE,
-        type=parse_slot_search_type,
-        help='Slot search type (e.g. "0", "DiagnosticProcedure"). Default: 0',
-    )
+    personSelect.addEventListener('change', odswiezSpecjalizacje);
+    odswiezSpecjalizacje();
+    ustawDzisiejszaDate();
 
-    list_filters = subparsers.add_parser("list-filters", help="List filters")
-    list_filters_subparsers = list_filters.add_subparsers(
-        dest="filter_type", required=True, help="Type of filter to list"
-    )
+    // ==========================================
+    // 3. LOGIKA APLIKACJI
+    // ==========================================
+    let tasks = JSON.parse(localStorage.getItem('medicover_tasks')) || [];
 
-    list_filters_subparsers.add_parser("regions", help="List available regions")
-    list_filters_subparsers.add_parser("specialties", help="List available specialties")
-    doctors = list_filters_subparsers.add_parser(
-        "doctors", help="List available doctors"
-    )
-    doctors.add_argument("-r", "--region", required=True, type=int, help="Region ID")
-    doctors.add_argument(
-        "-s", "--specialty", required=True, type=int, help="Specialty ID"
-    )
-    clinics = list_filters_subparsers.add_parser(
-        "clinics", help="List available clinics"
-    )
-    clinics.add_argument("-r", "--region", required=True, type=int, help="Region ID")
-    clinics.add_argument(
-        "-s", "--specialty", required=True, type=int, nargs="+", help="Specialty ID(s)"
-    )
+    function renderTasks() {
+        const list = document.getElementById('taskList');
+        list.innerHTML = '';
+        if (tasks.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    Radar wyłączony.<br>Dodaj specjalizację powyżej, aby rozpocząć monitorowanie.
+                </div>`;
+            return;
+        }
+        tasks.forEach((task, index) => {
+            const theme = userTheme[task.person] || userTheme["KAMIL"];
+            const div = document.createElement('div');
+            div.className = 'task-item';
+            div.style.setProperty('--task-color', theme.color);
+            
+            const cityName = task.region === "199" ? "Łódź" : task.region;
+            const docName = (task.doctorName && task.doctorName.toLowerCase() !== "wszyscy") ? task.doctorName : "Wszyscy";
+            
+            let dateRangeText = "od dziś (bez limitu)";
+            if (task.startDate && task.endDate) {
+                dateRangeText = `${task.startDate} do ${task.endDate}`;
+            } else if (task.startDate) {
+                dateRangeText = `od ${task.startDate}`;
+            } else if (task.endDate) {
+                dateRangeText = `do ${task.endDate}`;
+            }
 
-    argcomplete.autocomplete(parser)
-    args = parser.parse_args()
+            div.innerHTML = `
+                <div class="task-info">
+                    <span class="task-tag" style="background-color: ${theme.color};">${task.person}</span>
+                    <div class="task-details">
+                        <div>Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${wszystkieSpecjalizacje[task.service] || "ID: " + task.service}</b></div>
+                        <div style="font-size: 13px; margin-top: 5px; color: var(--text-secondary);">
+                            Lekarz: <b>${docName}</b> &nbsp;&bull;&nbsp; Termin: <b>${dateRangeText}</b>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-delete" onclick="removeTask(${index})" title="Usuń z Radaru">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+            `;
+            list.appendChild(div);
+        });
+        localStorage.setItem('medicover_tasks', JSON.stringify(tasks));
+    }
 
-    username = os.environ.get("MEDICOVER_USER")
-    password = os.environ.get("MEDICOVER_PASS")
+    function addTask() {
+        const person = document.getElementById('person').value;
+        const region = document.getElementById('region').value; 
+        const service = document.getElementById('service').value;
+        
+        let doctorInput = document.getElementById('doctorName').value.trim();
+        const doctorName = (doctorInput === "" || doctorInput.toLowerCase() === "wszyscy") ? "Wszyscy" : doctorInput;
+        
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
 
-    if not username or not password:
-        log.error(
-            "MEDICOVER_USER and MEDICOVER_PASS environment variables must be set."
-        )
-        sys.exit(1)
+        const isDuplicate = tasks.some(t => 
+            t.person === person && 
+            t.service === service && 
+            (t.doctorName || "Wszyscy") === doctorName &&
+            (t.startDate || "") === startDate &&
+            (t.endDate || "") === endDate
+        );
+        if (isDuplicate) {
+            alert("Identyczne ustawienie Radaru już istnieje na liście!");
+            return;
+        }
 
-    auth = Authenticator(username, password)
-    try:
-        auth.login()
-    except MFAError:
-        log.error("Failed MFA, please try again.")
-        DEVICE_ID_PATH.unlink(missing_ok=True)
-        raise
+        tasks.push({ person, region, service, doctorName, startDate, endDate });
+        renderTasks();
 
-    time.sleep(5)
+        document.getElementById('doctorName').value = "Wszyscy";
+        ustawDzisiejszaDate();
+        document.getElementById('endDate').value = "";
+    }
 
-    finder = AppointmentFinder(auth.session, auth.headers)
+    function removeTask(index) {
+        tasks.splice(index, 1);
+        renderTasks();
+    }
 
-    if args.command == "find-appointment":
-        if args.interval is not None:
-            Notifier.send_notification(
-                args.notification,
-                "Medichaser start",
-                message=f"medichaser started in interval with command: {args.command} and arguments: {json.dumps(vars(args), indent=2, default=json_date_serializer)}",
-            )
+    function generateYaml() {
+        let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '*/30 * * * *'\n  workflow_dispatch:\n\njobs:\n`;
+        yaml += `  check-slots:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n`;
+        yaml += `      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n`;
+        yaml += `      - run: pip install uv && uv sync\n`;
+        yaml += `      - name: Przywrocenie sesji\n        env:\n          MEDICOVER_SESSION: \${{ secrets.MEDICOVER_SESSION }}\n`;
+        yaml += `        run: mkdir -p data && echo "$MEDICOVER_SESSION" | base64 -d | tar -xz -C data\n`;
+        yaml += `      - name: Szukaj wizyt\n        env:\n`;
+        yaml += `          MEDICOVER_USER: \${{ secrets.MEDICOVER_USER }}\n`;
+        yaml += `          MEDICOVER_PASS: \${{ secrets.MEDICOVER_PASS }}\n`;
+        yaml += `          NOTIFIERS_TELEGRAM_TOKEN: \${{ secrets.NOTIFIERS_TELEGRAM_TOKEN }}\n`;
+        yaml += `          NOTIFIERS_TELEGRAM_CHAT_ID: \${{ secrets.NOTIFIERS_TELEGRAM_CHAT_ID }}\n`;
+        yaml += `        run: |\n`;
 
-        next_run = NextRun(args.interval)
-        previous_appointments: list[dict[str, Any]] = []
+        tasks.forEach((t, index) => {
+            const nazwaLekarza = wszystkieSpecjalizacje[t.service] || "Lekarz";
+            let cmd = `          uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service}`;
+            
+            if (t.doctorName && t.doctorName.toLowerCase() !== "wszyscy") {
+                cmd += ` --doctor-name "${t.doctorName}"`;
+            }
+            if (t.startDate) {
+                cmd += ` -f "${t.startDate}"`;
+            }
+            if (t.endDate) {
+                cmd += ` -e "${t.endDate}"`;
+            }
 
-        try:
-            while True:
-                # Authenticate
-                try:
-                    auth.refresh_token()
-                except InvalidGrantError as e:
-                    log.warning(f"Token refresh failed: {e}")
-                    log.info("Attempting to re-login...")
-                    auth.login()
-                    time.sleep(5)
-                    log.info("Re-login successful, continuing...")
-                    continue
+            cmd += ` -n telegram -t "[${t.person}] ${nazwaLekarza}"\n`;
+            yaml += cmd;
+            
+            if (index < tasks.length - 1) {
+                yaml += `          sleep 5\n`;
+            }
+        });
+        
+        yaml += `\n`;
+        return yaml;
+    }
 
-                if not next_run.is_time_to_run():
-                    time.sleep(30)
-                    continue
+    async function getGithubToken() {
+        let token = localStorage.getItem("medicover_gh_token");
+        if (!token) {
+            token = prompt("🔐 Bezpieczeństwo: Wklej swój GitHub Personal Access Token (PAT):");
+            if (token) localStorage.setItem("medicover_gh_token", token);
+        }
+        return token;
+    }
 
-                next_run.set_next_run()
+    async function syncToGithub() {
+        const statusEl = document.getElementById('status');
+        const syncBtn = document.getElementById('syncBtn');
+        
+        if (tasks.length === 0) { 
+            alert("Nie masz żadnych zadań na liście. Radar zostanie wyłączony, ale pamiętaj, aby zatrzymać skrypt na GitHubie jeśli chcesz w pełni wyłączyć bota."); 
+            return; 
+        }
 
-                # Find appointments
-                try:
-                    appointments = finder.find_appointments(
-                        args.region,
-                        args.specialty,
-                        args.clinic,
-                        args.date,
-                        args.enddate,
-                        args.language,
-                        args.doctor,
-                        args.slot_search_type,
-                    )
-                except ExpiredToken as e:
-                    log.warning("Expired token error: %s", e)
-                    continue
+        const GITHUB_TOKEN = await getGithubToken();
+        if (!GITHUB_TOKEN) {
+            alert("Aby zaktualizować system, musisz podać token!");
+            return;
+        }
 
-                # FILTROWANIE PO NAZWISKU (jeśli podano)
-                if args.doctor_name:
-                    target_name = args.doctor_name.strip().lower()
-                    appointments = [
-                        apt for apt in appointments
-                        if target_name in (apt.get("doctor", {}) or {}).get("name", "").lower()
-                    ]
+        statusEl.style.color = "var(--primary-blue)";
+        statusEl.innerHTML = "☁️ Łączenie z usługami chmurowymi GitHub...";
+        syncBtn.classList.add('syncing');
 
-                # Find new appointments
-                if previous_appointments:
-                    new_appointments = [
-                        x for x in appointments if x not in previous_appointments
-                    ]
-                else:
-                    new_appointments = appointments
+        const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/.github/workflows/checker.yml`;
+        const headers = { "Authorization": `token ${GITHUB_TOKEN}`, "Accept": "application/vnd.github.v3+json" };
 
-                previous_appointments = appointments
+        try {
+            let sha = "";
+            const getRes = await fetch(url, { headers });
+            if (getRes.ok) sha = (await getRes.json()).sha;
 
-                # Display appointments
-                display_appointments(new_appointments)
+            const base64Content = btoa(unescape(encodeURIComponent(generateYaml())));
+            const body = { message: "Aktualizacja Radaru", content: base64Content };
+            if (sha) body.sha = sha;
 
-                # Send notification if appointments are found
-                if new_appointments:
-                    Notifier.send_notification(
-                        args.notification, args.title, appointments=new_appointments
-                    )
+            const putRes = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body) });
+            
+            if (putRes.ok) {
+                statusEl.style.color = "#198754";
+                statusEl.innerHTML = "✨ Sukces! Twój system Radar został zaktualizowany w chmurze.";
+            } else {
+                statusEl.style.color = "#dc3545";
+                statusEl.innerHTML = `❌ Błąd aktualizacji: ${(await putRes.json()).message}`;
+                if (putRes.status === 401) {
+                    localStorage.removeItem("medicover_gh_token");
+                    statusEl.innerHTML += "<br>Token był nieprawidłowy. Kliknij 'Zapisz' ponownie, aby wpisać poprawny token.";
+                }
+            }
+        } catch (error) {
+            statusEl.style.color = "#dc3545";
+            statusEl.innerHTML = `❌ Błąd połączenia: ${error.message}`;
+        } finally {
+            syncBtn.classList.remove('syncing');
+        }
+    }
 
-                if next_run.interval_minutes is None:
-                    log.info("Exiting after one run due to interval set to None.")
-                    break
+    async function loadFromGithub() {
+        const statusEl = document.getElementById('status');
+        const loadBtn = document.getElementById('loadBtn');
+        
+        const GITHUB_TOKEN = await getGithubToken();
+        if (!GITHUB_TOKEN) {
+            alert("Aby pobrać dane z GitHuba, musisz podać token!");
+            return;
+        }
 
-                continue
-        except Exception as e:
-            log.error(f"Error in main loop: {e}")
-            Notifier.send_notification(
-                args.notification,
-                "Medichaser error",
-                message=f"medichaser crashed during run:\n {e}",
-            )
-            raise
+        statusEl.style.color = "var(--text-secondary)";
+        statusEl.innerHTML = "⬇️ Pobieranie konfiguracji Radaru z chmury...";
+        loadBtn.classList.add('syncing');
 
-    elif args.command == "list-filters":
-        # Authenticate
-        try:
-            auth.refresh_token()
-        except InvalidGrantError as e:
-            log.warning(f"Token refresh failed: {e}")
-            log.info("Attempting to re-login...")
-            auth.login()
-            time.sleep(5)
-            log.info("Re-login successful, continuing...")
-        except Exception as e:
-            log.error(f"Error refreshing token: {e}")
-            Notifier.send_notification(
-                args.notification,
-                "Medichaser error",
-                message=f"medichaser crashed while refreshing token\n: {e}",
-            )
-            raise
-        if args.filter_type in ("doctors", "clinics"):
-            filters = finder.find_filters(args.region, args.specialty)
-        else:
-            filters = finder.find_filters()
+        const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/.github/workflows/checker.yml`;
+        const headers = { "Authorization": `token ${GITHUB_TOKEN}`, "Accept": "application/vnd.github.v3+json" };
 
-        for r in filters.get(args.filter_type, []):
-            log.info(f"{r.get('id', 'N/A')} - {r.get('value', 'N/A')}")
+        try {
+            const getRes = await fetch(url, { headers });
+            if (getRes.ok) {
+                const data = await getRes.json();
+                const decodedContent = decodeURIComponent(escape(atob(data.content)));
+                
+                tasks = [];
+                const lines = decodedContent.split('\n');
+                
+                for (let line of lines) {
+                    if (line.includes('find-appointment')) {
+                        const regionMatch = line.match(/-r\s+(\d+)/);
+                        const serviceMatch = line.match(/-s\s+(\d+)/);
+                        const personMatch = line.match(/-t\s+"\[(.*?)\]/);
+                        const docMatch = line.match(/--doctor-name\s+"([^"]+)"/);
+                        const startMatch = line.match(/-f\s+"([^"]+)"/);
+                        const endMatch = line.match(/-e\s+"([^"]+)"/);
 
+                        if (regionMatch && serviceMatch && personMatch) {
+                            tasks.push({
+                                region: regionMatch[1],
+                                service: serviceMatch[1],
+                                person: personMatch[1],
+                                doctorName: docMatch ? docMatch[1] : "Wszyscy",
+                                startDate: startMatch ? startMatch[1] : "",
+                                endDate: endMatch ? endMatch[1] : ""
+                            });
+                        }
+                    }
+                }
+                
+                renderTasks();
+                statusEl.style.color = "#198754";
+                statusEl.innerHTML = "✨ Sukces! Wczytano najnowsze dane z GitHuba.";
+            } else if (getRes.status === 404) {
+                statusEl.style.color = "var(--text-secondary)";
+                statusEl.innerHTML = "Brak pliku na GitHubie. Dodaj lekarzy i kliknij Zapisz.";
+                tasks = [];
+                renderTasks();
+            } else {
+                statusEl.style.color = "#dc3545";
+                statusEl.innerHTML = `❌ Błąd: ${(await getRes.json()).message}`;
+                if (getRes.status === 401) localStorage.removeItem("medicover_gh_token");
+            }
+        } catch (error) {
+            statusEl.style.color = "#dc3545";
+            statusEl.innerHTML = `❌ Błąd połączenia: ${error.message}`;
+        } finally {
+            loadBtn.classList.remove('syncing');
+        }
+    }
 
-if __name__ == "__main__":
-    main()
+    renderTasks();
+</script>
+
+</body>
+</html>
