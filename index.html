@@ -80,8 +80,6 @@
             box-shadow: var(--shadow-card); 
             border: 1px solid var(--border-subtle);
             position: relative;
-            border-top: 4px solid transparent;
-            background-clip: padding-box;
         }
 
         /* Nagłówek */
@@ -90,7 +88,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 16px;
-            margin-bottom: 28px;
+            margin-bottom: 22px;
             flex-wrap: wrap;
         }
 
@@ -105,6 +103,73 @@
             display: flex;
             align-items: center;
             gap: 12px;
+        }
+
+        /* Pasek Statusu Live & Skanuj Teraz */
+        .live-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .live-status-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #888;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .status-dot.success { background: #107c41; box-shadow: 0 0 8px rgba(16, 124, 65, 0.6); }
+        .status-dot.running { background: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.7); animation: pulse 1.2s infinite; }
+        .status-dot.error { background: #d13438; box-shadow: 0 0 8px rgba(209, 52, 56, 0.6); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.45; transform: scale(1.2); }
+        }
+
+        .live-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .btn-run-now {
+            padding: 9px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            background: var(--copilot-btn-gradient);
+            color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(92, 46, 145, 0.25);
+        }
+        .btn-run-now:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-refresh-status {
+            padding: 9px 12px;
+            font-size: 13px;
+            background: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border-input);
+            border-radius: 10px;
         }
 
         /* Przełącznik motywu */
@@ -179,7 +244,6 @@
             flex-shrink: 0;
         }
 
-        /* Rzędy formularza - wyrównanie dolnych krawędzi gwarantuje równą wysokość */
         .flex-row { 
             display: flex; 
             gap: 16px; 
@@ -320,6 +384,7 @@
             position: relative;
             overflow: hidden;
             gap: 12px;
+            transition: opacity 0.25s, filter 0.25s;
         }
 
         .task-item::before {
@@ -328,6 +393,12 @@
             left: 0; top: 0; bottom: 0;
             width: 5px;
             background-color: var(--task-color, var(--primary-copilot));
+        }
+
+        /* Wygląd wstrzymanego zadania */
+        .task-item.paused {
+            opacity: 0.55;
+            filter: grayscale(65%);
         }
 
         .task-info { 
@@ -350,6 +421,18 @@
             flex-shrink: 0;
         }
 
+        .paused-badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: rgba(209, 52, 56, 0.15);
+            color: #d13438;
+            margin-left: 6px;
+            text-transform: uppercase;
+        }
+
         .task-details { 
             color: var(--text-secondary); 
             line-height: 1.5; 
@@ -359,12 +442,38 @@
         }
         .task-details b { color: var(--text-main); font-weight: 600; }
 
+        .task-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .btn-pause {
+            padding: 7px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 8px;
+            border: 1.5px solid var(--border-input);
+            background: var(--bg-input);
+            color: var(--text-main);
+        }
+        .btn-pause.active {
+            border-color: #107c41;
+            color: #107c41;
+            background: rgba(16, 124, 65, 0.08);
+        }
+        .btn-pause.paused {
+            border-color: #d83b01;
+            color: #d83b01;
+            background: rgba(216, 59, 1, 0.08);
+        }
+
         .btn-delete {
             background: transparent;
             color: #d13438;
             padding: 8px;
             border-radius: 8px;
-            flex-shrink: 0;
         }
         .btn-delete:hover {
             background: rgba(209, 52, 56, 0.12);
@@ -434,6 +543,17 @@
             h1 {
                 font-size: 24px;
             }
+            .live-status-bar {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 12px 14px;
+            }
+            .live-actions {
+                width: 100%;
+            }
+            .btn-run-now {
+                flex: 1;
+            }
             .copilot-card {
                 padding: 14px;
             }
@@ -449,10 +569,22 @@
             button.btn-add {
                 width: 100%;
             }
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
             .task-info {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 6px;
+                width: 100%;
+            }
+            .task-actions {
+                width: 100%;
+                justify-content: flex-end;
+                border-top: 1px dashed var(--border-subtle);
+                padding-top: 8px;
             }
             .cron-preview {
                 flex-direction: column;
@@ -486,6 +618,22 @@
                 <input type="checkbox" id="checkbox_theme" />
                 <div class="slider"></div>
             </label>
+        </div>
+    </div>
+
+    <!-- Pasek Statusu Chmury na żywo + przycisk Skanuj teraz -->
+    <div class="live-status-bar">
+        <div class="live-status-info">
+            <span class="status-dot" id="runDot"></span>
+            <span id="runStatusText">Status chmury: Kliknij odśwież lub wymuś skanowanie</span>
+        </div>
+        <div class="live-actions">
+            <button class="btn-refresh-status" onclick="checkLastRunStatus()" title="Sprawdź ostatni skan">
+                🔄 Status
+            </button>
+            <button class="btn-run-now" id="runNowBtn" onclick="triggerWorkflowNow()">
+                ⚡ Skanuj teraz
+            </button>
         </div>
     </div>
 
@@ -793,7 +941,7 @@
 
         const offset = getPolandUtcOffsetHours();
         const utcHours = plHours.map(h => (h - offset + 24) % 24);
-        return `${minPart} ${utcHours.join(',')} * * *`;
+        return `${minPart}${utcHours.join(',')} * * *`;
     }
 
     function updateScheduleSettings() {
@@ -875,7 +1023,7 @@
 
     initScheduleFromStorage();
 
-    // 4. LOGIKA ZADAŃ
+    // 4. LOGIKA ZADAŃ (WRAZ Z PAUZOWANIEM)
     let tasks = [];
     try {
         const storedTasks = JSON.parse(localStorage.getItem('medicover_tasks'));
@@ -894,31 +1042,39 @@
         }
         tasks.forEach((task, index) => {
             const theme = userTheme[task.person] || userTheme["KAMIL"];
+            const isPaused = !!task.paused;
             const div = document.createElement('div');
-            div.className = 'task-item';
+            div.className = 'task-item' + (isPaused ? ' paused' : '');
             div.style.setProperty('--task-color', theme.color);
             
             const cityName = task.region === "199" ? "Łódź" : task.region;
             const docName = (task.doctorName && task.doctorName.toLowerCase() !== "wszyscy") ? task.doctorName : "Wszyscy";
             
             let dateRangeText = "od dziś (bez limitu)";
-            if (task.startDate && task.endDate) dateRangeText = `${task.startDate} do ${task.endDate}`;
+            if (task.startDate && task.endDate) dateRangeText = `${task.startDate} do${task.endDate}`;
             else if (task.startDate) dateRangeText = `od ${task.startDate}`;
             else if (task.endDate) dateRangeText = `do ${task.endDate}`;
+
+            const pausedBadge = isPaused ? `<span class="paused-badge">Wstrzymany</span>` : ``;
 
             div.innerHTML = `
                 <div class="task-info">
                     <span class="task-tag" style="background-color: ${theme.color};">${task.person}</span>
                     <div class="task-details">
-                        <div>Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${wszystkieSpecjalizacje[task.service] || "ID: " + task.service}</b></div>
+                        <div>Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${wszystkieSpecjalizacje[task.service] || "ID: " + task.service}</b> ${pausedBadge}</div>
                         <div style="font-size: 12.5px; margin-top: 3px; color: var(--text-secondary);">
                             Lekarz: <b>${docName}</b> &nbsp;&bull;&nbsp; Termin: <b>${dateRangeText}</b>
                         </div>
                     </div>
                 </div>
-                <button class="btn-delete" onclick="removeTask(${index})" title="Usuń z Radaru">
-                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                </button>
+                <div class="task-actions">
+                    <button class="btn-pause ${isPaused ? 'paused' : 'active'}" onclick="togglePauseTask(${index})" title="${isPaused ? 'Wznów monitorowanie' : 'Wstrzymaj monitorowanie'}">
+                        ${isPaused ? '▶️ Wznów' : '⏸️ Aktywny'}
+                    </button>
+                    <button class="btn-delete" onclick="removeTask(${index})" title="Usuń całkowicie z listy">
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
+                </div>
             `;
             list.appendChild(div);
         });
@@ -948,7 +1104,7 @@
             return;
         }
 
-        tasks.push({ person, region, service, doctorName, startDate, endDate });
+        tasks.push({ person, region, service, doctorName, startDate, endDate, paused: false });
         renderTasks();
 
         document.getElementById('doctorName').value = "Wszyscy";
@@ -956,14 +1112,20 @@
         document.getElementById('endDate').value = "";
     }
 
+    function togglePauseTask(index) {
+        tasks[index].paused = !tasks[index].paused;
+        renderTasks();
+    }
+
     function removeTask(index) {
         tasks.splice(index, 1);
         renderTasks();
     }
 
+    // 5. GENEROWANIE YAML Z PAMIĘCIĄ WIZYT I OBSŁUGĄ PAUZY
     function generateYaml() {
         const cronExpr = buildCronExpression();
-        let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '${cronExpr}'\n  workflow_dispatch:\n\njobs:\n`;
+        let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '${cronExpr}'\n  workflow_dispatch:\n\npermissions:\n  contents: write\n\njobs:\n`;
         yaml += `  check-slots:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n`;
         yaml += `      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n`;
         yaml += `      - run: pip install uv && uv sync\n`;
@@ -976,9 +1138,15 @@
         yaml += `          NOTIFIERS_TELEGRAM_CHAT_ID: \${{ secrets.NOTIFIERS_TELEGRAM_CHAT_ID }}\n`;
         yaml += `        run: |\n`;
 
+        const hasActiveTasks = tasks.some(t => !t.paused);
+        if (!hasActiveTasks) {
+            yaml += `          echo "Wszystkie zadania sa obecnie wstrzymane."\n`;
+        }
+
         tasks.forEach((t, index) => {
             const nazwaLekarza = wszystkieSpecjalizacje[t.service] || "Lekarz";
-            let cmd = `          uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service}`;
+            const prefix = t.paused ? "          # PAUSED: " : "          ";
+            let cmd = `${prefix}uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service}`;
             
             if (t.doctorName && t.doctorName.toLowerCase() !== "wszyscy") cmd += ` --doctor-name "${t.doctorName}"`;
             if (t.startDate) cmd += ` -f "${t.startDate}"`;
@@ -987,10 +1155,21 @@
             cmd += ` -n telegram -t "[${t.person}] ${nazwaLekarza}"\n`;
             yaml += cmd;
             
-            if (index < tasks.length - 1) yaml += `          sleep 5\n`;
+            if (!t.paused && index < tasks.length - 1) {
+                yaml += `          sleep 5\n`;
+            }
         });
+
+        yaml += `      - name: Zapisz pamiec ogloszonych wizyt (Anty-Spam)\n`;
+        yaml += `        if: always()\n`;
+        yaml += `        run: |\n`;
+        yaml += `          if [ -f data/seen_slots.json ]; then\n`;
+        yaml += `            git config user.name "github-actions[bot]"\n`;
+        yaml += `            git config user.email "github-actions[bot]@users.noreply.github.com"\n`;
+        yaml += `            git add -f data/seen_slots.json\n`;
+        yaml += `            git diff --staged --quiet || (git commit -m "Aktualizacja pamieci wizyt [skip ci]" && git pull --rebase && git push)\n`;
+        yaml += `          fi\n`;
         
-        yaml += `\n`;
         return yaml;
     }
 
@@ -1003,6 +1182,101 @@
         return token;
     }
 
+    // 6. STATUS NA ŻYWO I RĘCZNE WYWOŁANIE SKANOWANIA
+    async function checkLastRunStatus() {
+        const token = localStorage.getItem("medicover_gh_token");
+        const dot = document.getElementById('runDot');
+        const text = document.getElementById('runStatusText');
+
+        if (!token) {
+            text.textContent = "Status chmury: Podaj token przy zapisie, aby widzieć status";
+            return;
+        }
+
+        text.textContent = "Sprawdzanie statusu na GitHubie...";
+        const url = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/runs?per_page=1`;
+        const headers = { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" };
+
+        try {
+            const res = await fetch(url, { headers });
+            if (!res.ok) {
+                dot.className = "status-dot error";
+                text.textContent = "Nie udało się pobrać statusu (sprawdź uprawnienia tokenu 'workflow')";
+                return;
+            }
+            const data = await res.json();
+            if (!data.workflow_runs || data.workflow_runs.length === 0) {
+                dot.className = "status-dot";
+                text.textContent = "Brak zarejestrowanych uruchomień bota.";
+                return;
+            }
+
+            const run = data.workflow_runs[0];
+            const updatedDate = new Date(run.updated_at);
+            const diffMin = Math.max(0, Math.round((new Date() - updatedDate) / 60000));
+            const timeAgo = diffMin === 0 ? "przed chwilą" : `${diffMin} min temu`;
+
+            if (run.status === "in_progress" || run.status === "queued") {
+                dot.className = "status-dot running";
+                text.innerHTML = `<b>Skanowanie w toku...</b> (uruchomiono ${timeAgo})`;
+            } else if (run.conclusion === "success") {
+                dot.className = "status-dot success";
+                text.innerHTML = `Ostatni skan: <b>${timeAgo}</b> &bull; Status: <b style="color:#107c41;">Sukces</b>`;
+            } else {
+                dot.className = "status-dot error";
+                text.innerHTML = `Ostatni skan: <b>${timeAgo}</b> &bull; Status: <b style="color:#d13438;">Błąd (${run.conclusion || 'Sprawdź sesję'})</b>`;
+            }
+        } catch (err) {
+            dot.className = "status-dot error";
+            text.textContent = "Błąd połączenia z API GitHub.";
+        }
+    }
+
+    async function triggerWorkflowNow() {
+        const runBtn = document.getElementById('runNowBtn');
+        const GITHUB_TOKEN = await getGithubToken();
+        if (!GITHUB_TOKEN) return;
+
+        runBtn.classList.add('syncing');
+        runBtn.textContent = "⏳ Uruchamianie...";
+
+        const url = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/dispatches`;
+        const headers = { "Authorization": `token ${GITHUB_TOKEN}`, "Accept": "application/vnd.github.v3+json" };
+
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers,
+                body: JSON.stringify({ ref: "main" })
+            });
+
+            if (res.status === 204 || res.ok) {
+                document.getElementById('runDot').className = "status-dot running";
+                document.getElementById('runStatusText').innerHTML = "<b>Zlecono skanowanie!</b> Maszyna startuje (odśwież za ok. 15s).";
+                setTimeout(checkLastRunStatus, 6000);
+            } else {
+                const resMaster = await fetch(url, {
+                    method: "POST",
+                    headers,
+                    body: JSON.stringify({ ref: "master" })
+                });
+                if (resMaster.status === 204 || resMaster.ok) {
+                    document.getElementById('runDot').className = "status-dot running";
+                    document.getElementById('runStatusText').innerHTML = "<b>Zlecono skanowanie!</b> Maszyna startuje.";
+                    setTimeout(checkLastRunStatus, 6000);
+                } else {
+                    alert("Błąd uruchamiania! Upewnij się, że Twój token GitHub posiada uprawnienie 'workflow' (Actions).");
+                }
+            }
+        } catch (e) {
+            alert("Błąd sieci podczas wywoływania skanu: " + e.message);
+        } finally {
+            runBtn.classList.remove('syncing');
+            runBtn.textContent = "⚡ Skanuj teraz";
+        }
+    }
+
+    // 7. SYNCHRONIZACJA Z GITHUBEM
     async function syncToGithub() {
         const statusEl = document.getElementById('status');
         const syncBtn = document.getElementById('syncBtn');
@@ -1038,7 +1312,8 @@
             
             if (putRes.ok) {
                 statusEl.style.color = "#107c41";
-                statusEl.innerHTML = "✨ Sukces! Twój system Radar oraz godziny pracy zostały zaktualizowane w chmurze.";
+                statusEl.innerHTML = "✨ Sukces! Twój system Radar został zaktualizowany w chmurze.";
+                checkLastRunStatus();
             } else {
                 statusEl.style.color = "#d13438";
                 statusEl.innerHTML = `❌ Błąd aktualizacji: ${(await putRes.json()).message}`;
@@ -1088,6 +1363,7 @@
                 
                 for (let line of lines) {
                     if (line.includes('find-appointment')) {
+                        const isPaused = line.trim().startsWith('# PAUSED:');
                         const regionMatch = line.match(/-r\s+(\d+)/);
                         const serviceMatch = line.match(/-s\s+(\d+)/);
                         const personMatch = line.match(/-t\s+"\[(.*?)\]/);
@@ -1102,13 +1378,15 @@
                                 person: personMatch[1],
                                 doctorName: docMatch ? docMatch[1] : "Wszyscy",
                                 startDate: startMatch ? startMatch[1] : "",
-                                endDate: endMatch ? endMatch[1] : ""
+                                endDate: endMatch ? endMatch[1] : "",
+                                paused: isPaused
                             });
                         }
                     }
                 }
                 
                 renderTasks();
+                checkLastRunStatus();
                 statusEl.style.color = "#107c41";
                 statusEl.innerHTML = "✨ Sukces! Wczytano najnowsze zadania i harmonogram z GitHuba.";
             } else if (getRes.status === 404) {
@@ -1130,6 +1408,9 @@
     }
 
     renderTasks();
+    if (localStorage.getItem("medicover_gh_token")) {
+        checkLastRunStatus();
+    }
 </script>
 
 </body>
