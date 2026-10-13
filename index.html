@@ -82,7 +82,6 @@
             position: relative;
         }
 
-        /* Nagłówek */
         .header-bar {
             display: flex;
             justify-content: space-between;
@@ -105,7 +104,6 @@
             gap: 12px;
         }
 
-        /* Pasek Statusu Live & Skanuj Teraz */
         .live-status-bar {
             display: flex;
             justify-content: space-between;
@@ -163,7 +161,6 @@
             filter: brightness(1.1);
         }
 
-        /* Przełącznik motywu */
         .theme-switch-wrapper {
             display: flex;
             align-items: center;
@@ -386,7 +383,6 @@
             background-color: var(--task-color, var(--primary-copilot));
         }
 
-        /* Wygląd wstrzymanego zadania */
         .task-item.paused {
             opacity: 0.55;
             filter: grayscale(65%);
@@ -540,67 +536,21 @@
             font-size: 14px;
         }
 
-        /* ==========================================
-           RESPONSYWNOŚĆ DLA TELEFONÓW
-           ========================================== */
         @media (max-width: 768px) {
-            body {
-                padding: 10px 8px;
-            }
-            .container {
-                padding: 20px 14px;
-                border-radius: 18px;
-            }
-            h1 {
-                font-size: 24px;
-            }
-            .live-status-bar {
-                flex-direction: column;
-                align-items: stretch;
-                padding: 12px 14px;
-            }
-            .live-actions {
-                width: 100%;
-            }
-            .btn-run-now {
-                width: 100%;
-            }
-            .copilot-card {
-                padding: 14px;
-            }
-            .flex-row {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 12px;
-            }
-            .flex-row > .form-group {
-                flex: 1 1 100%;
-                width: 100%;
-            }
-            button.btn-add {
-                width: 100%;
-            }
-            .task-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-            .task-info {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 6px;
-                width: 100%;
-            }
-            .task-actions {
-                width: 100%;
-                justify-content: flex-end;
-                border-top: 1px dashed var(--border-subtle);
-                padding-top: 8px;
-            }
-            .cron-preview {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+            body { padding: 10px 8px; }
+            .container { padding: 20px 14px; border-radius: 18px; }
+            h1 { font-size: 24px; }
+            .live-status-bar { flex-direction: column; align-items: stretch; padding: 12px 14px; }
+            .live-actions { width: 100%; }
+            .btn-run-now { width: 100%; }
+            .copilot-card { padding: 14px; }
+            .flex-row { flex-direction: column; align-items: stretch; gap: 12px; }
+            .flex-row > .form-group { flex: 1 1 100%; width: 100%; }
+            button.btn-add { width: 100%; }
+            .task-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .task-info { flex-direction: column; align-items: flex-start; gap: 6px; width: 100%; }
+            .task-actions { width: 100%; justify-content: flex-end; border-top: 1px dashed var(--border-subtle); padding-top: 8px; }
+            .cron-preview { flex-direction: column; align-items: flex-start; }
         }
     </style>
 </head>
@@ -632,7 +582,6 @@
         </div>
     </div>
 
-    <!-- Pasek Statusu Chmury na żywo + przycisk Skanuj teraz -->
     <div class="live-status-bar">
         <div class="live-status-info">
             <span class="status-dot" id="runDot"></span>
@@ -750,7 +699,6 @@
 </div>
 
 <script>
-    // 0. OBSŁUGA MOTYWU
     const toggleSwitch = document.getElementById('checkbox_theme');
     try {
         const currentTheme = localStorage.getItem('theme');
@@ -766,76 +714,10 @@
         try { localStorage.setItem('theme', theme); } catch (err) {}
     });
 
-    // 1. KONFIGURACJA GITHUB
     const GITHUB_REPO = "kopek-beep/medicover"; 
 
-    // 2. SPECJALIZACJE
     const wszystkieSpecjalizacje = {
-        "176": "Alergolog dorośli",
-        "178": "Alergolog dorośli odczulanie",
-        "11682": "Badanie dna oka - dorośli",
-        "76796": "Badanie dna oka - dzieci",
-        "2": "Chirurg dorośli",
-        "1190": "Choroby zakaźne dorośli",
-        "3": "Dermatolog dorośli",
-        "99": "Diabetolog",
-        "182": "Dietetyk dorośli",
-        "5": "Endokrynolog dorośli",
-        "27962": "Endokrynolog dorośli - porada telefoniczna",
-        "46066": "Ginekolog - kwalifikacja do założenia wkładki",
-        "4800": "Ginekolog - prowadzenie ciąży",
-        "64948": "Ginekolog - założenie wkładki",
-        "4798": "Ginekolog dorośli",
-        "94448": "Ginekologia - awaryjna antykoncepcja - porada tel. u położnej",
-        "89834": "Ginekologia - badania w ciąży - porada telefoniczna u położnej",
-        "46068": "Ginekologia - infekcja intymna u położnej",
-        "10244": "Ginekologia - pobranie wymazu",
-        "116730": "Ginekologia - porada poporodowa u położnej - porada telefoniczna",
-        "116732": "Ginekologia - porada poporodowa u położnej",
-        "72380": "Ginekologia - przygotowanie do ciąży u położnej",
-        "10864": "Hematolog - Szpital",
-        "47068": "Higienizacja 4w1",
-        "112": "Higienizacja standardowa",
-        "9": "Internista",
-        "19046": "Internista - porada telefoniczna",
-        "63748": "Invisalign",
-        "39836": "Invisalign - leczenie",
-        "10": "Kardiolog dorośli",
-        "87430": "Kwalifikacja i szczepienie dorośli – specjalista med.",
-        "192": "Laryngolog dorośli",
-        "96": "Logopeda dorośli",
-        "16234": "Medicover Express - przeziębienie, grypa",
-        "62742": "Medicover Express - szcz. grypa - dorośli - specjalista med.",
-        "16236": "Medicover Express - szczepienia dorośli",
-        "486": "Medicover Express - szczepienia grypa",
-        "9976": "Medycyna podróży - dorośli",
-        "1586": "Medycyna Rodzinna - dorośli",
-        "27964": "Medycyna Rodzinna - dorośli - porada telefoniczna",
-        "3004": "Mykologia - pobranie u pielęgniarki",
-        "16": "Neurolog dorośli",
-        "198": "Okulista dorośli",
-        "200": "Okulista dziecięcy",
-        "19054": "Okulistyka - badanie wzroku",
-        "114": "Ortodonta",
-        "28766": "Ortodonta - leczenie",
-        "163": "Ortopeda dorośli",
-        "6254": "Pobranie HPV / Cytologia",
-        "105898": "Położna - infekcje pęcherza moczowego",
-        "105900": "Położna - infekcje pęcherza moczowego - porada telefoniczna",
-        "97064": "Położna - wizyta profilaktyczna",
-        "27158": "Poradnia Bólu Pleców i Układu Ruchu - dorośli",
-        "20056": "Poradnia Leczenia Boreliozy",
-        "28770": "Protetyk - leczenie",
-        "24": "Psychiatra dorośli",
-        "25": "Psycholog dorośli",
-        "48914": "Psycholog dorośli - porada telefoniczna",
-        "41": "Pulmonolog dorośli",
-        "52110": "Punkt Pobrań - ciężarne",
-        "52106": "Punkt Pobrań - dorośli",
-        "23504": "Stomatolog - leczenie",
-        "22890": "Stomatolog - przegląd",
-        "30": "Urolog dorośli",
-        "76798": "Urologia - pobranie wymazu u mężczyzn przez pielęgniarkę"
+        "176": "Alergolog dorośli", "178": "Alergolog dorośli odczulanie", "11682": "Badanie dna oka - dorośli", "76796": "Badanie dna oka - dzieci", "2": "Chirurg dorośli", "1190": "Choroby zakaźne dorośli", "3": "Dermatolog dorośli", "99": "Diabetolog", "182": "Dietetyk dorośli", "5": "Endokrynolog dorośli", "27962": "Endokrynolog dorośli - porada telefoniczna", "46066": "Ginekolog - kwalifikacja do założenia wkładki", "4800": "Ginekolog - prowadzenie ciąży", "64948": "Ginekolog - założenie wkładki", "4798": "Ginekolog dorośli", "94448": "Ginekologia - awaryjna antykoncepcja - porada tel. u położnej", "89834": "Ginekologia - badania w ciąży - porada telefoniczna u położnej", "46068": "Ginekologia - infekcja intymna u położnej", "10244": "Ginekologia - pobranie wymazu", "116730": "Ginekologia - porada poporodowa u położnej - porada telefoniczna", "116732": "Ginekologia - porada poporodowa u położnej", "72380": "Ginekologia - przygotowanie do ciąży u położnej", "10864": "Hematolog - Szpital", "47068": "Higienizacja 4w1", "112": "Higienizacja standardowa", "9": "Internista", "19046": "Internista - porada telefoniczna", "63748": "Invisalign", "39836": "Invisalign - leczenie", "10": "Kardiolog dorośli", "87430": "Kwalifikacja i szczepienie dorośli – specjalista med.", "192": "Laryngolog dorośli", "96": "Logopeda dorośli", "16234": "Medicover Express - przeziębienie, grypa", "62742": "Medicover Express - szcz. grypa - dorośli - specjalista med.", "16236": "Medicover Express - szczepienia dorośli", "486": "Medicover Express - szczepienia grypa", "9976": "Medycyna podróży - dorośli", "1586": "Medycyna Rodzinna - dorośli", "27964": "Medycyna Rodzinna - dorośli - porada telefoniczna", "3004": "Mykologia - pobranie u pielęgniarki", "16": "Neurolog dorośli", "198": "Okulista dorośli", "200": "Okulista dziecięcy", "19054": "Okulistyka - badanie wzroku", "114": "Ortodonta", "28766": "Ortodonta - leczenie", "163": "Ortopeda dorośli", "6254": "Pobranie HPV / Cytologia", "105898": "Położna - infekcje pęcherza moczowego", "105900": "Położna - infekcje pęcherza moczowego - porada telefoniczna", "97064": "Położna - wizyta profilaktyczna", "27158": "Poradnia Bólu Pleców i Układu Ruchu - dorośli", "20056": "Poradnia Leczenia Boreliozy", "28770": "Protetyk - leczenie", "24": "Psychiatra dorośli", "25": "Psycholog dorośli", "48914": "Psycholog dorośli - porada telefoniczna", "41": "Pulmonolog dorośli", "52110": "Punkt Pobrań - ciężarne", "52106": "Punkt Pobrań - dorośli", "23504": "Stomatolog - leczenie", "22890": "Stomatolog - przegląd", "30": "Urolog dorośli", "76798": "Urologia - pobranie wymazu u mężczyzn przez pielęgniarkę"
     };
 
     const dostepneDlaOsoby = {
@@ -896,7 +778,6 @@
     odswiezSpecjalizacje();
     ustawDzisiejszaDate();
 
-    // 3. OBSŁUGA HARMONOGRAMU (CZAS POLSKI -> UTC CRON)
     const hourStartSelect = document.getElementById('hourStart');
     const hourEndSelect = document.getElementById('hourEnd');
     const scanIntervalSelect = document.getElementById('scanInterval');
@@ -933,12 +814,13 @@
     }
 
     function buildCronExpression() {
-        const interval = parseInt(scanIntervalSelect.value, 10) || 30;
+        const rawInterval = scanIntervalSelect.value.trim();
+        const interval = (rawInterval === "15" || rawInterval === "10" || rawInterval === "20" || rawInterval === "30" || rawInterval === "60") ? rawInterval : "30";
         const mode = scanModeSelect.value;
         const startPL = parseInt(hourStartSelect.value, 10) || 0;
         const endPL = parseInt(hourEndSelect.value, 10) || 0;
 
-        const minPart = interval === 60 ? "0" : `*/${interval}`;
+        const minPart = (interval === "60") ? "0" : `*/${interval}`;
         if (mode === "24h") return `${minPart} * * * *`;
 
         const plHours = [];
@@ -1036,7 +918,6 @@
 
     initScheduleFromStorage();
 
-    // 4. LOGIKA ZADAŃ (WRAZ Z PAUZOWANIEM)
     let tasks = [];
     try {
         const storedTasks = JSON.parse(localStorage.getItem('medicover_tasks'));
@@ -1135,7 +1016,6 @@
         renderTasks();
     }
 
-    // 5. GENEROWANIE YAML Z PAMIĘCIĄ WIZYT I OBSŁUGĄ PAUZY
     function generateYaml() {
         const cronExpr = buildCronExpression();
         let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '${cronExpr}'\n  workflow_dispatch:\n\npermissions:\n  contents: write\n\njobs:\n`;
@@ -1208,7 +1088,6 @@
         }
     }
 
-    // 6. AUTOMATYCZNY STATUS NA ŻYWO I RĘCZNE WYWOŁANIE SKANOWANIA
     let fastPollingTimeout = null;
 
     async function checkLastRunStatus() {
@@ -1276,7 +1155,6 @@
         };
 
         try {
-            // 1. Pobieramy rzeczywistą domyślną gałąź repozytorium (np. main lub master)
             const repoRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}`, { headers });
             if (!repoRes.ok) {
                 const errData = await repoRes.json().catch(() => ({}));
@@ -1286,7 +1164,6 @@
             const repoData = await repoRes.json();
             const defaultBranch = repoData.default_branch || "main";
 
-            // 2. Wywołujemy skanowanie na właściwej gałęzi
             const dispatchUrl = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/dispatches`;
             const res = await fetch(dispatchUrl, {
                 method: "POST",
@@ -1311,7 +1188,6 @@
         }
     }
 
-    // 7. SYNCHRONIZACJA Z GITHUBEM
     async function syncToGithub() {
         const statusEl = document.getElementById('status');
         const syncBtn = document.getElementById('syncBtn');
