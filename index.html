@@ -2,121 +2,158 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MediRadar Panel</title>
     <style>
         /* ==========================================
-           MEDIRADAR - ZAAWANSOWANY DESIGN (JASNY/CIEMNY)
+           MICROSOFT COPILOT / FLUENT 2 DESIGN SYSTEM
            ========================================== */
         :root {
-            /* Tryb Jasny (Domyślny) */
-            --bg-page: #e9ecef;
-            --bg-container: rgba(255, 255, 255, 0.85);
-            --bg-element: rgba(255, 255, 255, 0.95);
-            --text-main: #212529;
-            --text-secondary: #495057;
-            --border-color: rgba(0, 0, 0, 0.1);
-            --input-border: #ced4da;
-            --primary-blue: #0d6efd;
-            --primary-hover: #0b5ed7;
-            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.12);
-            --gradient-title: linear-gradient(135deg, #0d6efd 0%, #6f42c1 50%, #0dcaf0 100%);
-            --btn-sync-grad: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-            --aurora-1: rgba(13, 110, 253, 0.15);
-            --aurora-2: rgba(111, 66, 193, 0.15);
-            --empty-bg: rgba(248, 249, 250, 0.8);
-            --empty-border: #adb5bd;
+            /* Tryb Jasny (Copilot Warm Daylight) */
+            --bg-page: #faf9f8;
+            --bg-container: rgba(255, 255, 255, 0.78);
+            --bg-card: rgba(255, 255, 255, 0.92);
+            --bg-input: #ffffff;
+            --text-main: #242424;
+            --text-secondary: #616161;
+            --border-subtle: rgba(0, 0, 0, 0.08);
+            --border-input: #d1d1d1;
+            --primary-copilot: #0f6cbd;
+            --primary-glow: rgba(15, 108, 189, 0.18);
             
+            /* Gradienty Microsoft Copilot */
+            --copilot-gradient: linear-gradient(135deg, #0f6cbd 0%, #75399c 35%, #d83b01 70%, #ffb900 100%);
+            --copilot-btn-gradient: linear-gradient(135deg, #0f6cbd 0%, #5c2e91 55%, #c239b3 100%);
+            --copilot-border-glow: linear-gradient(135deg, rgba(15, 108, 189, 0.3), rgba(194, 57, 179, 0.3), rgba(216, 59, 1, 0.25));
+
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03);
+            --shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.04);
+            --aurora-1: rgba(15, 108, 189, 0.14);
+            --aurora-2: rgba(194, 57, 179, 0.12);
+            --aurora-3: rgba(255, 140, 0, 0.10);
+
             --radius-main: 24px;
-            --radius-element: 12px;
-            --transition-speed: 0.3s;
+            --radius-card: 16px;
+            --radius-input: 12px;
+            --transition-speed: 0.25s;
         }
 
         [data-theme="dark"] {
-            /* Tryb Ciemny */
-            --bg-page: #121212;
-            --bg-container: rgba(30, 30, 30, 0.85);
-            --bg-element: rgba(45, 45, 45, 0.95);
-            --text-main: #f8f9fa;
-            --text-secondary: #adb5bd;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --input-border: #495057;
-            --primary-blue: #3d8bfd;
-            --primary-hover: #6ea8fe;
-            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.5);
-            --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.7);
-            --gradient-title: linear-gradient(135deg, #3d8bfd 0%, #d63384 50%, #0dcaf0 100%);
-            --btn-sync-grad: linear-gradient(135deg, #3d8bfd 0%, #0d6efd 100%);
-            --aurora-1: rgba(61, 139, 253, 0.1);
-            --aurora-2: rgba(214, 51, 132, 0.1);
-            --empty-bg: rgba(33, 37, 41, 0.8);
-            --empty-border: #6c757d;
+            /* Tryb Ciemny (Copilot Fluent Dark / Mica) */
+            --bg-page: #141414;
+            --bg-container: rgba(32, 32, 32, 0.78);
+            --bg-card: rgba(44, 44, 44, 0.88);
+            --bg-input: #1f1f1f;
+            --text-main: #f5f5f5;
+            --text-secondary: #adadad;
+            --border-subtle: rgba(255, 255, 255, 0.1);
+            --border-input: #424242;
+            --primary-copilot: #479ef5;
+            --primary-glow: rgba(71, 158, 245, 0.22);
+
+            --copilot-gradient: linear-gradient(135deg, #479ef5 0%, #b470ff 38%, #ff6b9d 72%, #ffaa44 100%);
+            --copilot-btn-gradient: linear-gradient(135deg, #115ea3 0%, #6b308b 50%, #c239b3 100%);
+            --copilot-border-glow: linear-gradient(135deg, rgba(71, 158, 245, 0.35), rgba(180, 112, 255, 0.35), rgba(255, 107, 157, 0.25));
+
+            --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.55);
+            --shadow-hover: 0 16px 36px rgba(0, 0, 0, 0.75);
+            --aurora-1: rgba(71, 158, 245, 0.12);
+            --aurora-2: rgba(180, 112, 255, 0.12);
+            --aurora-3: rgba(255, 107, 157, 0.08);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            overflow-x: hidden;
         }
 
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            font-family: "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg-page); 
-            margin: 0; 
-            padding: 50px 20px; 
+            padding: 36px 16px; 
             color: var(--text-main); 
             position: relative;
             min-height: 100vh;
-            overflow-x: hidden;
-            box-sizing: border-box;
             transition: background-color var(--transition-speed), color var(--transition-speed);
         }
 
-        /* Dynamiczne tło (Aura) */
+        /* Wielobarwna poświata AI w tle (Copilot Ambient Glow) */
         body::before, body::after {
             content: '';
-            position: absolute;
-            width: 60vw; height: 60vw;
+            position: fixed;
+            width: 55vw; 
+            height: 55vw;
+            max-width: 600px;
+            max-height: 600px;
             z-index: -1;
-            filter: blur(100px);
-            transition: background var(--transition-speed);
+            filter: blur(90px);
             border-radius: 50%;
+            pointer-events: none;
         }
         body::before {
-            top: -20%; left: -10%;
-            background: radial-gradient(circle, var(--aurora-1) 0%, transparent 70%);
+            top: -10%; left: -10%;
+            background: radial-gradient(circle, var(--aurora-1) 0%, var(--aurora-2) 60%, transparent 100%);
         }
         body::after {
-            bottom: -20%; right: -10%;
-            background: radial-gradient(circle, var(--aurora-2) 0%, transparent 70%);
+            bottom: -10%; right: -10%;
+            background: radial-gradient(circle, var(--aurora-3) 0%, var(--aurora-2) 60%, transparent 100%);
         }
 
         .container { 
-            max-width: 900px; 
+            max-width: 880px; 
+            width: 100%;
             margin: 0 auto; 
             background: var(--bg-container);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            padding: 50px; 
+            backdrop-filter: blur(28px) saturate(160%);
+            -webkit-backdrop-filter: blur(28px) saturate(160%);
+            padding: 40px; 
             border-radius: var(--radius-main); 
-            box-shadow: var(--shadow-soft); 
-            border: 1px solid var(--border-color);
-            transition: background var(--transition-speed), border var(--transition-speed), box-shadow var(--transition-speed);
+            box-shadow: var(--shadow-card); 
+            border: 1px solid var(--border-subtle);
             position: relative;
+        }
+
+        /* Nagłówek (Flexbox zapobiegający nachodzeniu na telefonie) */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        h1 { 
+            margin: 0;
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            background: var(--copilot-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
         /* Przełącznik motywu */
         .theme-switch-wrapper {
-            position: absolute;
-            top: 40px;
-            right: 50px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            gap: 8px;
         }
         .theme-switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 26px;
+            width: 52px;
+            height: 28px;
+            margin: 0;
         }
         .theme-switch input { 
             opacity: 0;
@@ -127,8 +164,8 @@
             position: absolute;
             cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
+            background-color: var(--border-input);
+            transition: .3s;
             border-radius: 34px;
         }
         .slider:before {
@@ -137,339 +174,473 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            height: 20px;
-            width: 20px;
+            font-size: 13px;
+            height: 22px;
+            width: 22px;
             left: 3px;
             bottom: 3px;
-            background-color: white;
-            transition: .4s;
+            background-color: #ffffff;
+            transition: .3s;
             border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         input:checked + .slider {
-            background-color: #495057;
+            background: var(--copilot-btn-gradient);
         }
         input:checked + .slider:before {
             transform: translateX(24px);
             content: "🌙";
-            background-color: #2d2d2d;
-        }
-
-        h1 { 
-            margin-top: 0;
-            font-size: 36px;
-            font-weight: 800;
-            letter-spacing: -1px;
-            background: var(--gradient-title);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            background-color: #1f1f1f;
         }
 
         h2 { 
-            font-size: 18px; 
+            font-size: 16px; 
             font-weight: 700; 
             color: var(--text-main);
-            margin-top: 40px;
-            margin-bottom: 25px;
-            padding-bottom: 12px; 
-            border-bottom: 2px solid var(--border-color); 
+            margin-top: 36px;
+            margin-bottom: 18px;
+            padding-bottom: 10px; 
+            border-bottom: 1px solid var(--border-subtle); 
             display: flex;
             align-items: center;
             gap: 10px;
         }
         h2::before {
             content: '';
-            display: block;
+            display: inline-block;
             width: 8px;
             height: 8px;
-            background: var(--primary-blue);
+            background: var(--copilot-gradient);
             border-radius: 50%;
+            flex-shrink: 0;
         }
 
-        .form-group { margin-bottom: 20px; }
+        /* Rzędy formularza - align-items: flex-end gwarantuje równą wysokość wszystkich pól */
+        .flex-row { 
+            display: flex; 
+            gap: 16px; 
+            flex-wrap: wrap; 
+            align-items: flex-end;
+            margin-bottom: 16px;
+        }
+        .flex-row > .form-group { 
+            flex: 1 1 160px; 
+            margin-bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-width: 0;
+        }
         
         label { 
             display: block; 
-            font-weight: 700; 
-            margin-bottom: 10px; 
-            font-size: 13px; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            font-size: 12px; 
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             color: var(--text-secondary);
+            line-height: 1.3;
         }
 
         select, input { 
             width: 100%; 
-            padding: 14px 18px; 
-            font-size: 15px; 
+            height: 46px; /* Sztywna wysokość dla idealnego wyrównania w linii */
+            padding: 0 14px; 
+            font-size: 14px; 
             font-family: inherit;
             font-weight: 500;
             color: var(--text-main);
-            border: 2px solid var(--input-border); 
-            border-radius: var(--radius-element); 
-            box-sizing: border-box; 
-            background-color: var(--bg-element);
+            border: 1.5px solid var(--border-input); 
+            border-radius: var(--radius-input); 
+            background-color: var(--bg-input);
             transition: all var(--transition-speed);
         }
 
         select:focus, input:focus {
             outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.2);
-            background-color: var(--bg-page);
+            border-color: var(--primary-copilot);
+            box-shadow: 0 0 0 3px var(--primary-glow);
         }
 
         select:disabled, input:disabled {
-            opacity: 0.6;
+            opacity: 0.55;
             cursor: not-allowed;
         }
         
-        /* Kolorowanie krawędzi pól w zależności od wybranej osoby */
-        select#person { border-left-width: 6px; }
-        select#person option { font-weight: 600; }
+        select#person { border-left-width: 5px; }
 
-        .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
-        .flex-row > div { flex: 1; min-width: 180px; }
+        /* Karty sekcji w stylu Copilot */
+        .copilot-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 22px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+        }
+
+        .cron-preview {
+            margin-top: 18px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border-subtle);
+        }
+
+        .cron-badge-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            max-width: 100%;
+        }
+
+        .cron-badge {
+            font-family: "Cascadia Code", Consolas, monospace;
+            background: var(--primary-glow);
+            color: var(--primary-copilot);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            word-break: break-all; /* Zapobiega rozpychaniu strony na telefonach */
+            display: inline-block;
+        }
 
         button { 
             font-family: inherit;
             border: none; 
-            padding: 14px 28px; 
-            font-size: 15px; 
-            font-weight: 700; 
-            border-radius: var(--radius-element); 
+            padding: 13px 24px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            border-radius: var(--radius-input); 
             cursor: pointer; 
             transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        button:active { transform: scale(0.96); }
+        button:active { transform: scale(0.97); }
         
         button.btn-add {
-            background-color: var(--bg-element);
-            color: var(--primary-blue);
-            border: 2px solid var(--primary-blue);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-top: 15px;
+            background: var(--bg-input);
+            color: var(--primary-copilot);
+            border: 1.5px solid var(--primary-copilot);
+            margin-top: 6px;
+            width: auto;
         }
         button.btn-add:hover { 
-            background-color: var(--primary-blue); 
-            color: white;
-            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.2);
+            background: var(--primary-copilot); 
+            color: #ffffff;
+            box-shadow: 0 4px 12px var(--primary-glow);
         }
-        button.btn-add svg { stroke: currentColor; }
 
         .task-list { 
-            margin-top: 20px; 
+            margin-top: 16px; 
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
         .task-item { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            padding: 20px 24px; 
-            border-radius: var(--radius-element); 
-            background: var(--bg-element);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
+            padding: 16px 20px; 
+            border-radius: var(--radius-card); 
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
             overflow: hidden;
+            gap: 12px;
         }
 
-        /* Kolorowy pasek po lewej stronie zadania */
         .task-item::before {
             content: '';
             position: absolute;
             left: 0; top: 0; bottom: 0;
-            width: 6px;
-            background-color: var(--task-color, var(--primary-blue));
+            width: 5px;
+            background-color: var(--task-color, var(--primary-copilot));
         }
 
         .task-item:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
-            border-color: var(--task-color, var(--primary-blue));
         }
 
-        .task-info { display: flex; align-items: center; gap: 20px; flex: 1; }
+        .task-info { 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+            flex: 1; 
+            min-width: 0;
+        }
         
         .task-tag { 
             display: inline-flex; 
             align-items: center;
             justify-content: center;
-            padding: 6px 16px; 
+            padding: 5px 12px; 
             border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 800; 
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            font-size: 12px; 
+            font-weight: 700; 
+            letter-spacing: 0.5px;
             color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            min-width: 80px;
+            flex-shrink: 0;
         }
 
-        .task-details { color: var(--text-secondary); line-height: 1.6; font-size: 14px;}
-        .task-details b { color: var(--text-main); font-weight: 700; }
+        .task-details { 
+            color: var(--text-secondary); 
+            line-height: 1.5; 
+            font-size: 13.5px;
+            word-wrap: break-word;
+            min-width: 0;
+        }
+        .task-details b { color: var(--text-main); font-weight: 600; }
 
         .btn-delete {
             background: transparent;
-            color: #dc3545;
-            padding: 10px;
+            color: #d13438;
+            padding: 8px;
             border-radius: 8px;
-            border: 1px solid transparent;
+            flex-shrink: 0;
         }
         .btn-delete:hover {
-            background: rgba(220, 53, 69, 0.1);
-            border-color: rgba(220, 53, 69, 0.3);
+            background: rgba(209, 52, 56, 0.1);
         }
 
         .btn-sync {
             width: 100%;
-            padding: 18px;
-            font-size: 16px;
-            border-radius: var(--radius-element);
-            margin-top: 20px;
-            background: var(--btn-sync-grad);
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: var(--radius-input);
+            margin-top: 10px;
+            background: var(--copilot-btn-gradient);
             color: white;
-            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            box-shadow: 0 6px 20px rgba(92, 46, 145, 0.28);
         }
         .btn-sync:hover {
-            box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
-            filter: brightness(1.1);
+            filter: brightness(1.08);
+            box-shadow: 0 8px 24px rgba(92, 46, 145, 0.38);
         }
 
         .btn-load {
             width: 100%;
-            padding: 16px;
-            font-size: 15px;
-            border-radius: var(--radius-element);
-            margin-top: 15px;
-            background-color: transparent;
+            padding: 14px;
+            font-size: 14px;
+            border-radius: var(--radius-input);
+            margin-top: 12px;
+            background-color: var(--bg-card);
             color: var(--text-main);
-            border: 2px dashed var(--border-color);
+            border: 1.5px solid var(--border-input);
         }
         .btn-load:hover { 
-            background-color: var(--border-color); 
+            border-color: var(--primary-copilot);
         }
 
         #status { 
-            margin-top: 25px; 
-            font-weight: 700; 
+            margin-top: 20px; 
+            font-weight: 600; 
             text-align: center; 
-            font-size: 15px; 
-            padding: 14px;
-            border-radius: var(--radius-element);
-            transition: all 0.3s ease;
+            font-size: 14px; 
+            padding: 12px;
+            border-radius: var(--radius-input);
+            word-wrap: break-word;
         }
         .syncing { opacity: 0.6; pointer-events: none; }
         
         .empty-state {
-            padding: 40px; 
+            padding: 32px 20px; 
             text-align: center; 
             color: var(--text-secondary); 
-            background: var(--empty-bg); 
-            border-radius: var(--radius-element); 
-            border: 2px dashed var(--empty-border);
-            font-size: 15px;
-            font-weight: 500;
+            background: var(--bg-card); 
+            border-radius: var(--radius-card); 
+            border: 1.5px dashed var(--border-input);
+            font-size: 14px;
         }
         .empty-state svg {
-            display: block; margin: 0 auto 15px auto; opacity: 0.5;
+            display: block; margin: 0 auto 10px auto; opacity: 0.45;
+        }
+
+        /* ==========================================
+           OPTYMALIZACJA MOBILNA (SMARTFONY)
+           ========================================== */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px 10px;
+            }
+            .container {
+                padding: 22px 16px;
+                border-radius: 18px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .header-bar {
+                margin-bottom: 20px;
+            }
+            .copilot-card {
+                padding: 16px;
+            }
+            .flex-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            .flex-row > .form-group {
+                flex: 1 1 100%;
+                width: 100%;
+            }
+            button.btn-add {
+                width: 100%;
+                margin-top: 4px;
+            }
+            .task-item {
+                padding: 14px 14px 14px 18px;
+            }
+            .task-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .cron-preview {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Przełącznik Dark Mode -->
-    <div class="theme-switch-wrapper">
-        <label class="theme-switch" for="checkbox_theme">
-            <input type="checkbox" id="checkbox_theme" />
-            <div class="slider round"></div>
-        </label>
-    </div>
+    <div class="header-bar">
+        <h1>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="copilotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#0f6cbd" />
+                        <stop offset="40%" stop-color="#8a2be2" />
+                        <stop offset="75%" stop-color="#ec4899" />
+                        <stop offset="100%" stop-color="#f97316" />
+                    </linearGradient>
+                </defs>
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#copilotGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="2.5" fill="url(#copilotGrad)"/>
+            </svg>
+            MediRadar
+        </h1>
 
-    <h1>
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#0d6efd" />
-                    <stop offset="50%" stop-color="#d63384" />
-                    <stop offset="100%" stop-color="#0dcaf0" />
-                </linearGradient>
-            </defs>
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <circle cx="12" cy="12" r="3" fill="url(#grad1)"/>
-        </svg>
-        MediRadar Panel
-    </h1>
+        <!-- Przełącznik Dark Mode -->
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox_theme" title="Zmień motyw">
+                <input type="checkbox" id="checkbox_theme" />
+                <div class="slider"></div>
+            </label>
+        </div>
+    </div>
 
     <h2>Dodaj nowe zadanie monitorowania</h2>
-    
-    <!-- Rząd 1: Pacjent, Miasto, Specjalizacja -->
-    <div class="flex-row">
-        <div class="form-group">
-            <label>Członek rodziny</label>
-            <select id="person">
-                <option value="KAMIL">Kamil</option>
-                <option value="MONIKA">Monika</option>
-                <option value="ADAM">Adam</option>
-                <option value="SZYMON">Szymon</option>
-            </select>
+    <div class="copilot-card">
+        <!-- Rząd 1: Pacjent, Miasto, Specjalizacja -->
+        <div class="flex-row">
+            <div class="form-group">
+                <label>Członek rodziny</label>
+                <select id="person">
+                    <option value="KAMIL">Kamil</option>
+                    <option value="MONIKA">Monika</option>
+                    <option value="ADAM">Adam</option>
+                    <option value="SZYMON">Szymon</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Miasto</label>
+                <select id="region" disabled>
+                    <option value="199">Łódź</option>
+                </select>
+            </div>
+            <div class="form-group" style="flex: 2 1 240px;">
+                <label>Specjalizacja</label>
+                <select id="service"></select>
+            </div>
         </div>
-        <div class="form-group">
-            <label>Miasto</label>
-            <select id="region" disabled>
-                <option value="199">Łódź</option>
-            </select>
+
+        <!-- Rząd 2: Lekarz i Zakres dat -->
+        <div class="flex-row">
+            <div class="form-group" style="flex: 2 1 240px;">
+                <label>Preferowany lekarz</label>
+                <input type="text" id="doctorName" value="Wszyscy" placeholder="np. Kowalski lub Wszyscy">
+            </div>
+            <div class="form-group">
+                <label>Data od</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="form-group">
+                <label>Data do (opcjonalnie)</label>
+                <input type="date" id="endDate">
+            </div>
         </div>
-        <div class="form-group" style="flex: 2;">
-            <label>Specjalizacja</label>
-            <select id="service"></select>
-        </div>
+
+        <button class="btn-add" onclick="addTask()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Aktywuj Radar
+        </button>
     </div>
 
-    <!-- Rząd 2: Lekarz i Zakres dat -->
-    <div class="flex-row">
-        <div class="form-group" style="flex: 2;">
-            <label>Preferowany lekarz</label>
-            <input type="text" id="doctorName" value="Wszyscy" placeholder="np. Kowalski lub Wszyscy">
-        </div>
-        <div class="form-group">
-            <label>Data od</label>
-            <input type="date" id="startDate">
-        </div>
-        <div class="form-group">
-            <label>Data do (opcjonalnie)</label>
-            <input type="date" id="endDate">
-        </div>
-    </div>
-
-    <button class="btn-add" onclick="addTask()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        Aktywuj Radar
-    </button>
-
-    <h2>Aktywne Radary (Harmonogram)</h2>
+    <h2>Aktywne Radary (Lista zadań)</h2>
     <div class="task-list" id="taskList"></div>
 
-    <hr style="margin: 50px 0 40px 0; border: 0; border-top: 2px solid var(--border-color);">
+    <h2>Konfiguracja czasu pracy Radaru (Czas Polski)</h2>
+    <div class="copilot-card">
+        <div class="flex-row" style="margin-bottom: 0;">
+            <div class="form-group">
+                <label>Częstotliwość</label>
+                <select id="scanInterval" onchange="updateScheduleSettings()">
+                    <option value="10">Co 10 minut (intensywne)</option>
+                    <option value="15">Co 15 minut (optymalne)</option>
+                    <option value="20">Co 20 minut</option>
+                    <option value="30" selected>Co 30 minut (bezpieczne)</option>
+                    <option value="60">Co 60 minut (oszczędne)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tryb pracy</label>
+                <select id="scanMode" onchange="updateScheduleSettings()">
+                    <option value="window" selected>Wybrane godziny</option>
+                    <option value="24h">Całą dobę (24/7)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Start (Od godz.)</label>
+                <select id="hourStart" onchange="updateScheduleSettings()"></select>
+            </div>
+            <div class="form-group">
+                <label>Koniec (Do godz.)</label>
+                <select id="hourEnd" onchange="updateScheduleSettings()"></select>
+            </div>
+        </div>
+        <div class="cron-preview">
+            <span id="scheduleSummary">Podsumowanie czasu pracy...</span>
+            <div class="cron-badge-wrapper">
+                <span>Kod GitHub (UTC):</span>
+                <span class="cron-badge" id="cronPreviewText">*/30 * * * *</span>
+            </div>
+        </div>
+    </div>
+
+    <hr style="margin: 36px 0 24px 0; border: 0; border-top: 1px solid var(--border-subtle);">
     
     <button id="syncBtn" class="btn-sync" onclick="syncToGithub()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
         Zapisz i zaktualizuj system
     </button>
     <button id="loadBtn" class="btn-load" onclick="loadFromGithub()">
@@ -501,7 +672,6 @@
         }    
     }
     toggleSwitch.addEventListener('change', switchTheme, false);
-
 
     // ==========================================
     // 1. KONFIGURACJA GITHUB
@@ -586,12 +756,11 @@
         "SZYMON": ["200", "76796"]
     };
 
-    // Przypisane kolory akcentów dla członków rodziny
     const userTheme = {
-        "KAMIL": { color: "#0d6efd" },  
-        "MONIKA": { color: "#d63384" }, 
-        "ADAM": { color: "#198754" },   
-        "SZYMON": { color: "#fd7e14" }  
+        "KAMIL": { color: "#0f6cbd" },  
+        "MONIKA": { color: "#c239b3" }, 
+        "ADAM": { color: "#107c41" },   
+        "SZYMON": { color: "#d83b01" }  
     };
 
     const personSelect = document.getElementById('person');
@@ -652,7 +821,159 @@
     ustawDzisiejszaDate();
 
     // ==========================================
-    // 3. LOGIKA APLIKACJI
+    // 3. OBSŁUGA HARMONOGRAMU (CZAS POLSKI -> UTC CRON)
+    // ==========================================
+    const hourStartSelect = document.getElementById('hourStart');
+    const hourEndSelect = document.getElementById('hourEnd');
+    const scanIntervalSelect = document.getElementById('scanInterval');
+    const scanModeSelect = document.getElementById('scanMode');
+
+    for (let h = 0; h < 24; h++) {
+        const opt1 = document.createElement('option');
+        opt1.value = h;
+        opt1.text = String(h).padStart(2, '0') + ":00";
+        hourStartSelect.appendChild(opt1);
+
+        const opt2 = document.createElement('option');
+        opt2.value = h;
+        opt2.text = String(h).padStart(2, '0') + ":59";
+        hourEndSelect.appendChild(opt2);
+    }
+
+    function getPolandUtcOffsetHours() {
+        return -Math.round(new Date().getTimezoneOffset() / 60);
+    }
+
+    function initScheduleFromStorage() {
+        const saved = JSON.parse(localStorage.getItem('medicover_schedule')) || {
+            interval: "30",
+            mode: "window",
+            start: 7,
+            end: 23
+        };
+        scanIntervalSelect.value = saved.interval || "30";
+        scanModeSelect.value = saved.mode || "window";
+        hourStartSelect.value = saved.start !== undefined ? saved.start : 7;
+        hourEndSelect.value = saved.end !== undefined ? saved.end : 23;
+        updateScheduleSettings();
+    }
+
+    function buildCronExpression() {
+        const interval = parseInt(scanIntervalSelect.value, 10);
+        const mode = scanModeSelect.value;
+        const startPL = parseInt(hourStartSelect.value, 10);
+        const endPL = parseInt(hourEndSelect.value, 10);
+
+        const minPart = interval === 60 ? "0" : `*/${interval}`;
+
+        if (mode === "24h") {
+            return `${minPart} * * * *`;
+        }
+
+        const plHours = [];
+        let curr = startPL;
+        while (true) {
+            plHours.push(curr);
+            if (curr === endPL) break;
+            curr = (curr + 1) % 24;
+            if (plHours.length >= 24) break;
+        }
+
+        if (plHours.length === 24) {
+            return `${minPart} * * * *`;
+        }
+
+        const offset = getPolandUtcOffsetHours();
+        const utcHours = plHours.map(h => (h - offset + 24) % 24);
+
+        return `${minPart} ${utcHours.join(',')} * * *`;
+    }
+
+    function updateScheduleSettings() {
+        const mode = scanModeSelect.value;
+        hourStartSelect.disabled = (mode === "24h");
+        hourEndSelect.disabled = (mode === "24h");
+
+        const interval = scanIntervalSelect.value;
+        const startPL = parseInt(hourStartSelect.value, 10);
+        const endPL = parseInt(hourEndSelect.value, 10);
+
+        localStorage.setItem('medicover_schedule', JSON.stringify({
+            interval: interval,
+            mode: mode,
+            start: startPL,
+            end: endPL
+        }));
+
+        const cronExpr = buildCronExpression();
+        document.getElementById('cronPreviewText').textContent = cronExpr;
+
+        const offset = getPolandUtcOffsetHours();
+        const startLabel = String(startPL).padStart(2, '0') + ":00";
+        const endLabel = String(endPL).padStart(2, '0') + ":59";
+
+        if (mode === "24h") {
+            document.getElementById('scheduleSummary').innerHTML = 
+                `Skanowanie <b>całą dobę (24/7)</b> co <b>${interval} min</b>.`;
+        } else {
+            document.getElementById('scheduleSummary').innerHTML = 
+                `Aktywne od <b>${startLabel}</b> do <b>${endLabel}</b> czasu polskiego (UTC+${offset}), sprawdzanie co <b>${interval} min</b>.`;
+        }
+    }
+
+    function parseCronFromGithub(cronStr) {
+        const parts = cronStr.trim().split(/\s+/);
+        if (parts.length < 2) return;
+
+        const minPart = parts[0];
+        const hourPart = parts[1];
+
+        let interval = "30";
+        if (minPart === "0") {
+            interval = "60";
+        } else if (minPart.startsWith("*/")) {
+            interval = minPart.replace("*/", "");
+        }
+
+        if (["10", "15", "20", "30", "60"].includes(interval)) {
+            scanIntervalSelect.value = interval;
+        }
+
+        if (hourPart === "*") {
+            scanModeSelect.value = "24h";
+        } else {
+            scanModeSelect.value = "window";
+            const offset = getPolandUtcOffsetHours();
+            let utcHours = [];
+
+            if (hourPart.includes(",")) {
+                utcHours = hourPart.split(",").map(Number);
+            } else if (hourPart.includes("-")) {
+                const [s, e] = hourPart.split("-").map(Number);
+                let c = s;
+                while (true) {
+                    utcHours.push(c);
+                    if (c === e) break;
+                    c = (c + 1) % 24;
+                    if (utcHours.length >= 24) break;
+                }
+            } else if (!isNaN(parseInt(hourPart, 10))) {
+                utcHours = [parseInt(hourPart, 10)];
+            }
+
+            if (utcHours.length > 0) {
+                const plHours = utcHours.map(h => (h + offset + 24) % 24);
+                hourStartSelect.value = plHours[0];
+                hourEndSelect.value = plHours[plHours.length - 1];
+            }
+        }
+        updateScheduleSettings();
+    }
+
+    initScheduleFromStorage();
+
+    // ==========================================
+    // 4. LOGIKA ZADAŃ APLIKACJI
     // ==========================================
     let tasks = JSON.parse(localStorage.getItem('medicover_tasks')) || [];
 
@@ -662,7 +983,7 @@
         if (tasks.length === 0) {
             list.innerHTML = `
                 <div class="empty-state">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                     Radar wyłączony.<br>Dodaj specjalizację powyżej, aby rozpocząć monitorowanie.
                 </div>`;
             return;
@@ -690,13 +1011,13 @@
                     <span class="task-tag" style="background-color: ${theme.color};">${task.person}</span>
                     <div class="task-details">
                         <div>Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${wszystkieSpecjalizacje[task.service] || "ID: " + task.service}</b></div>
-                        <div style="font-size: 13px; margin-top: 5px; color: var(--text-secondary);">
+                        <div style="font-size: 12.5px; margin-top: 3px; color: var(--text-secondary);">
                             Lekarz: <b>${docName}</b> &nbsp;&bull;&nbsp; Termin: <b>${dateRangeText}</b>
                         </div>
                     </div>
                 </div>
                 <button class="btn-delete" onclick="removeTask(${index})" title="Usuń z Radaru">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                 </button>
             `;
             list.appendChild(div);
@@ -741,7 +1062,8 @@
     }
 
     function generateYaml() {
-        let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '*/30 * * * *'\n  workflow_dispatch:\n\njobs:\n`;
+        const cronExpr = buildCronExpression();
+        let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '${cronExpr}'\n  workflow_dispatch:\n\njobs:\n`;
         yaml += `  check-slots:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n`;
         yaml += `      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n`;
         yaml += `      - run: pip install uv && uv sync\n`;
@@ -794,7 +1116,7 @@
         const syncBtn = document.getElementById('syncBtn');
         
         if (tasks.length === 0) { 
-            alert("Nie masz żadnych zadań na liście. Radar zostanie wyłączony, ale pamiętaj, aby zatrzymać skrypt na GitHubie jeśli chcesz w pełni wyłączyć bota."); 
+            alert("Nie masz żadnych zadań na liście. Dodaj chociaż jedno zadanie, aby zapisać harmonogram."); 
             return; 
         }
 
@@ -804,7 +1126,7 @@
             return;
         }
 
-        statusEl.style.color = "var(--primary-blue)";
+        statusEl.style.color = "var(--primary-copilot)";
         statusEl.innerHTML = "☁️ Łączenie z usługami chmurowymi GitHub...";
         syncBtn.classList.add('syncing');
 
@@ -817,16 +1139,16 @@
             if (getRes.ok) sha = (await getRes.json()).sha;
 
             const base64Content = btoa(unescape(encodeURIComponent(generateYaml())));
-            const body = { message: "Aktualizacja Radaru", content: base64Content };
+            const body = { message: "Aktualizacja Radaru i harmonogramu", content: base64Content };
             if (sha) body.sha = sha;
 
             const putRes = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body) });
             
             if (putRes.ok) {
-                statusEl.style.color = "#198754";
-                statusEl.innerHTML = "✨ Sukces! Twój system Radar został zaktualizowany w chmurze.";
+                statusEl.style.color = "#107c41";
+                statusEl.innerHTML = "✨ Sukces! Twój system Radar oraz godziny pracy zostały zaktualizowane w chmurze.";
             } else {
-                statusEl.style.color = "#dc3545";
+                statusEl.style.color = "#d13438";
                 statusEl.innerHTML = `❌ Błąd aktualizacji: ${(await putRes.json()).message}`;
                 if (putRes.status === 401) {
                     localStorage.removeItem("medicover_gh_token");
@@ -834,7 +1156,7 @@
                 }
             }
         } catch (error) {
-            statusEl.style.color = "#dc3545";
+            statusEl.style.color = "#d13438";
             statusEl.innerHTML = `❌ Błąd połączenia: ${error.message}`;
         } finally {
             syncBtn.classList.remove('syncing');
@@ -864,6 +1186,11 @@
                 const data = await getRes.json();
                 const decodedContent = decodeURIComponent(escape(atob(data.content)));
                 
+                const cronMatch = decodedContent.match(/cron:\s*'([^']+)'/);
+                if (cronMatch && cronMatch[1]) {
+                    parseCronFromGithub(cronMatch[1]);
+                }
+
                 tasks = [];
                 const lines = decodedContent.split('\n');
                 
@@ -890,20 +1217,20 @@
                 }
                 
                 renderTasks();
-                statusEl.style.color = "#198754";
-                statusEl.innerHTML = "✨ Sukces! Wczytano najnowsze dane z GitHuba.";
+                statusEl.style.color = "#107c41";
+                statusEl.innerHTML = "✨ Sukces! Wczytano najnowsze zadania i harmonogram z GitHuba.";
             } else if (getRes.status === 404) {
                 statusEl.style.color = "var(--text-secondary)";
                 statusEl.innerHTML = "Brak pliku na GitHubie. Dodaj lekarzy i kliknij Zapisz.";
                 tasks = [];
                 renderTasks();
             } else {
-                statusEl.style.color = "#dc3545";
+                statusEl.style.color = "#d13438";
                 statusEl.innerHTML = `❌ Błąd: ${(await getRes.json()).message}`;
                 if (getRes.status === 401) localStorage.removeItem("medicover_gh_token");
             }
         } catch (error) {
-            statusEl.style.color = "#dc3545";
+            statusEl.style.color = "#d13438";
             statusEl.innerHTML = `❌ Błąd połączenia: ${error.message}`;
         } finally {
             loadBtn.classList.remove('syncing');
