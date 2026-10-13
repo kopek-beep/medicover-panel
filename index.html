@@ -5,130 +5,156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediRadar Panel</title>
     <style>
-        /* ==========================================
-           MEDIRADAR - ZAAWANSOWANY DESIGN (JASNY/CIEMNY)
-           ========================================== */
         :root {
-            /* Tryb Jasny (Domyślny) */
-            --bg-page: #e9ecef;
-            --bg-container: rgba(255, 255, 255, 0.85);
-            --bg-element: rgba(255, 255, 255, 0.95);
-            --text-main: #212529;
-            --text-secondary: #495057;
-            --border-color: rgba(0, 0, 0, 0.1);
-            --input-border: #ced4da;
-            --primary-blue: #0d6efd;
-            --primary-hover: #0b5ed7;
-            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.08);
-            --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.12);
-            --gradient-title: linear-gradient(135deg, #0d6efd 0%, #6f42c1 50%, #0dcaf0 100%);
-            --btn-sync-grad: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-            --aurora-1: rgba(13, 110, 253, 0.15);
-            --aurora-2: rgba(111, 66, 193, 0.15);
-            --empty-bg: rgba(248, 249, 250, 0.8);
-            --empty-border: #adb5bd;
+            --bg-page: #faf9f8;
+            --bg-container: #ffffff;
+            --bg-card: #f5f5f5;
+            --bg-input: #ffffff;
+            --text-main: #242424;
+            --text-secondary: #616161;
+            --border-subtle: #e0e0e0;
+            --border-input: #d1d1d1;
+            --primary-copilot: #0f6cbd;
+            --primary-glow: rgba(15, 108, 189, 0.16);
             
+            --copilot-gradient: linear-gradient(135deg, #0f6cbd 0%, #75399c 35%, #d83b01 70%, #ffb900 100%);
+            --copilot-btn-gradient: linear-gradient(135deg, #0f6cbd 0%, #5c2e91 55%, #c239b3 100%);
+
+            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.07);
             --radius-main: 24px;
-            --radius-element: 12px;
-            --transition-speed: 0.3s;
+            --radius-card: 16px;
+            --radius-input: 12px;
         }
 
         [data-theme="dark"] {
-            /* Tryb Ciemny */
-            --bg-page: #121212;
-            --bg-container: rgba(30, 30, 30, 0.85);
-            --bg-element: rgba(45, 45, 45, 0.95);
-            --text-main: #f8f9fa;
-            --text-secondary: #adb5bd;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --input-border: #495057;
-            --primary-blue: #3d8bfd;
-            --primary-hover: #6ea8fe;
-            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.5);
-            --shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.7);
-            --gradient-title: linear-gradient(135deg, #3d8bfd 0%, #d63384 50%, #0dcaf0 100%);
-            --btn-sync-grad: linear-gradient(135deg, #3d8bfd 0%, #0d6efd 100%);
-            --aurora-1: rgba(61, 139, 253, 0.1);
-            --aurora-2: rgba(214, 51, 132, 0.1);
-            --empty-bg: rgba(33, 37, 41, 0.8);
-            --empty-border: #6c757d;
+            --bg-page: #141414;
+            --bg-container: #1f1f1f;
+            --bg-card: #292929;
+            --bg-input: #141414;
+            --text-main: #f5f5f5;
+            --text-secondary: #adadad;
+            --border-subtle: #383838;
+            --border-input: #4a4a4a;
+            --primary-copilot: #479ef5;
+            --primary-glow: rgba(71, 158, 245, 0.22);
+
+            --copilot-gradient: linear-gradient(135deg, #479ef5 0%, #b470ff 38%, #ff6b9d 72%, #ffaa44 100%);
+            --copilot-btn-gradient: linear-gradient(135deg, #115ea3 0%, #6b308b 50%, #c239b3 100%);
+
+            --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.6);
         }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
 
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            font-family: "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--bg-page); 
-            margin: 0; 
-            padding: 50px 20px; 
+            padding: 32px 16px; 
             color: var(--text-main); 
-            position: relative;
             min-height: 100vh;
-            overflow-x: hidden;
-            box-sizing: border-box;
-            transition: background-color var(--transition-speed), color var(--transition-speed);
-        }
-
-        /* Dynamiczne tło (Aura) */
-        body::before, body::after {
-            content: '';
-            position: absolute;
-            width: 60vw; height: 60vw;
-            z-index: -1;
-            filter: blur(100px);
-            transition: background var(--transition-speed);
-            border-radius: 50%;
-        }
-        body::before {
-            top: -20%; left: -10%;
-            background: radial-gradient(circle, var(--aurora-1) 0%, transparent 70%);
-        }
-        body::after {
-            bottom: -20%; right: -10%;
-            background: radial-gradient(circle, var(--aurora-2) 0%, transparent 70%);
+            transition: background-color 0.25s, color 0.25s;
         }
 
         .container { 
-            max-width: 900px; 
+            max-width: 880px; 
+            width: 100%;
             margin: 0 auto; 
             background: var(--bg-container);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            padding: 50px; 
+            padding: 38px; 
             border-radius: var(--radius-main); 
-            box-shadow: var(--shadow-soft); 
-            border: 1px solid var(--border-color);
-            transition: background var(--transition-speed), border var(--transition-speed), box-shadow var(--transition-speed);
+            box-shadow: var(--shadow-card); 
+            border: 1px solid var(--border-subtle);
             position: relative;
         }
 
-        /* Przełącznik motywu */
-        .theme-switch-wrapper {
-            position: absolute;
-            top: 40px;
-            right: 50px;
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        h1 { 
+            margin: 0;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+            background: var(--copilot-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .live-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+
+        .live-status-info {
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13.5px;
             color: var(--text-secondary);
         }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #888;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        .status-dot.success { background: #107c41; box-shadow: 0 0 8px rgba(16, 124, 65, 0.6); }
+        .status-dot.running { background: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.7); animation: pulse 1.2s infinite; }
+        .status-dot.error { background: #d13438; box-shadow: 0 0 8px rgba(209, 52, 56, 0.6); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.45; transform: scale(1.2); }
+        }
+
+        .btn-run-now {
+            padding: 9px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            background: var(--copilot-btn-gradient);
+            color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(92, 46, 145, 0.25);
+            border: none;
+            cursor: pointer;
+        }
+        .btn-run-now:hover { filter: brightness(1.1); }
+
         .theme-switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 26px;
+            width: 52px;
+            height: 28px;
+            margin: 0;
+            cursor: pointer;
         }
-        .theme-switch input { 
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .theme-switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute;
-            cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
+            background-color: var(--border-input);
+            transition: .3s;
             border-radius: 34px;
         }
         .slider:before {
@@ -137,446 +163,333 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            height: 20px;
-            width: 20px;
+            font-size: 13px;
+            height: 22px;
+            width: 22px;
             left: 3px;
             bottom: 3px;
-            background-color: white;
-            transition: .4s;
+            background-color: #ffffff;
+            transition: .3s;
             border-radius: 50%;
         }
-        input:checked + .slider {
-            background-color: #495057;
-        }
-        input:checked + .slider:before {
-            transform: translateX(24px);
-            content: "🌙";
-            background-color: #2d2d2d;
-        }
-
-        h1 { 
-            margin-top: 0;
-            font-size: 36px;
-            font-weight: 800;
-            letter-spacing: -1px;
-            background: var(--gradient-title);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+        input:checked + .slider { background: var(--copilot-btn-gradient); }
+        input:checked + .slider:before { transform: translateX(24px); content: "🌙"; background-color: #1f1f1f; }
 
         h2 { 
-            font-size: 18px; 
+            font-size: 16px; 
             font-weight: 700; 
             color: var(--text-main);
-            margin-top: 40px;
-            margin-bottom: 25px;
-            padding-bottom: 12px; 
-            border-bottom: 2px solid var(--border-color); 
+            margin-top: 32px;
+            margin-bottom: 16px;
+            padding-bottom: 10px; 
+            border-bottom: 1px solid var(--border-subtle); 
             display: flex;
             align-items: center;
             gap: 10px;
         }
         h2::before {
             content: '';
-            display: block;
-            width: 8px;
-            height: 8px;
-            background: var(--primary-blue);
+            display: inline-block;
+            width: 8px; height: 8px;
+            background: var(--copilot-gradient);
             border-radius: 50%;
         }
 
-        .form-group { margin-bottom: 20px; }
+        .flex-row { 
+            display: flex; 
+            gap: 16px; 
+            flex-wrap: wrap; 
+            align-items: flex-end;
+            margin-bottom: 16px;
+        }
+        .flex-row > .form-group { 
+            flex: 1 1 160px; 
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
         
         label { 
             display: block; 
-            font-weight: 700; 
-            margin-bottom: 10px; 
-            font-size: 13px; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            font-size: 12px; 
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             color: var(--text-secondary);
         }
 
         select, input { 
             width: 100%; 
-            padding: 14px 18px; 
-            font-size: 15px; 
+            height: 46px;
+            padding: 0 14px; 
+            font-size: 14px; 
             font-family: inherit;
-            font-weight: 500;
             color: var(--text-main);
-            border: 2px solid var(--input-border); 
-            border-radius: var(--radius-element); 
-            box-sizing: border-box; 
-            background-color: var(--bg-element);
-            transition: all var(--transition-speed);
+            border: 1.5px solid var(--border-input); 
+            border-radius: var(--radius-input); 
+            background-color: var(--bg-input);
+        }
+        select:focus, input:focus { outline: none; border-color: var(--primary-copilot); box-shadow: 0 0 0 3px var(--primary-glow); }
+        select#person { border-left-width: 5px; }
+
+        .copilot-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-card);
+            padding: 20px;
         }
 
-        select:focus, input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 4px rgba(13, 110, 253, 0.2);
-            background-color: var(--bg-page);
+        .cron-preview {
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-top: 14px;
+            border-top: 1px dashed var(--border-subtle);
         }
 
-        select:disabled, input:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        .cron-badge {
+            font-family: Consolas, monospace;
+            background: var(--primary-glow);
+            color: var(--primary-copilot);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
         }
-        
-        /* Kolorowanie krawędzi pól w zależności od wybranej osoby */
-        select#person { border-left-width: 6px; }
-        select#person option { font-weight: 600; }
-
-        .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
-        .flex-row > div { flex: 1; min-width: 180px; }
 
         button { 
             font-family: inherit;
             border: none; 
-            padding: 14px 28px; 
-            font-size: 15px; 
-            font-weight: 700; 
-            border-radius: var(--radius-element); 
+            padding: 13px 24px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            border-radius: var(--radius-input); 
             cursor: pointer; 
-            transition: all 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        button:active { transform: scale(0.96); }
-        
         button.btn-add {
-            background-color: var(--bg-element);
-            color: var(--primary-blue);
-            border: 2px solid var(--primary-blue);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-top: 15px;
+            background: var(--bg-input);
+            color: var(--primary-copilot);
+            border: 1.5px solid var(--primary-copilot);
+            margin-top: 4px;
         }
-        button.btn-add:hover { 
-            background-color: var(--primary-blue); 
-            color: white;
-            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.2);
-        }
-        button.btn-add svg { stroke: currentColor; }
+        button.btn-add:hover { background: var(--primary-copilot); color: #ffffff; }
 
-        .task-list { 
-            margin-top: 20px; 
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
+        .task-list { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
         .task-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 20px 24px; 
-            border-radius: var(--radius-element); 
-            background: var(--bg-element);
-            border: 1px solid var(--border-color);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
-            position: relative;
-            overflow: hidden;
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 16px 18px 16px 22px; border-radius: var(--radius-card); 
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            position: relative; overflow: hidden; gap: 12px;
         }
-
-        /* Kolorowy pasek po lewej stronie zadania */
         .task-item::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 6px;
-            background-color: var(--task-color, var(--primary-blue));
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+            background-color: var(--task-color, var(--primary-copilot));
         }
-
-        .task-item:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-hover);
-            border-color: var(--task-color, var(--primary-blue));
-        }
-
-        .task-info { display: flex; align-items: center; gap: 20px; flex: 1; }
-        
+        .task-item.paused { opacity: 0.55; filter: grayscale(65%); }
+        .task-info { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
         .task-tag { 
-            display: inline-flex; 
-            align-items: center;
-            justify-content: center;
-            padding: 6px 16px; 
-            border-radius: 20px; 
-            font-size: 13px; 
-            font-weight: 800; 
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: white;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            min-width: 80px;
+            padding: 5px 12px; border-radius: 20px; font-size: 12px; 
+            font-weight: 700; color: white; flex-shrink: 0; 
         }
+        .paused-badge {
+            font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px;
+            background: rgba(209, 52, 56, 0.15); color: #d13438; margin-left: 6px; text-transform: uppercase;
+        }
+        .task-details { color: var(--text-secondary); font-size: 13.5px; }
+        .task-details b { color: var(--text-main); }
+        .task-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-        .task-details { color: var(--text-secondary); line-height: 1.6; font-size: 14px;}
-        .task-details b { color: var(--text-main); font-weight: 700; }
+        .btn-pause {
+            padding: 7px 12px; font-size: 12px; font-weight: 700; border-radius: 8px;
+            border: 1.5px solid var(--border-input); background: var(--bg-input); color: var(--text-main);
+        }
+        .btn-pause.active { border-color: #107c41; color: #107c41; background: rgba(16, 124, 65, 0.08); }
+        .btn-pause.paused { border-color: #d83b01; color: #d83b01; background: rgba(216, 59, 1, 0.08); }
 
-        .btn-delete {
-            background: transparent;
-            color: #dc3545;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid transparent;
-        }
-        .btn-delete:hover {
-            background: rgba(220, 53, 69, 0.1);
-            border-color: rgba(220, 53, 69, 0.3);
-        }
+        .btn-delete { background: transparent; color: #d13438; padding: 8px; border-radius: 8px; }
+        .btn-delete:hover { background: rgba(209, 52, 56, 0.12); }
 
         .btn-sync {
-            width: 100%;
-            padding: 18px;
-            font-size: 16px;
-            border-radius: var(--radius-element);
-            margin-top: 20px;
-            background: var(--btn-sync-grad);
-            color: white;
-            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            width: 100%; padding: 16px; font-size: 15px; font-weight: 700; border-radius: var(--radius-input);
+            margin-top: 10px; background: var(--copilot-btn-gradient); color: white;
         }
-        .btn-sync:hover {
-            box-shadow: 0 8px 25px rgba(13, 110, 253, 0.4);
-            filter: brightness(1.1);
-        }
+        .btn-sync:hover { filter: brightness(1.08); }
 
         .btn-load {
-            width: 100%;
-            padding: 16px;
-            font-size: 15px;
-            border-radius: var(--radius-element);
-            margin-top: 15px;
-            background-color: transparent;
-            color: var(--text-main);
-            border: 2px dashed var(--border-color);
-        }
-        .btn-load:hover { 
-            background-color: var(--border-color); 
+            width: 100%; padding: 14px; font-size: 14px; border-radius: var(--radius-input);
+            margin-top: 12px; background-color: var(--bg-card); color: var(--text-main); border: 1.5px solid var(--border-input);
         }
 
-        #status { 
-            margin-top: 25px; 
-            font-weight: 700; 
-            text-align: center; 
-            font-size: 15px; 
-            padding: 14px;
-            border-radius: var(--radius-element);
-            transition: all 0.3s ease;
-        }
+        .footer-tools { margin-top: 18px; display: flex; justify-content: center; }
+        .btn-reset-token { background: transparent; color: var(--text-secondary); font-size: 12px; padding: 6px 12px; opacity: 0.75; }
+        .btn-reset-token:hover { opacity: 1; color: var(--primary-copilot); }
+
+        #status { margin-top: 18px; font-weight: 600; text-align: center; font-size: 14px; padding: 10px; }
         .syncing { opacity: 0.6; pointer-events: none; }
-        
-        .empty-state {
-            padding: 40px; 
-            text-align: center; 
-            color: var(--text-secondary); 
-            background: var(--empty-bg); 
-            border-radius: var(--radius-element); 
-            border: 2px dashed var(--empty-border);
-            font-size: 15px;
-            font-weight: 500;
-        }
-        .empty-state svg {
-            display: block; margin: 0 auto 15px auto; opacity: 0.5;
+        .empty-state { padding: 28px 16px; text-align: center; color: var(--text-secondary); background: var(--bg-card); border-radius: var(--radius-card); border: 1.5px dashed var(--border-input); }
+
+        @media (max-width: 768px) {
+            body { padding: 10px 8px; }
+            .container { padding: 20px 14px; }
+            .flex-row { flex-direction: column; align-items: stretch; }
+            .task-item { flex-direction: column; align-items: flex-start; }
+            .task-actions { width: 100%; justify-content: flex-end; border-top: 1px dashed var(--border-subtle); padding-top: 8px; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- Przełącznik Dark Mode -->
-    <div class="theme-switch-wrapper">
-        <label class="theme-switch" for="checkbox_theme">
-            <input type="checkbox" id="checkbox_theme" />
-            <div class="slider round"></div>
-        </label>
+    <div class="header-bar">
+        <h1>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#0f6cbd" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="2.5" fill="#0f6cbd"/>
+            </svg>
+            MediRadar
+        </h1>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox_theme">
+                <input type="checkbox" id="checkbox_theme" />
+                <div class="slider"></div>
+            </label>
+        </div>
     </div>
 
-    <h1>
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="url(#grad1)" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#0d6efd" />
-                    <stop offset="50%" stop-color="#d63384" />
-                    <stop offset="100%" stop-color="#0dcaf0" />
-                </linearGradient>
-            </defs>
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#grad1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            <circle cx="12" cy="12" r="3" fill="url(#grad1)"/>
-        </svg>
-        MediRadar Panel
-    </h1>
+    <div class="live-status-bar">
+        <div class="live-status-info">
+            <span class="status-dot" id="runDot"></span>
+            <span id="runStatusText">Status chmury: Oczekiwanie na połączenie...</span>
+        </div>
+        <div class="live-actions">
+            <button class="btn-run-now" id="runNowBtn" onclick="triggerWorkflowNow()">⚡ Skanuj teraz</button>
+        </div>
+    </div>
 
     <h2>Dodaj nowe zadanie monitorowania</h2>
-    
-    <!-- Rząd 1: Pacjent, Miasto, Specjalizacja -->
-    <div class="flex-row">
-        <div class="form-group">
-            <label>Członek rodziny</label>
-            <select id="person">
-                <option value="KAMIL">Kamil</option>
-                <option value="MONIKA">Monika</option>
-                <option value="ADAM">Adam</option>
-                <option value="SZYMON">Szymon</option>
-            </select>
+    <div class="copilot-card">
+        <div class="flex-row">
+            <div class="form-group">
+                <label>Członek rodziny</label>
+                <select id="person">
+                    <option value="KAMIL">Kamil</option>
+                    <option value="MONIKA">Monika</option>
+                    <option value="ADAM">Adam</option>
+                    <option value="SZYMON">Szymon</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Miasto</label>
+                <select id="region" disabled><option value="199">Łódź</option></select>
+            </div>
+            <div class="form-group" style="flex: 2 1 240px;">
+                <label>Specjalizacja</label>
+                <select id="service"></select>
+            </div>
         </div>
-        <div class="form-group">
-            <label>Miasto</label>
-            <select id="region" disabled>
-                <option value="199">Łódź</option>
-            </select>
+
+        <div class="flex-row">
+            <div class="form-group" style="flex: 2 1 240px;">
+                <label>Preferowany lekarz</label>
+                <input type="text" id="doctorName" value="Wszyscy" placeholder="np. Kowalski lub Wszyscy">
+            </div>
+            <div class="form-group">
+                <label>Data od</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="form-group">
+                <label>Data do (opcjonalnie)</label>
+                <input type="date" id="endDate">
+            </div>
         </div>
-        <div class="form-group" style="flex: 2;">
-            <label>Specjalizacja</label>
-            <select id="service"></select>
-        </div>
+
+        <button class="btn-add" onclick="addTask()">Aktywuj Radar</button>
     </div>
 
-    <!-- Rząd 2: Lekarz i Zakres dat -->
-    <div class="flex-row">
-        <div class="form-group" style="flex: 2;">
-            <label>Preferowany lekarz</label>
-            <input type="text" id="doctorName" value="Wszyscy" placeholder="np. Kowalski lub Wszyscy">
-        </div>
-        <div class="form-group">
-            <label>Data od</label>
-            <input type="date" id="startDate">
-        </div>
-        <div class="form-group">
-            <label>Data do (opcjonalnie)</label>
-            <input type="date" id="endDate">
-        </div>
-    </div>
-
-    <button class="btn-add" onclick="addTask()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        Aktywuj Radar
-    </button>
-
-    <h2>Aktywne Radary (Harmonogram)</h2>
+    <h2>Aktywne Radary (Lista zadań)</h2>
     <div class="task-list" id="taskList"></div>
 
-    <hr style="margin: 50px 0 40px 0; border: 0; border-top: 2px solid var(--border-color);">
+    <h2>Konfiguracja czasu pracy Radaru (Czas Polski)</h2>
+    <div class="copilot-card">
+        <div class="flex-row" style="margin-bottom: 0;">
+            <div class="form-group">
+                <label>Częstotliwość</label>
+                <select id="scanInterval" onchange="updateScheduleSettings()">
+                    <option value="10">Co 10 minut</option>
+                    <option value="15" selected>Co 15 minut</option>
+                    <option value="20">Co 20 minut</option>
+                    <option value="30">Co 30 minut</option>
+                    <option value="60">Co 60 minut</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Tryb pracy</label>
+                <select id="scanMode" onchange="updateScheduleSettings()">
+                    <option value="window" selected>Wybrane godziny</option>
+                    <option value="24h">Całą dobę (24/7)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Start (Od godz.)</label>
+                <select id="hourStart" onchange="updateScheduleSettings()"></select>
+            </div>
+            <div class="form-group">
+                <label>Koniec (Do godz.)</label>
+                <select id="hourEnd" onchange="updateScheduleSettings()"></select>
+            </div>
+        </div>
+        <div class="cron-preview">
+            <span id="scheduleSummary">Podsumowanie czasu pracy...</span>
+            <div class="cron-badge-wrapper">
+                <span>Kod GitHub (UTC):</span>
+                <span class="cron-badge" id="cronPreviewText">*/15 * * * *</span>
+            </div>
+        </div>
+    </div>
+
+    <hr style="margin: 32px 0 20px 0; border: 0; border-top: 1px solid var(--border-subtle);">
     
-    <button id="syncBtn" class="btn-sync" onclick="syncToGithub()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-        Zapisz i zaktualizuj system
-    </button>
-    <button id="loadBtn" class="btn-load" onclick="loadFromGithub()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-        Wczytaj dane z chmury (GitHub)
-    </button>
+    <button id="syncBtn" class="btn-sync" onclick="syncToGithub()">Zapisz i zaktualizuj system</button>
+    <button id="loadBtn" class="btn-load" onclick="loadFromGithub()">Wczytaj dane z chmury (GitHub)</button>
+
     <div id="status"></div>
+
+    <div class="footer-tools">
+        <button class="btn-reset-token" onclick="resetGithubToken()">🔑 Zmień / Zresetuj Token GitHub</button>
+    </div>
 </div>
 
 <script>
-    // ==========================================
-    // 0. OBSŁUGA MOTYWU (JASNY/CIEMNY)
-    // ==========================================
     const toggleSwitch = document.getElementById('checkbox_theme');
-    const currentTheme = localStorage.getItem('theme');
+    try {
+        const theme = localStorage.getItem('theme');
+        if (theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            if (theme === 'dark') toggleSwitch.checked = true;
+        }
+    } catch (e) {}
 
-    if (currentTheme) {
-        document.documentElement.setAttribute('data-theme', currentTheme);
-        if (currentTheme === 'dark') toggleSwitch.checked = true;
-    }
+    toggleSwitch.addEventListener('change', (e) => {
+        const t = e.target.checked ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('theme', t);
+    });
 
-    function switchTheme(e) {
-        if (e.target.checked) {
-            document.documentElement.setAttribute('data-theme', 'dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.setAttribute('data-theme', 'light');
-            localStorage.setItem('theme', 'light');
-        }    
-    }
-    toggleSwitch.addEventListener('change', switchTheme, false);
-
-
-    // ==========================================
-    // 1. KONFIGURACJA GITHUB
-    // ==========================================
     const GITHUB_REPO = "kopek-beep/medicover"; 
 
-    // ==========================================
-    // 2. SPECJALIZACJE I DYNAMIKA LISTY
-    // ==========================================
     const wszystkieSpecjalizacje = {
-        "176": "Alergolog dorośli",
-        "178": "Alergolog dorośli odczulanie",
-        "11682": "Badanie dna oka - dorośli",
-        "76796": "Badanie dna oka - dzieci",
-        "2": "Chirurg dorośli",
-        "1190": "Choroby zakaźne dorośli",
-        "3": "Dermatolog dorośli",
-        "99": "Diabetolog",
-        "182": "Dietetyk dorośli",
-        "5": "Endokrynolog dorośli",
-        "27962": "Endokrynolog dorośli - porada telefoniczna",
-        "46066": "Ginekolog - kwalifikacja do założenia wkładki",
-        "4800": "Ginekolog - prowadzenie ciąży",
-        "64948": "Ginekolog - założenie wkładki",
-        "4798": "Ginekolog dorośli",
-        "94448": "Ginekologia - awaryjna antykoncepcja - porada tel. u położnej",
-        "89834": "Ginekologia - badania w ciąży - porada telefoniczna u położnej",
-        "46068": "Ginekologia - infekcja intymna u położnej",
-        "10244": "Ginekologia - pobranie wymazu",
-        "116730": "Ginekologia - porada poporodowa u położnej - porada telefoniczna",
-        "116732": "Ginekologia - porada poporodowa u położnej",
-        "72380": "Ginekologia - przygotowanie do ciąży u położnej",
-        "10864": "Hematolog - Szpital",
-        "47068": "Higienizacja 4w1",
-        "112": "Higienizacja standardowa",
-        "9": "Internista",
-        "19046": "Internista - porada telefoniczna",
-        "63748": "Invisalign",
-        "39836": "Invisalign - leczenie",
-        "10": "Kardiolog dorośli",
-        "87430": "Kwalifikacja i szczepienie dorośli – specjalista med.",
-        "192": "Laryngolog dorośli",
-        "96": "Logopeda dorośli",
-        "16234": "Medicover Express - przeziębienie, grypa",
-        "62742": "Medicover Express - szcz. grypa - dorośli - specjalista med.",
-        "16236": "Medicover Express - szczepienia dorośli",
-        "486": "Medicover Express - szczepienia grypa",
-        "9976": "Medycyna podróży - dorośli",
-        "1586": "Medycyna Rodzinna - dorośli",
-        "27964": "Medycyna Rodzinna - dorośli - porada telefoniczna",
-        "3004": "Mykologia - pobranie u pielęgniarki",
-        "16": "Neurolog dorośli",
-        "198": "Okulista dorośli",
-        "200": "Okulista dziecięcy",
-        "19054": "Okulistyka - badanie wzroku",
-        "114": "Ortodonta",
-        "28766": "Ortodonta - leczenie",
-        "163": "Ortopeda dorośli",
-        "6254": "Pobranie HPV / Cytologia",
-        "105898": "Położna - infekcje pęcherza moczowego",
-        "105900": "Położna - infekcje pęcherza moczowego - porada telefoniczna",
-        "97064": "Położna - wizyta profilaktyczna",
-        "27158": "Poradnia Bólu Pleców i Układu Ruchu - dorośli",
-        "20056": "Poradnia Leczenia Boreliozy",
-        "28770": "Protetyk - leczenie",
-        "24": "Psychiatra dorośli",
-        "25": "Psycholog dorośli",
-        "48914": "Psycholog dorośli - porada telefoniczna",
-        "41": "Pulmonolog dorośli",
-        "52110": "Punkt Pobrań - ciężarne",
-        "52106": "Punkt Pobrań - dorośli",
-        "23504": "Stomatolog - leczenie",
-        "22890": "Stomatolog - przegląd",
-        "30": "Urolog dorośli",
-        "76798": "Urologia - pobranie wymazu u mężczyzn przez pielęgniarkę"
+        "176": "Alergolog dorośli", "178": "Alergolog dorośli odczulanie", "11682": "Badanie dna oka - dorośli", "76796": "Badanie dna oka - dzieci", "2": "Chirurg dorośli", "1190": "Choroby zakaźne dorośli", "3": "Dermatolog dorośli", "99": "Diabetolog", "182": "Dietetyk dorośli", "5": "Endokrynolog dorośli", "27962": "Endokrynolog dorośli - porada telefoniczna", "46066": "Ginekolog - kwalifikacja do założenia wkładki", "4800": "Ginekolog - prowadzenie ciąży", "64948": "Ginekolog - założenie wkładki", "4798": "Ginekolog dorośli", "94448": "Ginekologia - awaryjna antykoncepcja - porada tel. u położnej", "89834": "Ginekologia - badania w ciąży - porada telefoniczna u położnej", "46068": "Ginekologia - infekcja intymna u położnej", "10244": "Ginekologia - pobranie wymazu", "116730": "Ginekologia - porada poporodowa u położnej - porada telefoniczna", "116732": "Ginekologia - porada poporodowa u położnej", "72380": "Ginekologia - przygotowanie do ciąży u położnej", "10864": "Hematolog - Szpital", "47068": "Higienizacja 4w1", "112": "Higienizacja standardowa", "9": "Internista", "19046": "Internista - porada telefoniczna", "63748": "Invisalign", "39836": "Invisalign - leczenie", "10": "Kardiolog dorośli", "87430": "Kwalifikacja i szczepienie dorośli – specjalista med.", "192": "Laryngolog dorośli", "96": "Logopeda dorośli", "16234": "Medicover Express - przeziębienie, grypa", "62742": "Medicover Express - szcz. grypa - dorośli - specjalista med.", "16236": "Medicover Express - szczepienia dorośli", "486": "Medicover Express - szczepienia grypa", "9976": "Medycyna podróży - dorośli", "1586": "Medycyna Rodzinna - dorośli", "27964": "Medycyna Rodzinna - dorośli - porada telefoniczna", "3004": "Mykologia - pobranie u pielęgniarki", "16": "Neurolog dorośli", "198": "Okulista dorośli", "200": "Okulista dziecięcy", "19054": "Okulistyka - badanie wzroku", "114": "Ortodonta", "28766": "Ortodonta - leczenie", "163": "Ortopeda dorośli", "6254": "Pobranie HPV / Cytologia", "105898": "Położna - infekcje pęcherza moczowego", "105900": "Położna - infekcje pęcherza moczowego - porada telefoniczna", "97064": "Położna - wizyta profilaktyczna", "27158": "Poradnia Bólu Pleców i Układu Ruchu - dorośli", "20056": "Poradnia Leczenia Boreliozy", "28770": "Protetyk - leczenie", "24": "Psychiatra dorośli", "25": "Psycholog dorośli", "48914": "Psycholog dorośli - porada telefoniczna", "41": "Pulmonolog dorośli", "52110": "Punkt Pobrań - ciężarne", "52106": "Punkt Pobrań - dorośli", "23504": "Stomatolog - leczenie", "22890": "Stomatolog - przegląd", "30": "Urolog dorośli", "76798": "Urologia - pobranie wymazu u mężczyzn przez pielęgniarkę"
     };
 
     const dostepneDlaOsoby = {
@@ -586,12 +499,11 @@
         "SZYMON": ["200", "76796"]
     };
 
-    // Przypisane kolory akcentów dla członków rodziny
     const userTheme = {
-        "KAMIL": { color: "#0d6efd" },  
-        "MONIKA": { color: "#d63384" }, 
-        "ADAM": { color: "#198754" },   
-        "SZYMON": { color: "#fd7e14" }  
+        "KAMIL": { color: "#0f6cbd" },  
+        "MONIKA": { color: "#c239b3" }, 
+        "ADAM": { color: "#107c41" },   
+        "SZYMON": { color: "#d83b01" }  
     };
 
     const personSelect = document.getElementById('person');
@@ -599,105 +511,177 @@
 
     function getTodayString() {
         const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        return `${yyyy}-${mm}-${dd}`;
+        return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     }
 
-    function ustawDzisiejszaDate() {
-        document.getElementById('startDate').value = getTodayString();
-    }
-
-    function odswiezKolorSelecta() {
-        const osoba = personSelect.value;
-        const color = userTheme[osoba].color;
-        personSelect.style.borderLeftColor = color;
-    }
+    document.getElementById('startDate').value = getTodayString();
 
     function odswiezSpecjalizacje() {
-        const wybranaOsoba = personSelect.value;
-        const isChild = (wybranaOsoba === "ADAM" || wybranaOsoba === "SZYMON");
-        const dostepneID = dostepneDlaOsoby[wybranaOsoba] || [];
-
+        const osoba = personSelect.value;
+        const isChild = (osoba === "ADAM" || osoba === "SZYMON");
         serviceSelect.innerHTML = '';
-        odswiezKolorSelecta();
+        personSelect.style.borderLeftColor = userTheme[osoba].color;
 
-        const opcje = dostepneID
+        (dostepneDlaOsoby[osoba] || [])
             .filter(id => {
                 const nazwa = (wszystkieSpecjalizacje[id] || "").toLowerCase();
-                if (isChild) {
-                    return !nazwa.includes("dorośli");
-                } else {
-                    return !nazwa.includes("dzieci") && !nazwa.includes("dziecięcy");
-                }
+                return isChild ? !nazwa.includes("dorośli") : (!nazwa.includes("dzieci") && !nazwa.includes("dziecięcy"));
             })
-            .map(id => ({ 
-                id: id, 
-                nazwa: wszystkieSpecjalizacje[id] || "ID: " + id 
-            }));
-        
-        opcje.sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl'));
-
-        opcje.forEach(opcja => {
-            const option = document.createElement('option');
-            option.value = opcja.id;
-            option.text = opcja.nazwa;
-            serviceSelect.appendChild(option);
-        });
+            .map(id => ({ id, nazwa: wszystkieSpecjalizacje[id] }))
+            .sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl'))
+            .forEach(opcja => {
+                const opt = document.createElement('option');
+                opt.value = opcja.id;
+                opt.text = opcja.nazwa;
+                serviceSelect.appendChild(opt);
+            });
     }
 
     personSelect.addEventListener('change', odswiezSpecjalizacje);
     odswiezSpecjalizacje();
-    ustawDzisiejszaDate();
 
-    // ==========================================
-    // 3. LOGIKA APLIKACJI
-    // ==========================================
-    let tasks = JSON.parse(localStorage.getItem('medicover_tasks')) || [];
+    const hourStartSelect = document.getElementById('hourStart');
+    const hourEndSelect = document.getElementById('hourEnd');
+    const scanIntervalSelect = document.getElementById('scanInterval');
+    const scanModeSelect = document.getElementById('scanMode');
+
+    for (let h = 0; h < 24; h++) {
+        const label = String(h).padStart(2, '0') + ":00";
+        const o1 = document.createElement('option'); o1.value = h; o1.text = label; hourStartSelect.appendChild(o1);
+        const o2 = document.createElement('option'); o2.value = h; o2.text = String(h).padStart(2, '0') + ":59"; hourEndSelect.appendChild(o2);
+    }
+
+    function initSchedule() {
+        let saved = { interval: "15", mode: "window", start: 7, end: 23 };
+        try {
+            const p = JSON.parse(localStorage.getItem('medicover_schedule'));
+            if (p && typeof p === 'object') saved = p;
+        } catch (e) {}
+        scanIntervalSelect.value = ["10", "15", "20", "30", "60"].includes(saved.interval) ? saved.interval : "15";
+        scanModeSelect.value = saved.mode || "window";
+        hourStartSelect.value = saved.start ?? 7;
+        hourEndSelect.value = saved.end ?? 23;
+        updateScheduleSettings();
+    }
+
+    function buildCronExpression() {
+        const interval = scanIntervalSelect.value;
+        const mode = scanModeSelect.value;
+        const startPL = parseInt(hourStartSelect.value, 10) || 0;
+        const endPL = parseInt(hourEndSelect.value, 10) || 0;
+
+        const minPart = (interval === "60") ? "0" : `*/${interval}`;
+        if (mode === "24h") return `${minPart} * * * *`;
+
+        const plHours = [];
+        let curr = startPL;
+        while (true) {
+            plHours.push(curr);
+            if (curr === endPL) break;
+            curr = (curr + 1) % 24;
+            if (plHours.length >= 24) break;
+        }
+
+        if (plHours.length === 24) return `${minPart} * * * *`;
+
+        const offset = -Math.round(new Date().getTimezoneOffset() / 60);
+        const utcHours = plHours.map(h => (h - offset + 24) % 24);
+        return `${minPart} ${utcHours.join(',')} * * *`;
+    }
+
+    function updateScheduleSettings() {
+        const mode = scanModeSelect.value;
+        hourStartSelect.disabled = (mode === "24h");
+        hourEndSelect.disabled = (mode === "24h");
+
+        const interval = scanIntervalSelect.value;
+        const startPL = parseInt(hourStartSelect.value, 10);
+        const endPL = parseInt(hourEndSelect.value, 10);
+
+        localStorage.setItem('medicover_schedule', JSON.stringify({ interval, mode, start: startPL, end: endPL }));
+        document.getElementById('cronPreviewText').textContent = buildCronExpression();
+
+        const offset = -Math.round(new Date().getTimezoneOffset() / 60);
+        if (mode === "24h") {
+            document.getElementById('scheduleSummary').innerHTML = `Skanowanie <b>24/7</b> co <b>${interval} min</b>.`;
+        } else {
+            document.getElementById('scheduleSummary').innerHTML = `Aktywne od <b>${String(startPL).padStart(2,'0')}:00</b> do <b>${String(endPL).padStart(2,'0')}:59</b> (UTC+${offset}), co <b>${interval} min</b>.`;
+        }
+    }
+
+    function parseCronFromGithub(cronStr) {
+        const parts = cronStr.trim().split(/\s+/);
+        if (parts.length < 2) return;
+        const minPart = parts[0];
+        const hourPart = parts[1];
+
+        let interval = "15";
+        if (minPart === "0") interval = "60";
+        else if (minPart.includes("/")) {
+            const clean = minPart.split("/")[1].trim();
+            if (["10", "15", "20", "30", "60"].includes(clean)) interval = clean;
+        }
+        scanIntervalSelect.value = interval;
+
+        if (hourPart === "*") {
+            scanModeSelect.value = "24h";
+        } else {
+            scanModeSelect.value = "window";
+            const offset = -Math.round(new Date().getTimezoneOffset() / 60);
+            let utcHours = [];
+            if (hourPart.includes(",")) utcHours = hourPart.split(",").map(Number);
+            else if (!isNaN(parseInt(hourPart, 10))) utcHours = [parseInt(hourPart, 10)];
+
+            if (utcHours.length > 0) {
+                const plHours = utcHours.map(h => (h + offset + 24) % 24);
+                hourStartSelect.value = plHours[0];
+                hourEndSelect.value = plHours[plHours.length - 1];
+            }
+        }
+        updateScheduleSettings();
+    }
+
+    initSchedule();
+
+    let tasks = [];
+    try {
+        tasks = JSON.parse(localStorage.getItem('medicover_tasks')) || [];
+    } catch (e) { tasks = []; }
 
     function renderTasks() {
         const list = document.getElementById('taskList');
         list.innerHTML = '';
         if (tasks.length === 0) {
-            list.innerHTML = `
-                <div class="empty-state">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                    Radar wyłączony.<br>Dodaj specjalizację powyżej, aby rozpocząć monitorowanie.
-                </div>`;
+            list.innerHTML = `<div class="empty-state">Radar wyłączony.<br>Dodaj specjalizację powyżej, aby rozpocząć monitorowanie.</div>`;
+            localStorage.setItem('medicover_tasks', JSON.stringify(tasks));
             return;
         }
         tasks.forEach((task, index) => {
             const theme = userTheme[task.person] || userTheme["KAMIL"];
+            const isPaused = !!task.paused;
             const div = document.createElement('div');
-            div.className = 'task-item';
+            div.className = 'task-item' + (isPaused ? ' paused' : '');
             div.style.setProperty('--task-color', theme.color);
             
             const cityName = task.region === "199" ? "Łódź" : task.region;
             const docName = (task.doctorName && task.doctorName.toLowerCase() !== "wszyscy") ? task.doctorName : "Wszyscy";
             
             let dateRangeText = "od dziś (bez limitu)";
-            if (task.startDate && task.endDate) {
-                dateRangeText = `${task.startDate} do ${task.endDate}`;
-            } else if (task.startDate) {
-                dateRangeText = `od ${task.startDate}`;
-            } else if (task.endDate) {
-                dateRangeText = `do ${task.endDate}`;
-            }
+            if (task.startDate && task.endDate) dateRangeText = `${task.startDate} do ${task.endDate}`;
+            else if (task.startDate) dateRangeText = `od ${task.startDate}`;
 
             div.innerHTML = `
                 <div class="task-info">
                     <span class="task-tag" style="background-color: ${theme.color};">${task.person}</span>
                     <div class="task-details">
-                        <div>Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${wszystkieSpecjalizacje[task.service] || "ID: " + task.service}</b></div>
-                        <div style="font-size: 13px; margin-top: 5px; color: var(--text-secondary);">
-                            Lekarz: <b>${docName}</b> &nbsp;&bull;&nbsp; Termin: <b>${dateRangeText}</b>
-                        </div>
+                        <div>Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${wszystkieSpecjalizacje[task.service] || task.service}</b> ${isPaused ? '<span class="paused-badge">Wstrzymany</span>' : ''}</div>
+                        <div style="font-size: 12.5px; margin-top: 3px; color: var(--text-secondary);">Lekarz: <b>${docName}</b> &nbsp;&bull;&nbsp; Termin: <b>${dateRangeText}</b></div>
                     </div>
                 </div>
-                <button class="btn-delete" onclick="removeTask(${index})" title="Usuń z Radaru">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                </button>
+                <div class="task-actions">
+                    <button class="btn-pause ${isPaused ? 'paused' : 'active'}" onclick="togglePauseTask(${index})">${isPaused ? '▶️ Wznów' : '⏸️ Aktywny'}</button>
+                    <button class="btn-delete" onclick="removeTask(${index})">🗑️</button>
+                </div>
             `;
             list.appendChild(div);
         });
@@ -708,40 +692,28 @@
         const person = document.getElementById('person').value;
         const region = document.getElementById('region').value; 
         const service = document.getElementById('service').value;
-        
         let doctorInput = document.getElementById('doctorName').value.trim();
         const doctorName = (doctorInput === "" || doctorInput.toLowerCase() === "wszyscy") ? "Wszyscy" : doctorInput;
-        
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
 
-        const isDuplicate = tasks.some(t => 
-            t.person === person && 
-            t.service === service && 
-            (t.doctorName || "Wszyscy") === doctorName &&
-            (t.startDate || "") === startDate &&
-            (t.endDate || "") === endDate
-        );
-        if (isDuplicate) {
-            alert("Identyczne ustawienie Radaru już istnieje na liście!");
-            return;
+        if (tasks.some(t => t.person === person && t.service === service && (t.doctorName || "Wszyscy") === doctorName)) {
+            alert("Identyczne zadanie już istnieje!"); return;
         }
 
-        tasks.push({ person, region, service, doctorName, startDate, endDate });
+        tasks.push({ person, region, service, doctorName, startDate, endDate, paused: false });
         renderTasks();
-
         document.getElementById('doctorName').value = "Wszyscy";
-        ustawDzisiejszaDate();
+        document.getElementById('startDate').value = getTodayString();
         document.getElementById('endDate').value = "";
     }
 
-    function removeTask(index) {
-        tasks.splice(index, 1);
-        renderTasks();
-    }
+    function togglePauseTask(i) { tasks[i].paused = !tasks[i].paused; renderTasks(); }
+    function removeTask(i) { tasks.splice(i, 1); renderTasks(); }
 
     function generateYaml() {
-        let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '*/30 * * * *'\n  workflow_dispatch:\n\njobs:\n`;
+        const cronExpr = buildCronExpression();
+        let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '${cronExpr}'\n  workflow_dispatch:\n\npermissions:\n  contents: write\n\njobs:\n`;
         yaml += `  check-slots:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n`;
         yaml += `      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n`;
         yaml += `      - run: pip install uv && uv sync\n`;
@@ -754,163 +726,196 @@
         yaml += `          NOTIFIERS_TELEGRAM_CHAT_ID: \${{ secrets.NOTIFIERS_TELEGRAM_CHAT_ID }}\n`;
         yaml += `        run: |\n`;
 
+        if (!tasks.some(t => !t.paused)) yaml += `          echo "Wszystkie zadania sa wstrzymane."\n`;
+
         tasks.forEach((t, index) => {
             const nazwaLekarza = wszystkieSpecjalizacje[t.service] || "Lekarz";
-            let cmd = `          uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service}`;
-            
-            if (t.doctorName && t.doctorName.toLowerCase() !== "wszyscy") {
-                cmd += ` --doctor-name "${t.doctorName}"`;
-            }
-            if (t.startDate) {
-                cmd += ` -f "${t.startDate}"`;
-            }
-            if (t.endDate) {
-                cmd += ` -e "${t.endDate}"`;
-            }
-
-            cmd += ` -n telegram -t "[${t.person}] ${nazwaLekarza}"\n`;
-            yaml += cmd;
-            
-            if (index < tasks.length - 1) {
-                yaml += `          sleep 5\n`;
-            }
+            const prefix = t.paused ? "          # PAUSED: " : "          ";
+            let cmd = `${prefix}uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service}`;
+            if (t.doctorName && t.doctorName.toLowerCase() !== "wszyscy") cmd += ` --doctor-name "${t.doctorName}"`;
+            if (t.startDate) cmd += ` -f "${t.startDate}"`;
+            if (t.endDate) cmd += ` -e "${t.endDate}"`;
+            yaml += `${cmd} -n telegram -t "[${t.person}] ${nazwaLekarza}"\n`;
+            if (!t.paused && index < tasks.length - 1) yaml += `          sleep 5\n`;
         });
-        
-        yaml += `\n`;
+
+        yaml += `      - name: Zapisz pamiec ogloszonych wizyt (Anty-Spam)\n        if: always()\n        run: |\n`;
+        yaml += `          if [ -f data/seen_slots.json ]; then\n`;
+        yaml += `            git config user.name "github-actions[bot]"\n`;
+        yaml += `            git config user.email "github-actions[bot]@users.noreply.github.com"\n`;
+        yaml += `            git add -f data/seen_slots.json\n`;
+        yaml += `            git diff --staged --quiet || (git commit -m "Aktualizacja pamieci wizyt [skip ci]" && git pull --rebase && git push)\n`;
+        yaml += `          fi\n`;
         return yaml;
     }
 
     async function getGithubToken() {
         let token = localStorage.getItem("medicover_gh_token");
         if (!token) {
-            token = prompt("🔐 Bezpieczeństwo: Wklej swój GitHub Personal Access Token (PAT):");
-            if (token) localStorage.setItem("medicover_gh_token", token);
+            token = prompt("🔐 Wklej swój GitHub Personal Access Token (PAT):");
+            if (token) localStorage.setItem("medicover_gh_token", token.trim());
         }
-        return token;
+        return token ? token.trim() : null;
+    }
+
+    function resetGithubToken() {
+        localStorage.removeItem("medicover_gh_token");
+        const t = prompt("🔑 Wklej nowy GitHub Personal Access Token (PAT):");
+        if (t && t.trim()) {
+            localStorage.setItem("medicover_gh_token", t.trim());
+            checkLastRunStatus();
+            alert("Token zaktualizowany!");
+        }
+    }
+
+    let fastPollingTimeout = null;
+
+    async function checkLastRunStatus() {
+        const token = localStorage.getItem("medicover_gh_token");
+        const dot = document.getElementById('runDot');
+        const text = document.getElementById('runStatusText');
+        if (!token) { text.textContent = "Status chmury: Brak tokenu"; return; }
+
+        try {
+            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/runs?per_page=1`, {
+                headers: { "Authorization": `token ${token.trim()}`, "Accept": "application/vnd.github.v3+json" },
+                cache: "no-store"
+            });
+            if (!res.ok) { dot.className = "status-dot error"; text.textContent = `Błąd pobierania statusu (${res.status})`; return; }
+            const data = await res.json();
+            if (!data.workflow_runs || data.workflow_runs.length === 0) { dot.className = "status-dot"; text.textContent = "Brak uruchomień bota."; return; }
+
+            const run = data.workflow_runs[0];
+            const diffMin = Math.max(0, Math.round((new Date() - new Date(run.updated_at)) / 60000));
+            const timeAgo = diffMin === 0 ? "przed chwilą" : `${diffMin} min temu`;
+
+            if (run.status === "in_progress" || run.status === "queued") {
+                dot.className = "status-dot running";
+                text.innerHTML = `<b>Skanowanie w toku...</b> (${timeAgo})`;
+                clearTimeout(fastPollingTimeout);
+                fastPollingTimeout = setTimeout(checkLastRunStatus, 10000);
+            } else if (run.conclusion === "success") {
+                dot.className = "status-dot success";
+                text.innerHTML = `Ostatni skan: <b>${timeAgo}</b> &bull; Status: <b style="color:#107c41;">Sukces</b>`;
+            } else {
+                dot.className = "status-dot error";
+                text.innerHTML = `Ostatni skan: <b>${timeAgo}</b> &bull; Status: <b style="color:#d13438;">Błąd (${run.conclusion})</b>`;
+            }
+        } catch (err) { dot.className = "status-dot error"; text.textContent = "Błąd połączenia z API GitHub."; }
+    }
+
+    async function triggerWorkflowNow() {
+        const token = await getGithubToken();
+        if (!token) return;
+        try {
+            const repoRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}`, { headers: { "Authorization": `token ${token}` } });
+            if (!repoRes.ok) { alert("Błąd dostępu do repozytorium (sprawdź token)"); return; }
+            const branch = (await repoRes.json()).default_branch || "main";
+
+            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/dispatches`, {
+                method: "POST",
+                headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ ref: branch })
+            });
+            if (res.status === 204 || res.ok) {
+                document.getElementById('runDot').className = "status-dot running";
+                document.getElementById('runStatusText').innerHTML = "<b>Zlecono skanowanie!</b> Maszyna startuje...";
+                clearTimeout(fastPollingTimeout);
+                fastPollingTimeout = setTimeout(checkLastRunStatus, 6000);
+            } else {
+                alert("GitHub odrzucił polecenie. Upewnij się, że plik checker.yml ma workflow_dispatch.");
+            }
+        } catch (e) { alert("Błąd sieci: " + e.message); }
     }
 
     async function syncToGithub() {
+        if (tasks.length === 0) { alert("Dodaj przynajmniej jedno zadanie!"); return; }
+        const token = await getGithubToken();
+        if (!token) return;
+
         const statusEl = document.getElementById('status');
         const syncBtn = document.getElementById('syncBtn');
-        
-        if (tasks.length === 0) { 
-            alert("Nie masz żadnych zadań na liście. Radar zostanie wyłączony, ale pamiętaj, aby zatrzymać skrypt na GitHubie jeśli chcesz w pełni wyłączyć bota."); 
-            return; 
-        }
-
-        const GITHUB_TOKEN = await getGithubToken();
-        if (!GITHUB_TOKEN) {
-            alert("Aby zaktualizować system, musisz podać token!");
-            return;
-        }
-
-        statusEl.style.color = "var(--primary-blue)";
-        statusEl.innerHTML = "☁️ Łączenie z usługami chmurowymi GitHub...";
+        statusEl.style.color = "var(--primary-copilot)";
+        statusEl.innerHTML = "☁️ Zapisywanie konfiguracji na GitHubie...";
         syncBtn.classList.add('syncing');
 
         const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/.github/workflows/checker.yml`;
-        const headers = { "Authorization": `token ${GITHUB_TOKEN}`, "Accept": "application/vnd.github.v3+json" };
+        const headers = { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" };
 
         try {
             let sha = "";
             const getRes = await fetch(url, { headers });
             if (getRes.ok) sha = (await getRes.json()).sha;
 
-            const base64Content = btoa(unescape(encodeURIComponent(generateYaml())));
-            const body = { message: "Aktualizacja Radaru", content: base64Content };
+            const body = { message: "Aktualizacja MediRadar", content: btoa(unescape(encodeURIComponent(generateYaml()))) };
             if (sha) body.sha = sha;
 
             const putRes = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body) });
-            
             if (putRes.ok) {
-                statusEl.style.color = "#198754";
-                statusEl.innerHTML = "✨ Sukces! Twój system Radar został zaktualizowany w chmurze.";
+                statusEl.style.color = "#107c41";
+                statusEl.innerHTML = "✨ Sukces! System został zaktualizowany w chmurze.";
+                checkLastRunStatus();
             } else {
-                statusEl.style.color = "#dc3545";
-                statusEl.innerHTML = `❌ Błąd aktualizacji: ${(await putRes.json()).message}`;
-                if (putRes.status === 401) {
-                    localStorage.removeItem("medicover_gh_token");
-                    statusEl.innerHTML += "<br>Token był nieprawidłowy. Kliknij 'Zapisz' ponownie, aby wpisać poprawny token.";
-                }
+                statusEl.style.color = "#d13438";
+                statusEl.innerHTML = `❌ Błąd zapisywania: ${(await putRes.json()).message}`;
+                if (putRes.status === 401) localStorage.removeItem("medicover_gh_token");
             }
         } catch (error) {
-            statusEl.style.color = "#dc3545";
-            statusEl.innerHTML = `❌ Błąd połączenia: ${error.message}`;
-        } finally {
-            syncBtn.classList.remove('syncing');
-        }
+            statusEl.style.color = "#d13438";
+            statusEl.innerHTML = `❌ Błąd sieci: ${error.message}`;
+        } finally { syncBtn.classList.remove('syncing'); }
     }
 
     async function loadFromGithub() {
+        const token = await getGithubToken();
+        if (!token) return;
         const statusEl = document.getElementById('status');
-        const loadBtn = document.getElementById('loadBtn');
-        
-        const GITHUB_TOKEN = await getGithubToken();
-        if (!GITHUB_TOKEN) {
-            alert("Aby pobrać dane z GitHuba, musisz podać token!");
-            return;
-        }
-
         statusEl.style.color = "var(--text-secondary)";
-        statusEl.innerHTML = "⬇️ Pobieranie konfiguracji Radaru z chmury...";
-        loadBtn.classList.add('syncing');
-
-        const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/.github/workflows/checker.yml`;
-        const headers = { "Authorization": `token ${GITHUB_TOKEN}`, "Accept": "application/vnd.github.v3+json" };
+        statusEl.innerHTML = "⬇️ Pobieranie konfiguracji...";
 
         try {
-            const getRes = await fetch(url, { headers });
-            if (getRes.ok) {
-                const data = await getRes.json();
-                const decodedContent = decodeURIComponent(escape(atob(data.content)));
-                
-                tasks = [];
-                const lines = decodedContent.split('\n');
-                
-                for (let line of lines) {
-                    if (line.includes('find-appointment')) {
-                        const regionMatch = line.match(/-r\s+(\d+)/);
-                        const serviceMatch = line.match(/-s\s+(\d+)/);
-                        const personMatch = line.match(/-t\s+"\[(.*?)\]/);
-                        const docMatch = line.match(/--doctor-name\s+"([^"]+)"/);
-                        const startMatch = line.match(/-f\s+"([^"]+)"/);
-                        const endMatch = line.match(/-e\s+"([^"]+)"/);
+            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/.github/workflows/checker.yml`, {
+                headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
+            });
+            if (res.ok) {
+                const content = decodeURIComponent(escape(atob((await res.json()).content)));
+                const cronMatch = content.match(/cron:\s*'([^']+)'/);
+                if (cronMatch) parseCronFromGithub(cronMatch[1]);
 
-                        if (regionMatch && serviceMatch && personMatch) {
+                tasks = [];
+                content.split('\n').forEach(line => {
+                    if (line.includes('find-appointment')) {
+                        const isPaused = line.trim().startsWith('# PAUSED:');
+                        const r = line.match(/-r\s+(\d+)/);
+                        const s = line.match(/-s\s+(\d+)/);
+                        const p = line.match(/-t\s+"\[(.*?)\]/);
+                        const d = line.match(/--doctor-name\s+"([^"]+)"/);
+                        const f = line.match(/-f\s+"([^"]+)"/);
+                        const e = line.match(/-e\s+"([^"]+)"/);
+                        if (r && s && p) {
                             tasks.push({
-                                region: regionMatch[1],
-                                service: serviceMatch[1],
-                                person: personMatch[1],
-                                doctorName: docMatch ? docMatch[1] : "Wszyscy",
-                                startDate: startMatch ? startMatch[1] : "",
-                                endDate: endMatch ? endMatch[1] : ""
+                                region: r[1], service: s[1], person: p[1],
+                                doctorName: d ? d[1] : "Wszyscy",
+                                startDate: f ? f[1] : "", endDate: e ? e[1] : "",
+                                paused: isPaused
                             });
                         }
                     }
-                }
-                
+                });
                 renderTasks();
-                statusEl.style.color = "#198754";
-                statusEl.innerHTML = "✨ Sukces! Wczytano najnowsze dane z GitHuba.";
-            } else if (getRes.status === 404) {
-                statusEl.style.color = "var(--text-secondary)";
-                statusEl.innerHTML = "Brak pliku na GitHubie. Dodaj lekarzy i kliknij Zapisz.";
-                tasks = [];
-                renderTasks();
+                checkLastRunStatus();
+                statusEl.style.color = "#107c41";
+                statusEl.innerHTML = "✨ Sukces! Wczytano konfigurację z chmury.";
             } else {
-                statusEl.style.color = "#dc3545";
-                statusEl.innerHTML = `❌ Błąd: ${(await getRes.json()).message}`;
-                if (getRes.status === 401) localStorage.removeItem("medicover_gh_token");
+                statusEl.style.color = "#d13438";
+                statusEl.innerHTML = "❌ Brak pliku workflow na GitHubie.";
             }
-        } catch (error) {
-            statusEl.style.color = "#dc3545";
-            statusEl.innerHTML = `❌ Błąd połączenia: ${error.message}`;
-        } finally {
-            loadBtn.classList.remove('syncing');
-        }
+        } catch (err) { statusEl.style.color = "#d13438"; statusEl.innerHTML = "❌ Błąd ładowania."; }
     }
 
     renderTasks();
+    checkLastRunStatus();
+    setInterval(checkLastRunStatus, 30000);
 </script>
 
 </body>
