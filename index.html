@@ -806,7 +806,7 @@
             if (parsed && typeof parsed === 'object') saved = parsed;
         } catch (e) {}
 
-        scanIntervalSelect.value = saved.interval || "30";
+        scanIntervalSelect.value = ["10", "15", "20", "30", "60"].includes(saved.interval) ? saved.interval : "30";
         scanModeSelect.value = saved.mode || "window";
         hourStartSelect.value = saved.start !== undefined ? saved.start : 7;
         hourEndSelect.value = saved.end !== undefined ? saved.end : 23;
@@ -815,7 +815,7 @@
 
     function buildCronExpression() {
         const rawInterval = scanIntervalSelect.value.trim();
-        const interval = (rawInterval === "15" || rawInterval === "10" || rawInterval === "20" || rawInterval === "30" || rawInterval === "60") ? rawInterval : "30";
+        const interval = ["10", "15", "20", "30", "60"].includes(rawInterval) ? rawInterval : "30";
         const mode = scanModeSelect.value;
         const startPL = parseInt(hourStartSelect.value, 10) || 0;
         const endPL = parseInt(hourEndSelect.value, 10) || 0;
@@ -878,12 +878,13 @@
         const hourPart = parts[1];
 
         let interval = "30";
-        if (minPart === "0") interval = "60";
-        else if (minPart.startsWith("*/")) interval = minPart.replace("*/", "");
-
-        if (["10", "15", "20", "30", "60"].includes(interval)) {
-            scanIntervalSelect.value = interval;
+        if (minPart === "0") {
+            interval = "60";
+        } else if (minPart.includes("/")) {
+            const clean = minPart.split("/")[1];
+            if (["10", "15", "20", "30", "60"].includes(clean)) interval = clean;
         }
+        scanIntervalSelect.value = interval;
 
         if (hourPart === "*") {
             scanModeSelect.value = "24h";
