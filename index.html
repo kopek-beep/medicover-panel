@@ -1255,6 +1255,7 @@
                 document.getElementById('runStatusText').innerHTML = "<b>Zlecono skanowanie!</b> Maszyna startuje (odśwież za ok. 15s).";
                 setTimeout(checkLastRunStatus, 6000);
             } else {
+                // Próba dla gałęzi master jeśli repo nie używa main
                 const resMaster = await fetch(url, {
                     method: "POST",
                     headers,
