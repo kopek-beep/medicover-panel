@@ -259,6 +259,7 @@
         .col-3 { grid-column: span 3; }
         .col-4 { grid-column: span 4; }
         .col-6 { grid-column: span 6; }
+        .col-8 { grid-column: span 8; }
         .col-12 { grid-column: span 12; }
 
         label {
@@ -291,18 +292,6 @@
         select:disabled, input:disabled { opacity: 0.55; cursor: not-allowed; }
 
         select#person { border-left-width: 6px; font-weight: 700; }
-
-        .toggle-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--bg-page);
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            border: 1.5px solid var(--input-border);
-            height: 45px;
-        }
-        .toggle-row span { font-size: 14px; font-weight: 600; }
 
         .cron-preview {
             margin-top: 12px;
@@ -525,7 +514,7 @@
             .container { padding: 20px 16px; border-radius: 18px; }
             h1 { font-size: 23px; }
             .section-card { padding: 16px; }
-            .col-3, .col-4, .col-6 { grid-column: span 12; }
+            .col-3, .col-4, .col-6, .col-8, .col-12 { grid-column: span 12; }
             .live-status-bar { flex-direction: column; align-items: stretch; }
             .live-actions { width: 100%; }
             .live-actions button { flex: 1; }
@@ -615,8 +604,8 @@
                 </select>
             </div>
             <div class="col-8">
-                <label for="doctorName" id="doctorNameLabel">Nazwisko lekarza (można podać kilka po przecinku)</label>
-                <input type="text" id="doctorName" placeholder="Wybierz tryb powyżej, aby wpisać nazwisko..." disabled>
+                <label for="doctorName" id="doctorNameLabel">Nazwisko lekarza</label>
+                <input type="text" id="doctorName" placeholder="Szukam u wszystkich dostępnych lekarzy" disabled>
             </div>
         </div>
 
@@ -667,11 +656,11 @@
             </div>
 
             <div class="col-4">
-                <label>Tryb pracy (24/7)</label>
-                <div class="toggle-row">
-                    <span id="allDayLabel">Wybrane godziny</span>
-                    <input type="checkbox" id="radarAllDay" onchange="updateScheduleUI(true)" style="width: 20px; height: 20px; cursor: pointer;">
-                </div>
+                <label for="radarAllDay">Tryb pracy</label>
+                <select id="radarAllDay" onchange="updateScheduleUI(true)">
+                    <option value="false">Wybrane godziny (Od – Do)</option>
+                    <option value="true">Cała doba (24/7)</option>
+                </select>
             </div>
 
             <div class="col-4" id="hoursContainer">
@@ -987,7 +976,7 @@
         }
 
         document.getElementById('radarInterval').value = radarSchedule.interval;
-        document.getElementById('radarAllDay').checked = radarSchedule.allDay;
+        document.getElementById('radarAllDay').value = radarSchedule.allDay ? "true" : "false";
         startSel.value = radarSchedule.startHour;
         endSel.value = radarSchedule.endHour;
         updateScheduleUI(false);
@@ -1055,14 +1044,13 @@
 
     function updateScheduleUI(markDirty = false) {
         const interval = parseInt(document.getElementById('radarInterval').value, 10);
-        const allDay = document.getElementById('radarAllDay').checked;
+        const allDay = document.getElementById('radarAllDay').value === "true";
         const startHour = parseInt(document.getElementById('radarStartHour').value, 10);
         const endHour = parseInt(document.getElementById('radarEndHour').value, 10);
 
         radarSchedule = { interval, allDay, startHour, endHour };
         localStorage.setItem('medicover_schedule', JSON.stringify(radarSchedule));
 
-        document.getElementById('allDayLabel').textContent = allDay ? "Cała doba (24/7)" : "Wybrane godziny";
         document.getElementById('radarStartHour').disabled = allDay;
         document.getElementById('radarEndHour').disabled = allDay;
         document.getElementById('hoursContainer').style.opacity = allDay ? "0.5" : "1";
