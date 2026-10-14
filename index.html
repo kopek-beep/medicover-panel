@@ -6,7 +6,7 @@
     <title>MediRadar Panel</title>
     <style>
         /* ==========================================
-           STYL MICROSOFT COPILOT (JASNY / CIEMNY)
+           NOWOCZESNY MOTYW (JASNY / CIEMNY)
            ========================================== */
         :root {
             --bg-page: #f5f3ef;
@@ -21,6 +21,7 @@
             --primary-hover: #1d4ed8;
             --accent-grad: linear-gradient(135deg, #2563eb 0%, #7c3aed 55%, #db2777 100%);
             --btn-primary-grad: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            --btn-unsaved-grad: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
             --shadow-card: 0 12px 32px rgba(20, 20, 20, 0.06), 0 2px 6px rgba(20, 20, 20, 0.04);
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
             --aurora-1: rgba(37, 99, 235, 0.12);
@@ -47,6 +48,7 @@
             --primary-hover: #93c5fd;
             --accent-grad: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
             --btn-primary-grad: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            --btn-unsaved-grad: linear-gradient(135deg, #f97316 0%, #ef4444 100%);
             --shadow-card: 0 16px 40px rgba(0, 0, 0, 0.45);
             --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
             --aurora-1: rgba(59, 130, 246, 0.14);
@@ -208,6 +210,11 @@
             padding: 24px;
             margin-bottom: 24px;
             box-shadow: var(--shadow-sm);
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+        .section-card.editing-mode {
+            border-color: var(--warning);
+            box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
         }
 
         h2 {
@@ -220,6 +227,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
         h2::before {
             content: '';
@@ -228,6 +236,18 @@
             background: var(--accent-grad);
             border-radius: 50%;
             flex-shrink: 0;
+        }
+
+        .count-badge {
+            margin-left: auto;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: var(--bg-subtle);
+            color: var(--primary);
+            border: 1px solid var(--border-color);
+            white-space: nowrap;
         }
 
         .grid-row {
@@ -323,16 +343,29 @@
         }
         button:active { transform: scale(0.98); }
 
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
         .btn-add {
-            width: 100%;
+            flex: 1;
             background: var(--bg-page);
             color: var(--primary);
             border: 1.5px solid var(--primary);
             padding: 13px;
             font-weight: 700;
-            margin-top: 4px;
         }
         .btn-add:hover { background: var(--primary); color: #fff; }
+
+        .btn-cancel-edit {
+            background: var(--bg-subtle);
+            color: var(--text-main);
+            border: 1.5px solid var(--input-border);
+            padding: 13px 18px;
+            display: none;
+        }
+        .btn-cancel-edit:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
 
         .btn-run-now {
             background: var(--bg-element);
@@ -388,7 +421,7 @@
         }
         .task-details { font-size: 13.5px; color: var(--text-secondary); line-height: 1.45; word-break: break-word; }
         .task-details b { color: var(--text-main); }
-        .task-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .task-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
         .btn-icon {
             background: transparent;
             padding: 8px 10px;
@@ -401,6 +434,20 @@
         .btn-icon.delete { color: var(--danger); }
         .btn-icon.delete:hover { background: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.25); }
 
+        .unsaved-banner {
+            display: none;
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            background: rgba(234, 88, 12, 0.12);
+            border: 1.5px solid var(--warning);
+            color: var(--text-main);
+            font-size: 13.5px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .unsaved-banner.visible { display: block; }
+
         .action-group { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
         .btn-sync {
             width: 100%;
@@ -410,6 +457,10 @@
             background: var(--btn-primary-grad);
             color: #fff;
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.25);
+        }
+        .btn-sync.unsaved {
+            background: var(--btn-unsaved-grad);
+            box-shadow: 0 6px 20px rgba(234, 88, 12, 0.35);
         }
         .btn-sync:hover { filter: brightness(1.08); }
         .btn-load {
@@ -478,6 +529,7 @@
             .live-status-bar { flex-direction: column; align-items: stretch; }
             .live-actions { width: 100%; }
             .live-actions button { flex: 1; }
+            .form-buttons { flex-direction: column; }
             .task-item { flex-direction: column; align-items: flex-start; gap: 12px; }
             .task-info { flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; }
             .task-actions { width: 100%; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 8px; }
@@ -491,14 +543,14 @@
         <h1>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
-                    <linearGradient id="copilotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <linearGradient id="radarGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                         <stop offset="0%" stop-color="#2563eb" />
                         <stop offset="50%" stop-color="#7c3aed" />
                         <stop offset="100%" stop-color="#db2777" />
                     </linearGradient>
                 </defs>
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#copilotGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="12" cy="12" r="3" fill="url(#copilotGrad)"/>
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#radarGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="3" fill="url(#radarGrad)"/>
             </svg>
             MediRadar Panel
         </h1>
@@ -518,7 +570,7 @@
             <strong id="lastRunText">⏳ Kliknij „Sprawdź status” lub „Wczytaj dane”, aby pobrać informacje</strong>
         </div>
         <div class="live-actions">
-            <button class="btn-run-now" onclick="fetchLastRunStatus()" title="Odśwież informację o ostatnim uruchomieniu">
+            <button class="btn-run-now" onclick="fetchLastRunStatus(true)" title="Odśwież informację o ostatnim uruchomieniu">
                 🔄 Sprawdź status
             </button>
             <button id="runNowBtn" class="btn-run-now primary-trigger" onclick="triggerWorkflowNow()">
@@ -527,9 +579,9 @@
         </div>
     </div>
 
-    <!-- Sekcja 1: Dodawanie nowego zadania -->
-    <div class="section-card">
-        <h2>Dodaj nowe zadanie monitorowania</h2>
+    <!-- Sekcja 1: Dodawanie / Edycja zadania -->
+    <div class="section-card" id="taskFormCard">
+        <h2 id="formTitle">Dodaj nowe zadanie monitorowania</h2>
 
         <div class="grid-row">
             <div class="col-3">
@@ -554,10 +606,21 @@
         </div>
 
         <div class="grid-row">
-            <div class="col-6">
-                <label for="doctorName">Preferowany lekarz (opcjonalnie)</label>
-                <input type="text" id="doctorName" value="Wszyscy" placeholder="np. Kowalski lub Wszyscy">
+            <div class="col-4">
+                <label for="doctorMode">Filtr lekarza</label>
+                <select id="doctorMode" onchange="updateDoctorInputState()">
+                    <option value="all">Wszyscy lekarze</option>
+                    <option value="include">Tylko wybrani (szukaj)</option>
+                    <option value="exclude">Wyklucz (czarna lista)</option>
+                </select>
             </div>
+            <div class="col-8">
+                <label for="doctorName" id="doctorNameLabel">Nazwisko lekarza (można podać kilka po przecinku)</label>
+                <input type="text" id="doctorName" placeholder="Wybierz tryb powyżej, aby wpisać nazwisko..." disabled>
+            </div>
+        </div>
+
+        <div class="grid-row">
             <div class="col-3">
                 <label for="startDate">Data od</label>
                 <input type="date" id="startDate">
@@ -566,11 +629,24 @@
                 <label for="endDate">Data do (opcjonalnie)</label>
                 <input type="date" id="endDate">
             </div>
+            <div class="col-3">
+                <label for="timeFrom">Godziny wizyty od</label>
+                <select id="timeFrom"></select>
+            </div>
+            <div class="col-3">
+                <label for="timeTo">Godziny wizyty do</label>
+                <select id="timeTo"></select>
+            </div>
         </div>
 
-        <button class="btn-add" onclick="addTask()">
-            ➕ Dodaj do listy Radarów
-        </button>
+        <div class="form-buttons">
+            <button id="saveTaskBtn" class="btn-add" onclick="saveOrAddTask()">
+                ➕ Dodaj do listy Radarów
+            </button>
+            <button id="cancelEditBtn" class="btn-cancel-edit" onclick="cancelEditTask()">
+                ✖️ Anuluj edycję
+            </button>
+        </div>
     </div>
 
     <!-- Sekcja 2: Konfiguracja czasu pracy Radaru -->
@@ -580,7 +656,7 @@
         <div class="grid-row">
             <div class="col-4">
                 <label for="radarInterval">Częstotliwość sprawdzania</label>
-                <select id="radarInterval" onchange="updateScheduleUI()">
+                <select id="radarInterval" onchange="updateScheduleUI(true)">
                     <option value="5">Co 5 minut (intensywnie)</option>
                     <option value="10">Co 10 minut</option>
                     <option value="15">Co 15 minut (zalecane)</option>
@@ -594,16 +670,16 @@
                 <label>Tryb pracy (24/7)</label>
                 <div class="toggle-row">
                     <span id="allDayLabel">Wybrane godziny</span>
-                    <input type="checkbox" id="radarAllDay" onchange="updateScheduleUI()" style="width: 20px; height: 20px; cursor: pointer;">
+                    <input type="checkbox" id="radarAllDay" onchange="updateScheduleUI(true)" style="width: 20px; height: 20px; cursor: pointer;">
                 </div>
             </div>
 
             <div class="col-4" id="hoursContainer">
                 <label>Godziny w Polsce (Od – Do)</label>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <select id="radarStartHour" onchange="updateScheduleUI()"></select>
+                    <select id="radarStartHour" onchange="updateScheduleUI(true)"></select>
                     <span>–</span>
-                    <select id="radarEndHour" onchange="updateScheduleUI()"></select>
+                    <select id="radarEndHour" onchange="updateScheduleUI(true)"></select>
                 </div>
             </div>
         </div>
@@ -616,8 +692,16 @@
 
     <!-- Sekcja 3: Lista aktywnych zadań -->
     <div class="section-card">
-        <h2>Aktywne Radary (<span id="taskCount">0</span>)</h2>
+        <h2>
+            <span>Aktywne Radary</span>
+            <span id="taskCount" class="count-badge">Aktywne: 0 z 0</span>
+        </h2>
         <div class="task-list" id="taskList"></div>
+    </div>
+
+    <!-- Pasek ostrzegający o niezapisanych zmianach -->
+    <div id="unsavedBanner" class="unsaved-banner">
+        ⚠️ Masz niezapisane zmiany na liście lub w harmonogramie! Kliknij przycisk poniżej, aby wysłać je do GitHuba.
     </div>
 
     <!-- Przyciski synchronizacji z chmurą -->
@@ -661,6 +745,8 @@
     // ==========================================
     const GITHUB_REPO = "kopek-beep/medicover";
     const WORKFLOW_PATH = ".github/workflows/checker.yml";
+    let statusPollTimer = null;
+    let statusPollCount = 0;
 
     function utf8ToBase64(str) {
         const bytes = new TextEncoder().encode(str);
@@ -691,7 +777,6 @@
     // 2. BAZA SPECJALIZACJI (DOROŚLI + DZIECI)
     // ==========================================
     const wszystkieSpecjalizacje = {
-        // Dorośli i ogólne
         "176": "Alergolog dorośli",
         "178": "Alergolog dorośli odczulanie",
         "11682": "Badanie dna oka - dorośli",
@@ -815,6 +900,48 @@
         document.getElementById('startDate').value = getTodayString();
     }
 
+    function initAppointmentTimeSelects() {
+        const fromSel = document.getElementById('timeFrom');
+        const toSel = document.getElementById('timeTo');
+        fromSel.innerHTML = '';
+        toSel.innerHTML = '';
+
+        fromSel.add(new Option("Od rana (00:00)", "00:00"));
+        for (let h = 7; h <= 20; h++) {
+            const t = `${String(h).padStart(2, '0')}:00`;
+            fromSel.add(new Option(t, t));
+        }
+
+        toSel.add(new Option("Do końca dnia (23:59)", "23:59"));
+        for (let h = 8; h <= 21; h++) {
+            const t = `${String(h).padStart(2, '0')}:00`;
+            toSel.add(new Option(t, t));
+        }
+        fromSel.value = "00:00";
+        toSel.value = "23:59";
+    }
+
+    function updateDoctorInputState() {
+        const mode = document.getElementById('doctorMode').value;
+        const input = document.getElementById('doctorName');
+        const label = document.getElementById('doctorNameLabel');
+
+        if (mode === "all") {
+            input.value = "";
+            input.disabled = true;
+            input.placeholder = "Szukam u wszystkich dostępnych lekarzy";
+            label.textContent = "Nazwisko lekarza";
+        } else if (mode === "include") {
+            input.disabled = false;
+            input.placeholder = "np. Kowalski, Nowak (szukaj tylko tych lekarzy)";
+            label.textContent = "Tylko wybrani lekarze (po przecinku)";
+        } else if (mode === "exclude") {
+            input.disabled = false;
+            input.placeholder = "np. Kowalski, Nowak (ignoruj tych lekarzy)";
+            label.textContent = "Czarna lista – wyklucz lekarzy (po przecinku)";
+        }
+    }
+
     function odswiezSpecjalizacje() {
         const wybranaOsoba = personSelect.value;
         const dostepneID = dostepneDlaOsoby[wybranaOsoba] || [];
@@ -839,7 +966,6 @@
 
     // ==========================================
     // 3. HARMONOGRAM I KONWERSJA CZASU PL -> UTC
-    //    (ODPORNA NA ZMIANĘ CZASU LETNI/ZIMOWY)
     // ==========================================
     let radarSchedule = JSON.parse(localStorage.getItem('medicover_schedule')) || {
         interval: 30,
@@ -864,7 +990,7 @@
         document.getElementById('radarAllDay').checked = radarSchedule.allDay;
         startSel.value = radarSchedule.startHour;
         endSel.value = radarSchedule.endHour;
-        updateScheduleUI();
+        updateScheduleUI(false);
     }
 
     function getPolandUtcOffsetHours() {
@@ -874,8 +1000,6 @@
         return Math.round((plDate - utcDate) / (1000 * 60 * 60));
     }
 
-    // Wylicza wyrażenie Cron UTC obejmujące zarówno czas letni (UTC+2), jak i zimowy (UTC+1),
-    // natomiast dokładne odcięcie godzin realizuje strażnik Europe/Warsaw w Pythonie.
     function buildCronExpression(schedule) {
         const step = parseInt(schedule.interval, 10) || 30;
         const minPart = step === 60 ? "0" : `*/${step}`;
@@ -887,7 +1011,6 @@
         const startPL = parseInt(schedule.startHour, 10);
         const endPL = parseInt(schedule.endHour, 10);
 
-        // Zbieramy zbiór godzin w Polsce
         const plHours = [];
         let h = startPL;
         while (true) {
@@ -897,16 +1020,14 @@
             if (plHours.length >= 24) break;
         }
 
-        // Jeśli zakres pokrywa min. 23 godziny, upraszczamy do '*'
         if (plHours.length >= 23) {
             return `${minPart} * * * *`;
         }
 
-        // Wyznaczamy godziny UTC dla czasu letniego (UTC+2) oraz zimowego (UTC+1)
         const utcHoursSet = new Set();
         plHours.forEach(ph => {
-            utcHoursSet.add((ph - 2 + 24) % 24); // Czas letni (CEST)
-            utcHoursSet.add((ph - 1 + 24) % 24); // Czas zimowy (CET)
+            utcHoursSet.add((ph - 2 + 24) % 24); // CEST (UTC+2)
+            utcHoursSet.add((ph - 1 + 24) % 24); // CET (UTC+1)
         });
 
         if (utcHoursSet.size >= 24) {
@@ -914,8 +1035,6 @@
         }
 
         const sortedUtc = Array.from(utcHoursSet).sort((a, b) => a - b);
-
-        // Kompresja posortowanych godzin UTC do przedziałów Crona (np. 0-1,5-23)
         const ranges = [];
         let rangeStart = sortedUtc[0];
         let prev = sortedUtc[0];
@@ -934,7 +1053,7 @@
         return `${minPart} ${ranges.join(',')} * * *`;
     }
 
-    function updateScheduleUI() {
+    function updateScheduleUI(markDirty = false) {
         const interval = parseInt(document.getElementById('radarInterval').value, 10);
         const allDay = document.getElementById('radarAllDay').checked;
         const startHour = parseInt(document.getElementById('radarStartHour').value, 10);
@@ -953,18 +1072,54 @@
         document.getElementById('cronPreviewCode').textContent = cron;
         document.getElementById('tzInfoText').textContent =
             `Obecnie w PL: UTC+${offset} • Gotowy na zmianę czasu zimowego/letniego (25.10) bez ponownego zapisu`;
+
+        if (markDirty) setUnsavedChanges(true);
     }
 
     // ==========================================
-    // 4. ZARZĄDZANIE ZADANIAMI
+    // 4. ZARZĄDZANIE ZADANIAMI I EDYCJĄ
     // ==========================================
     let tasks = JSON.parse(localStorage.getItem('medicover_tasks')) || [];
+    let editingIndex = null;
+    let hasUnsavedChanges = false;
+
+    function setUnsavedChanges(state) {
+        hasUnsavedChanges = state;
+        const banner = document.getElementById('unsavedBanner');
+        const syncBtn = document.getElementById('syncBtn');
+        if (state) {
+            banner.classList.add('visible');
+            syncBtn.classList.add('unsaved');
+            syncBtn.innerHTML = "⚠️ Zapisz niezapisane zmiany w chmurze (GitHub)";
+        } else {
+            banner.classList.remove('visible');
+            syncBtn.classList.remove('unsaved');
+            syncBtn.innerHTML = "☁️ Zapisz i zaktualizuj system w chmurze (GitHub)";
+        }
+    }
+
+    function normalizeTaskDoctor(task) {
+        let mode = task.doctorMode || "all";
+        let name = (task.doctorName || "").trim();
+        if (!task.doctorMode) {
+            if (!name || name.toLowerCase() === "wszyscy") {
+                mode = "all";
+                name = "";
+            } else if (name.startsWith("-")) {
+                mode = "exclude";
+                name = name.substring(1).trim();
+            } else {
+                mode = "include";
+            }
+        }
+        return { mode, name };
+    }
 
     function renderTasks() {
         const list = document.getElementById('taskList');
         const countEl = document.getElementById('taskCount');
         const activeCount = tasks.filter(t => !t.paused).length;
-        countEl.textContent = `${activeCount} aktywne / ${tasks.length} łącznie`;
+        countEl.textContent = `Aktywne: ${activeCount} z ${tasks.length}`;
         list.innerHTML = '';
 
         if (tasks.length === 0) {
@@ -983,8 +1138,15 @@
             div.style.setProperty('--task-color', theme.color);
 
             const cityName = task.region === "199" ? "Łódź" : task.region;
-            const docName = (task.doctorName && task.doctorName.toLowerCase() !== "wszyscy") ? task.doctorName : "Wszyscy";
             const specName = wszystkieSpecjalizacje[task.service] || task.serviceName || `ID: ${task.service}`;
+
+            const docInfo = normalizeTaskDoctor(task);
+            let docDisplay = "Wszyscy";
+            if (docInfo.mode === "include" && docInfo.name) {
+                docDisplay = `Tylko: ${docInfo.name}`;
+            } else if (docInfo.mode === "exclude" && docInfo.name) {
+                docDisplay = `Wyklucz: ${docInfo.name}`;
+            }
 
             let dateRangeText = "od dziś (bez limitu)";
             if (task.startDate && task.endDate) {
@@ -995,18 +1157,25 @@
                 dateRangeText = `do ${task.endDate}`;
             }
 
+            const tFrom = task.timeFrom || "00:00";
+            const tTo = task.timeTo || "23:59";
+            const timeRangeText = (tFrom === "00:00" && tTo === "23:59") ? "cały dzień" : `${tFrom}–${tTo}`;
+
             div.innerHTML = `
                 <div class="task-info">
                     <span class="task-tag" style="background-color: ${theme.color};">${escapeHtml(task.person)}</span>
                     <div class="task-details">
                         <div>Specjalizacja: <b>${escapeHtml(specName)}</b> • Miasto: <b>${escapeHtml(cityName)}</b></div>
                         <div style="font-size: 12.5px; margin-top: 3px;">
-                            Lekarz: <b>${escapeHtml(docName)}</b> • Termin: <b>${escapeHtml(dateRangeText)}</b>
+                            Lekarz: <b>${escapeHtml(docDisplay)}</b> • Termin: <b>${escapeHtml(dateRangeText)}</b> • Godz.: <b>${escapeHtml(timeRangeText)}</b>
                             ${task.paused ? ' • <b style="color: var(--warning);">[WSTRZYMANE]</b>' : ''}
                         </div>
                     </div>
                 </div>
                 <div class="task-actions">
+                    <button class="btn-icon" onclick="editTask(${index})" title="Edytuj zadanie">
+                        ✏️ Edytuj
+                    </button>
                     <button class="btn-icon" onclick="togglePauseTask(${index})" title="${task.paused ? 'Wznów zadanie' : 'Wstrzymaj zadanie'}">
                         ${task.paused ? '▶️ Wznów' : '⏸️ Pauza'}
                     </button>
@@ -1021,52 +1190,129 @@
         localStorage.setItem('medicover_tasks', JSON.stringify(tasks));
     }
 
-    function addTask() {
+    function saveOrAddTask() {
         const person = document.getElementById('person').value;
         const region = document.getElementById('region').value;
         const service = document.getElementById('service').value;
         const serviceName = wszystkieSpecjalizacje[service] || `ID: ${service}`;
 
+        const doctorMode = document.getElementById('doctorMode').value;
         let doctorInput = document.getElementById('doctorName').value.trim().replace(/"/g, '');
-        const doctorName = (doctorInput === "" || doctorInput.toLowerCase() === "wszyscy") ? "Wszyscy" : doctorInput;
+        if (doctorMode !== "all" && !doctorInput) {
+            alert("Wpisz nazwisko lekarza lub zmień filtr lekarza na „Wszyscy lekarze”!");
+            return;
+        }
+        const doctorName = doctorMode === "all" ? "Wszyscy" : doctorInput;
 
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
+        const timeFrom = document.getElementById('timeFrom').value;
+        const timeTo = document.getElementById('timeTo').value;
 
         if (startDate && endDate && startDate > endDate) {
             alert("Data początkowa nie może być późniejsza niż data końcowa!");
             return;
         }
-
-        const isDuplicate = tasks.some(t =>
-            t.person === person &&
-            t.service === service &&
-            (t.doctorName || "Wszyscy").toLowerCase() === doctorName.toLowerCase() &&
-            (t.startDate || "") === startDate &&
-            (t.endDate || "") === endDate
-        );
-
-        if (isDuplicate) {
-            alert("Identyczne zadanie znajduje się już na liście!");
+        if (timeFrom > timeTo) {
+            alert("Godzina początkowa wizyty nie może być późniejsza niż godzina końcowa!");
             return;
         }
 
-        tasks.push({ person, region, service, serviceName, doctorName, startDate, endDate, paused: false });
-        renderTasks();
+        const newTaskObj = {
+            person,
+            region,
+            service,
+            serviceName,
+            doctorMode,
+            doctorName,
+            startDate,
+            endDate,
+            timeFrom,
+            timeTo,
+            paused: editingIndex !== null ? tasks[editingIndex].paused : false
+        };
 
-        document.getElementById('doctorName').value = "Wszyscy";
+        if (editingIndex !== null) {
+            tasks[editingIndex] = newTaskObj;
+            cancelEditTask();
+        } else {
+            const isDuplicate = tasks.some(t =>
+                t.person === person &&
+                t.service === service &&
+                (t.doctorMode || "all") === doctorMode &&
+                (t.doctorName || "Wszyscy").toLowerCase() === doctorName.toLowerCase() &&
+                (t.startDate || "") === startDate &&
+                (t.endDate || "") === endDate &&
+                (t.timeFrom || "00:00") === timeFrom &&
+                (t.timeTo || "23:59") === timeTo
+            );
+
+            if (isDuplicate) {
+                alert("Identyczne zadanie znajduje się już na liście!");
+                return;
+            }
+            tasks.push(newTaskObj);
+            resetTaskForm();
+        }
+
+        renderTasks();
+        setUnsavedChanges(true);
+    }
+
+    function editTask(index) {
+        const task = tasks[index];
+        editingIndex = index;
+
+        document.getElementById('person').value = task.person;
+        odswiezSpecjalizacje();
+        document.getElementById('service').value = task.service;
+
+        const docInfo = normalizeTaskDoctor(task);
+        document.getElementById('doctorMode').value = docInfo.mode;
+        updateDoctorInputState();
+        document.getElementById('doctorName').value = docInfo.name;
+
+        document.getElementById('startDate').value = task.startDate || getTodayString();
+        document.getElementById('endDate').value = task.endDate || "";
+        document.getElementById('timeFrom').value = task.timeFrom || "00:00";
+        document.getElementById('timeTo').value = task.timeTo || "23:59";
+
+        document.getElementById('formTitle').innerHTML = "<span>✏️ Edycja wybranego zadania</span>";
+        document.getElementById('saveTaskBtn').innerHTML = "💾 Zapisz zmiany w zadaniu";
+        document.getElementById('cancelEditBtn').style.display = "inline-flex";
+        document.getElementById('taskFormCard').classList.add('editing-mode');
+        document.getElementById('taskFormCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function cancelEditTask() {
+        editingIndex = null;
+        document.getElementById('formTitle').innerHTML = "Dodaj nowe zadanie monitorowania";
+        document.getElementById('saveTaskBtn').innerHTML = "➕ Dodaj do listy Radarów";
+        document.getElementById('cancelEditBtn').style.display = "none";
+        document.getElementById('taskFormCard').classList.remove('editing-mode');
+        resetTaskForm();
+    }
+
+    function resetTaskForm() {
+        document.getElementById('doctorMode').value = "all";
+        updateDoctorInputState();
         ustawDzisiejszaDate();
         document.getElementById('endDate').value = "";
+        document.getElementById('timeFrom').value = "00:00";
+        document.getElementById('timeTo').value = "23:59";
     }
 
     function togglePauseTask(index) {
         tasks[index].paused = !tasks[index].paused;
         renderTasks();
+        setUnsavedChanges(true);
     }
 
     function removeTask(index) {
+        if (editingIndex === index) cancelEditTask();
         tasks.splice(index, 1);
         renderTasks();
+        setUnsavedChanges(true);
     }
 
     // ==========================================
@@ -1097,6 +1343,9 @@
             yaml += `    - cron: '${cronExpr}'\n`;
         }
         yaml += `  workflow_dispatch:\n\n`;
+        yaml += `concurrency:\n`;
+        yaml += `  group: medicover-radar-lock\n`;
+        yaml += `  cancel-in-progress: false\n\n`;
         yaml += `jobs:\n`;
         yaml += `  check-slots:\n`;
         yaml += `    runs-on: ubuntu-latest\n`;
@@ -1109,7 +1358,6 @@
             return yaml;
         }
 
-        // Kodujemy zadania w Base64, aby uniknąć problemów ze znakami specjalnymi i cudzysłowami w YAML
         const tasksBase64 = utf8ToBase64(JSON.stringify(activeTasks));
 
         yaml += `      - uses: actions/checkout@v4\n`;
@@ -1120,7 +1368,10 @@
         yaml += `      - name: Przywrocenie sesji bazowej\n`;
         yaml += `        env:\n`;
         yaml += `          MEDICOVER_SESSION: \${{ secrets.MEDICOVER_SESSION }}\n`;
-        yaml += `        run: mkdir -p data && echo "$MEDICOVER_SESSION" | base64 -d | tar -xz -C data\n`;
+        yaml += `        run: |\n`;
+        yaml += `          mkdir -p data data_base\n`;
+        yaml += `          echo "$MEDICOVER_SESSION" | base64 -d | tar -xz -C data\n`;
+        yaml += `          echo "$MEDICOVER_SESSION" | base64 -d | tar -xz -C data_base\n`;
         yaml += `      - name: Przywrocenie pamieci podrecznej\n`;
         yaml += `        uses: actions/cache/restore@v4\n`;
         yaml += `        with:\n`;
@@ -1153,7 +1404,7 @@
     }
 
     // ==========================================
-    // 6. KOMUNIKACJA Z GITHUB API
+    // 6. KOMUNIKACJA Z GITHUB API + AUTO-POLLING
     // ==========================================
     function showStatus(msg, colorVar = "var(--primary)") {
         const statusEl = document.getElementById('status');
@@ -1186,11 +1437,16 @@
         } else {
             localStorage.setItem("medicover_gh_token", nextToken.trim());
             showStatus("✅ Nowy token GitHub został zapisany.", "var(--success)");
-            fetchLastRunStatus();
+            fetchLastRunStatus(true);
         }
     }
 
-    async function fetchLastRunStatus() {
+    async function fetchLastRunStatus(resetCounter = false) {
+        if (resetCounter) {
+            statusPollCount = 0;
+            if (statusPollTimer) clearTimeout(statusPollTimer);
+        }
+
         const token = localStorage.getItem("medicover_gh_token");
         const lastRunEl = document.getElementById('lastRunText');
         if (!token) {
@@ -1198,8 +1454,7 @@
             return;
         }
 
-        lastRunEl.textContent = "⏳ Pobieranie statusu z GitHub Actions...";
-        const url = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/runs?per_page=1`;
+        const url = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/runs?per_page=1&_=${Date.now()}`;
         const headers = { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" };
 
         try {
@@ -1222,12 +1477,18 @@
                 hour: '2-digit', minute: '2-digit', second: '2-digit'
             });
 
-            let badge = "⏳ W trakcie...";
-            if (run.status === "completed") {
-                badge = run.conclusion === "success" ? "✅ Sukces" : `❌ Błąd (${run.conclusion})`;
-            }
             const eventLabel = run.event === "workflow_dispatch" ? "Na żądanie" : "Harmonogram";
-            lastRunEl.textContent = `Ostatnie sprawdzenie: ${dateStr} • ${badge} (${eventLabel})`;
+
+            if (run.status !== "completed") {
+                lastRunEl.textContent = `Ostatnie sprawdzenie: ${dateStr} • ⏳ W trakcie... (${eventLabel})`;
+                if (statusPollCount < 24) {
+                    statusPollCount++;
+                    statusPollTimer = setTimeout(() => fetchLastRunStatus(false), 5000);
+                }
+            } else {
+                const badge = run.conclusion === "success" ? "✅ Sukces" : `❌ Błąd (${run.conclusion})`;
+                lastRunEl.textContent = `Ostatnie sprawdzenie: ${dateStr} • ${badge} (${eventLabel})`;
+            }
         } catch (err) {
             lastRunEl.textContent = `❌ Błąd sieci podczas sprawdzania statusu.`;
         }
@@ -1263,8 +1524,10 @@
             });
 
             if (res.status === 204 || res.ok) {
-                showStatus("🚀 Radar został uruchomiony na żądanie! Za ~15-30 sekund kliknij „Sprawdź status”.", "var(--success)");
-                setTimeout(fetchLastRunStatus, 6000);
+                showStatus("🚀 Radar został uruchomiony na żądanie! Status powyżej zaktualizuje się automatycznie po zakończeniu.", "var(--success)");
+                statusPollCount = 0;
+                if (statusPollTimer) clearTimeout(statusPollTimer);
+                statusPollTimer = setTimeout(() => fetchLastRunStatus(false), 4000);
             } else {
                 const errData = await res.json().catch(() => ({}));
                 showStatus(`❌ Nie udało się uruchomić: ${errData.message || res.status}`, "var(--danger)");
@@ -1306,13 +1569,14 @@
             const putRes = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body) });
 
             if (putRes.ok) {
+                setUnsavedChanges(false);
                 const activeCount = tasks.filter(t => !t.paused).length;
                 if (activeCount === 0) {
                     showStatus("⏸️ Zapisano! Brak aktywnych zadań – harmonogram Cron został wstrzymany.", "var(--warning)");
                 } else {
                     showStatus("✨ Sukces! Konfiguracja zadań i harmonogram zostały zapisane na GitHubie.", "var(--success)");
                 }
-                fetchLastRunStatus();
+                fetchLastRunStatus(true);
             } else {
                 const err = await putRes.json().catch(() => ({}));
                 if (putRes.status === 401) localStorage.removeItem("medicover_gh_token");
@@ -1333,7 +1597,7 @@
         showStatus("⬇️ Pobieranie konfiguracji z GitHuba...", "var(--text-secondary)");
         loadBtn.classList.add('syncing');
 
-        const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${WORKFLOW_PATH}`;
+        const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${WORKFLOW_PATH}?_=${Date.now()}`;
         const headers = { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" };
 
         try {
@@ -1343,7 +1607,6 @@
                 const decodedContent = base64ToUtf8(data.content);
                 const lines = decodedContent.split('\n');
 
-                // 1. Odczyt pełnych metadanych z komentarza # RADAR_CONFIG:
                 const metaLine = lines.find(l => l.startsWith('# RADAR_CONFIG:'));
                 let loadedFromMeta = false;
 
@@ -1364,7 +1627,6 @@
                     }
                 }
 
-                // 2. Fallback dla starszych plików YAML (parsowanie pojedynczych linii find-appointment)
                 if (!loadedFromMeta) {
                     tasks = [];
                     for (let line of lines) {
@@ -1383,9 +1645,12 @@
                                     service: sId,
                                     serviceName: wszystkieSpecjalizacje[sId] || `ID: ${sId}`,
                                     person: personMatch[1],
+                                    doctorMode: docMatch ? "include" : "all",
                                     doctorName: docMatch ? docMatch[1] : "Wszyscy",
                                     startDate: startMatch ? startMatch[1] : "",
                                     endDate: endMatch ? endMatch[1] : "",
+                                    timeFrom: "00:00",
+                                    timeTo: "23:59",
                                     paused: false
                                 });
                             }
@@ -1393,9 +1658,11 @@
                     }
                 }
 
+                cancelEditTask();
                 renderTasks();
+                setUnsavedChanges(false);
                 showStatus("✅ Wczytano konfigurację i harmonogram z chmury GitHub.", "var(--success)");
-                fetchLastRunStatus();
+                fetchLastRunStatus(true);
             } else if (getRes.status === 404) {
                 tasks = [];
                 renderTasks();
@@ -1412,12 +1679,15 @@
         }
     }
 
+    // Inicjalizacja przy starcie strony
     odswiezSpecjalizacje();
     ustawDzisiejszaDate();
+    initAppointmentTimeSelects();
+    updateDoctorInputState();
     initScheduleSelects();
     renderTasks();
     if (localStorage.getItem("medicover_gh_token")) {
-        fetchLastRunStatus();
+        fetchLastRunStatus(true);
     }
 </script>
 </body>
