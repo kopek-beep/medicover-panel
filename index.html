@@ -2,87 +2,130 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <title>MediRadar Panel</title>
     <style>
+        /* ==========================================
+           STYL MICROSOFT COPILOT (JASNY / CIEMNY)
+           ========================================== */
         :root {
-            --bg-page: #faf9f8;
-            --bg-container: #ffffff;
-            --bg-card: #f5f5f5;
-            --bg-input: #ffffff;
-            --text-main: #242424;
-            --text-secondary: #616161;
-            --border-subtle: #e0e0e0;
-            --border-input: #d1d1d1;
-            --primary-copilot: #0f6cbd;
-            --primary-glow: rgba(15, 108, 189, 0.16);
-            
-            --copilot-gradient: linear-gradient(135deg, #0f6cbd 0%, #75399c 35%, #d83b01 70%, #ffb900 100%);
-            --copilot-btn-gradient: linear-gradient(135deg, #0f6cbd 0%, #5c2e91 55%, #c239b3 100%);
-
-            --shadow-card: 0 8px 30px rgba(0, 0, 0, 0.07);
-            --radius-main: 24px;
-            --radius-card: 16px;
-            --radius-input: 12px;
+            --bg-page: #f5f3ef;
+            --bg-card: rgba(255, 255, 255, 0.86);
+            --bg-element: #ffffff;
+            --bg-subtle: #ebe8e1;
+            --text-main: #1f1f1f;
+            --text-secondary: #5c5c5c;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --input-border: #d6d2c9;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --accent-grad: linear-gradient(135deg, #2563eb 0%, #7c3aed 55%, #db2777 100%);
+            --btn-primary-grad: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            --shadow-card: 0 12px 32px rgba(20, 20, 20, 0.06), 0 2px 6px rgba(20, 20, 20, 0.04);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+            --aurora-1: rgba(37, 99, 235, 0.12);
+            --aurora-2: rgba(219, 39, 119, 0.10);
+            --aurora-3: rgba(124, 58, 237, 0.10);
+            --radius-lg: 24px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --success: #15803d;
+            --danger: #dc2626;
+            --warning: #d97706;
         }
 
         [data-theme="dark"] {
-            --bg-page: #141414;
-            --bg-container: #1f1f1f;
-            --bg-card: #292929;
-            --bg-input: #141414;
-            --text-main: #f5f5f5;
-            --text-secondary: #adadad;
-            --border-subtle: #383838;
-            --border-input: #4a4a4a;
-            --primary-copilot: #479ef5;
-            --primary-glow: rgba(71, 158, 245, 0.22);
-
-            --copilot-gradient: linear-gradient(135deg, #479ef5 0%, #b470ff 38%, #ff6b9d 72%, #ffaa44 100%);
-            --copilot-btn-gradient: linear-gradient(135deg, #115ea3 0%, #6b308b 50%, #c239b3 100%);
-
-            --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.6);
+            --bg-page: #111318;
+            --bg-card: rgba(26, 29, 36, 0.88);
+            --bg-element: #222631;
+            --bg-subtle: #181b22;
+            --text-main: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --border-color: rgba(255, 255, 255, 0.09);
+            --input-border: #374151;
+            --primary: #60a5fa;
+            --primary-hover: #93c5fd;
+            --accent-grad: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+            --btn-primary-grad: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            --shadow-card: 0 16px 40px rgba(0, 0, 0, 0.45);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+            --aurora-1: rgba(59, 130, 246, 0.14);
+            --aurora-2: rgba(236, 72, 153, 0.11);
+            --aurora-3: rgba(139, 92, 246, 0.12);
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
         }
 
-        *, *::before, *::after { box-sizing: border-box; }
-        html, body { margin: 0; padding: 0; width: 100%; overflow-x: hidden; }
+        * {
+            box-sizing: border-box;
+        }
 
-        body { 
-            font-family: "Segoe UI Variable", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif; 
-            background-color: var(--bg-page); 
-            padding: 32px 16px; 
-            color: var(--text-main); 
+        body {
+            font-family: "Segoe UI Variable Display", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            margin: 0;
+            padding: 32px 16px;
             min-height: 100vh;
-            transition: background-color 0.25s, color 0.25s;
-        }
-
-        .container { 
-            max-width: 880px; 
-            width: 100%;
-            margin: 0 auto; 
-            background: var(--bg-container);
-            padding: 38px; 
-            border-radius: var(--radius-main); 
-            box-shadow: var(--shadow-card); 
-            border: 1px solid var(--border-subtle);
             position: relative;
+            overflow-x: hidden;
+            line-height: 1.5;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
 
+        /* Subtelne tło Copilot Aura */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            width: 55vw;
+            height: 55vw;
+            max-width: 600px;
+            max-height: 600px;
+            z-index: -1;
+            filter: blur(90px);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        body::before {
+            top: -10%;
+            left: -10%;
+            background: radial-gradient(circle, var(--aurora-1) 0%, var(--aurora-3) 50%, transparent 75%);
+        }
+        body::after {
+            bottom: -10%;
+            right: -10%;
+            background: radial-gradient(circle, var(--aurora-2) 0%, transparent 70%);
+        }
+
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+            background: var(--bg-card);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            padding: 36px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Nagłówek (bez nakładania się na telefonie) */
         .header-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 16px;
-            margin-bottom: 22px;
+            margin-bottom: 24px;
             flex-wrap: wrap;
         }
 
-        h1 { 
+        h1 {
             margin: 0;
             font-size: 30px;
             font-weight: 800;
             letter-spacing: -0.6px;
-            background: var(--copilot-gradient);
+            background: var(--accent-grad);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: flex;
@@ -90,70 +133,30 @@
             gap: 12px;
         }
 
-        .live-status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 14px;
-            padding: 14px 18px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-card);
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-        }
-
-        .live-status-info {
+        /* Przełącznik motywu */
+        .theme-switch-wrapper {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 13.5px;
-            color: var(--text-secondary);
+            gap: 8px;
         }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #888;
-            display: inline-block;
-            flex-shrink: 0;
-        }
-        .status-dot.success { background: #107c41; box-shadow: 0 0 8px rgba(16, 124, 65, 0.6); }
-        .status-dot.running { background: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.7); animation: pulse 1.2s infinite; }
-        .status-dot.error { background: #d13438; box-shadow: 0 0 8px rgba(209, 52, 56, 0.6); }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.45; transform: scale(1.2); }
-        }
-
-        .btn-run-now {
-            padding: 9px 18px;
-            font-size: 13px;
-            font-weight: 700;
-            background: var(--copilot-btn-gradient);
-            color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(92, 46, 145, 0.25);
-            border: none;
-            cursor: pointer;
-        }
-        .btn-run-now:hover { filter: brightness(1.1); }
-
         .theme-switch {
             position: relative;
             display: inline-block;
             width: 52px;
             height: 28px;
             margin: 0;
-            cursor: pointer;
         }
-        .theme-switch input { opacity: 0; width: 0; height: 0; }
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
         .slider {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: var(--border-input);
+            cursor: pointer;
+            inset: 0;
+            background-color: var(--bg-subtle);
+            border: 1px solid var(--border-color);
             transition: .3s;
             border-radius: 34px;
         }
@@ -167,22 +170,68 @@
             height: 22px;
             width: 22px;
             left: 3px;
-            bottom: 3px;
-            background-color: #ffffff;
+            bottom: 2px;
+            background-color: var(--bg-element);
             transition: .3s;
             border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
         }
-        input:checked + .slider { background: var(--copilot-btn-gradient); }
-        input:checked + .slider:before { transform: translateX(24px); content: "🌙"; background-color: #1f1f1f; }
+        input:checked + .slider:before {
+            transform: translateX(22px);
+            content: "🌙";
+        }
 
-        h2 { 
-            font-size: 16px; 
-            font-weight: 700; 
+        /* Pasek Statusu Live (Ostatnie odświeżenie + Uruchom Teraz) */
+        .live-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .live-status-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .live-status-info strong {
+            font-size: 14px;
             color: var(--text-main);
-            margin-top: 32px;
-            margin-bottom: 16px;
-            padding-bottom: 10px; 
-            border-bottom: 1px solid var(--border-subtle); 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .live-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Sekcje i karty wewnętrzne */
+        .section-card {
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        h2 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 0 0 18px 0;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -190,198 +239,405 @@
         h2::before {
             content: '';
             display: inline-block;
-            width: 8px; height: 8px;
-            background: var(--copilot-gradient);
+            width: 8px;
+            height: 8px;
+            background: var(--accent-grad);
             border-radius: 50%;
+            flex-shrink: 0;
         }
 
-        .flex-row { 
-            display: flex; 
-            gap: 16px; 
-            flex-wrap: wrap; 
-            align-items: flex-end;
+        /* Formularze */
+        .grid-row {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
             margin-bottom: 16px;
         }
-        .flex-row > .form-group { 
-            flex: 1 1 160px; 
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-        
-        label { 
-            display: block; 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            font-size: 12px; 
+        .col-3 { grid-column: span 3; }
+        .col-4 { grid-column: span 4; }
+        .col-6 { grid-column: span 6; }
+        .col-12 { grid-column: span 12; }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 0.4px;
             color: var(--text-secondary);
         }
 
-        select, input { 
-            width: 100%; 
-            height: 46px;
-            padding: 0 14px; 
-            font-size: 14px; 
+        select, input[type="text"], input[type="date"], input[type="number"] {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 14px;
             font-family: inherit;
+            font-weight: 500;
             color: var(--text-main);
-            border: 1.5px solid var(--border-input); 
-            border-radius: var(--radius-input); 
-            background-color: var(--bg-input);
+            border: 1.5px solid var(--input-border);
+            border-radius: var(--radius-sm);
+            background-color: var(--bg-page);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        select:focus, input:focus { outline: none; border-color: var(--primary-copilot); box-shadow: 0 0 0 3px var(--primary-glow); }
-        select#person { border-left-width: 5px; }
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+        }
+        select:disabled, input:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
 
-        .copilot-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-card);
-            padding: 20px;
+        select#person {
+            border-left-width: 6px;
+            font-weight: 700;
+        }
+
+        /* Przełącznik 24/7 w harmonogramie */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-page);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid var(--input-border);
+            height: 45px;
+        }
+        .toggle-row span {
+            font-size: 14px;
+            font-weight: 600;
         }
 
         .cron-preview {
-            margin-top: 16px;
-            font-size: 13px;
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-subtle);
+            font-size: 12.5px;
             color: var(--text-secondary);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
-            padding-top: 14px;
-            border-top: 1px dashed var(--border-subtle);
+            gap: 8px;
         }
-
-        .cron-badge {
-            font-family: Consolas, monospace;
-            background: var(--primary-glow);
-            color: var(--primary-copilot);
-            padding: 5px 10px;
-            border-radius: 8px;
+        .cron-preview code {
+            font-family: monospace;
+            background: var(--bg-element);
+            padding: 3px 8px;
+            border-radius: 6px;
+            color: var(--primary);
             font-weight: 700;
-            font-size: 12px;
+            border: 1px solid var(--border-color);
         }
 
-        button { 
+        /* Przyciski */
+        button {
             font-family: inherit;
-            border: none; 
-            padding: 13px 24px; 
-            font-size: 14px; 
-            font-weight: 600; 
-            border-radius: var(--radius-input); 
-            cursor: pointer; 
-            display: flex;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
         }
+        button:active { transform: scale(0.98); }
 
-        button.btn-add {
-            background: var(--bg-input);
-            color: var(--primary-copilot);
-            border: 1.5px solid var(--primary-copilot);
+        .btn-add {
+            width: 100%;
+            background: var(--bg-page);
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            padding: 13px;
+            font-weight: 700;
             margin-top: 4px;
         }
-        button.btn-add:hover { background: var(--primary-copilot); color: #ffffff; }
+        .btn-add:hover {
+            background: var(--primary);
+            color: #fff;
+        }
 
-        .task-list { margin-top: 14px; display: flex; flex-direction: column; gap: 12px; }
-        .task-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 16px 18px 16px 22px; border-radius: var(--radius-card); 
-            background: var(--bg-card); border: 1px solid var(--border-subtle);
-            position: relative; overflow: hidden; gap: 12px;
+        .btn-run-now {
+            background: var(--bg-element);
+            color: var(--text-main);
+            border: 1px solid var(--input-border);
+            padding: 9px 14px;
+            font-size: 13px;
+        }
+        .btn-run-now:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn-run-now.primary-Trigger {
+            background: var(--btn-primary-grad);
+            color: #fff;
+            border: none;
+        }
+        .btn-run-now.primary-Trigger:hover {
+            filter: brightness(1.1);
+            color: #fff;
+        }
+
+        /* Lista zadań */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .task-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 18px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-page);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.15s ease, opacity 0.2s ease;
         }
         .task-item::before {
-            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
-            background-color: var(--task-color, var(--primary-copilot));
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 5px;
+            background-color: var(--task-color, var(--primary));
         }
-        .task-item.paused { opacity: 0.55; filter: grayscale(65%); }
-        .task-info { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
-        .task-tag { 
-            padding: 5px 12px; border-radius: 20px; font-size: 12px; 
-            font-weight: 700; color: white; flex-shrink: 0; 
+        .task-item.paused {
+            opacity: 0.55;
         }
-        .paused-badge {
-            font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px;
-            background: rgba(209, 52, 56, 0.15); color: #d13438; margin-left: 6px; text-transform: uppercase;
+        .task-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 0;
         }
-        .task-details { color: var(--text-secondary); font-size: 13.5px; }
-        .task-details b { color: var(--text-main); }
-        .task-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .task-tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            color: #fff;
+            flex-shrink: 0;
+            min-width: 74px;
+        }
+        .task-details {
+            font-size: 13.5px;
+            color: var(--text-secondary);
+            line-height: 1.45;
+            word-break: break-word;
+        }
+        .task-details b {
+            color: var(--text-main);
+        }
+        .task-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .btn-icon {
+            background: transparent;
+            padding: 8px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            border: 1px solid transparent;
+        }
+        .btn-icon:hover {
+            background: var(--bg-subtle);
+            color: var(--text-main);
+        }
+        .btn-icon.delete {
+            color: var(--danger);
+        }
+        .btn-icon.delete:hover {
+            background: rgba(220, 38, 38, 0.1);
+            border-color: rgba(220, 38, 38, 0.25);
+        }
 
-        .btn-pause {
-            padding: 7px 12px; font-size: 12px; font-weight: 700; border-radius: 8px;
-            border: 1.5px solid var(--border-input); background: var(--bg-input); color: var(--text-main);
+        /* Główne przyciski synchronizacji */
+        .action-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
         }
-        .btn-pause.active { border-color: #107c41; color: #107c41; background: rgba(16, 124, 65, 0.08); }
-        .btn-pause.paused { border-color: #d83b01; color: #d83b01; background: rgba(216, 59, 1, 0.08); }
-
-        .btn-delete { background: transparent; color: #d13438; padding: 8px; border-radius: 8px; }
-        .btn-delete:hover { background: rgba(209, 52, 56, 0.12); }
-
         .btn-sync {
-            width: 100%; padding: 16px; font-size: 15px; font-weight: 700; border-radius: var(--radius-input);
-            margin-top: 10px; background: var(--copilot-btn-gradient); color: white;
+            width: 100%;
+            padding: 16px;
+            font-size: 15px;
+            font-weight: 700;
+            background: var(--btn-primary-grad);
+            color: #fff;
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.25);
         }
-        .btn-sync:hover { filter: brightness(1.08); }
-
+        .btn-sync:hover {
+            filter: brightness(1.08);
+        }
         .btn-load {
-            width: 100%; padding: 14px; font-size: 14px; border-radius: var(--radius-input);
-            margin-top: 12px; background-color: var(--bg-card); color: var(--text-main); border: 1.5px solid var(--border-input);
+            width: 100%;
+            padding: 14px;
+            background: var(--bg-element);
+            color: var(--text-main);
+            border: 1.5px dashed var(--input-border);
+        }
+        .btn-load:hover {
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
-        .footer-tools { margin-top: 18px; display: flex; justify-content: center; }
-        .btn-reset-token { background: transparent; color: var(--text-secondary); font-size: 12px; padding: 6px 12px; opacity: 0.75; }
-        .btn-reset-token:hover { opacity: 1; color: var(--primary-copilot); }
+        #status {
+            margin-top: 18px;
+            font-weight: 600;
+            text-align: center;
+            font-size: 14px;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            display: none;
+        }
+        #status.visible {
+            display: block;
+        }
 
-        #status { margin-top: 18px; font-weight: 600; text-align: center; font-size: 14px; padding: 10px; }
+        .footer-bar {
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .btn-token {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 7px 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .btn-token:hover {
+            color: var(--text-main);
+            border-color: var(--input-border);
+            background: var(--bg-subtle);
+        }
+
         .syncing { opacity: 0.6; pointer-events: none; }
-        .empty-state { padding: 28px 16px; text-align: center; color: var(--text-secondary); background: var(--bg-card); border-radius: var(--radius-card); border: 1.5px dashed var(--border-input); }
 
+        .empty-state {
+            padding: 32px 16px;
+            text-align: center;
+            color: var(--text-secondary);
+            background: var(--bg-page);
+            border-radius: var(--radius-sm);
+            border: 1.5px dashed var(--input-border);
+            font-size: 14px;
+        }
+
+        /* ==========================================
+           RESPONSYWNOŚĆ (TELEFONY / TABLETY)
+           ========================================== */
         @media (max-width: 768px) {
-            body { padding: 10px 8px; }
-            .container { padding: 20px 14px; }
-            .flex-row { flex-direction: column; align-items: stretch; }
-            .task-item { flex-direction: column; align-items: flex-start; }
-            .task-actions { width: 100%; justify-content: flex-end; border-top: 1px dashed var(--border-subtle); padding-top: 8px; }
+            body { padding: 12px 10px; }
+            .container { padding: 20px 16px; border-radius: 18px; }
+            h1 { font-size: 23px; }
+            .section-card { padding: 16px; }
+            .col-3, .col-4, .col-6 { grid-column: span 12; }
+            .live-status-bar { flex-direction: column; align-items: stretch; }
+            .live-actions { width: 100%; }
+            .live-actions button { flex: 1; }
+            .task-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .task-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+                width: 100%;
+            }
+            .task-actions {
+                width: 100%;
+                justify-content: flex-end;
+                border-top: 1px solid var(--border-color);
+                padding-top: 8px;
+            }
+            .footer-bar {
+                flex-direction: column;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
-
 <div class="container">
+    <!-- Nagłówek z przełącznikiem motywu -->
     <div class="header-bar">
         <h1>
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="#0f6cbd" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="12" cy="12" r="2.5" fill="#0f6cbd"/>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="copilotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#2563eb" />
+                        <stop offset="50%" stop-color="#7c3aed" />
+                        <stop offset="100%" stop-color="#db2777" />
+                    </linearGradient>
+                </defs>
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#copilotGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="3" fill="url(#copilotGrad)"/>
             </svg>
-            MediRadar
+            MediRadar Copilot
         </h1>
+
         <div class="theme-switch-wrapper">
-            <label class="theme-switch" for="checkbox_theme">
+            <label class="theme-switch" for="checkbox_theme" title="Przełącz motyw jasny/ciemny">
                 <input type="checkbox" id="checkbox_theme" />
                 <div class="slider"></div>
             </label>
         </div>
     </div>
 
+    <!-- Pasek Statusu na żywo i odświeżania na żądanie -->
     <div class="live-status-bar">
         <div class="live-status-info">
-            <span class="status-dot" id="runDot"></span>
-            <span id="runStatusText">Status chmury: Oczekiwanie na połączenie...</span>
+            <span>Status automatyzacji GitHub Actions:</span>
+            <strong id="lastRunText">⏳ Kliknij „Sprawdź status” lub „Wczytaj dane”, aby pobrać informacje</strong>
         </div>
         <div class="live-actions">
-            <button class="btn-run-now" id="runNowBtn" onclick="triggerWorkflowNow()">⚡ Skanuj teraz</button>
+            <button class="btn-run-now" onclick="fetchLastRunStatus()" title="Odśwież informację o ostatnim uruchomieniu">
+                🔄 Sprawdź status
+            </button>
+            <button id="runNowBtn" class="btn-run-now primary-Trigger" onclick="triggerWorkflowNow()">
+                ⚡ Uruchom TERAZ
+            </button>
         </div>
     </div>
 
-    <h2>Dodaj nowe zadanie monitorowania</h2>
-    <div class="copilot-card">
-        <div class="flex-row">
-            <div class="form-group">
-                <label>Członek rodziny</label>
+    <!-- Sekcja 1: Dodawanie nowego zadania -->
+    <div class="section-card">
+        <h2>Dodaj nowe zadanie monitorowania</h2>
+
+        <div class="grid-row">
+            <div class="col-3">
+                <label for="person">Członek rodziny</label>
                 <select id="person">
                     <option value="KAMIL">Kamil</option>
                     <option value="MONIKA">Monika</option>
@@ -389,121 +645,263 @@
                     <option value="SZYMON">Szymon</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label>Miasto</label>
-                <select id="region" disabled><option value="199">Łódź</option></select>
+            <div class="col-3">
+                <label for="region">Miasto</label>
+                <select id="region" disabled>
+                    <option value="199">Łódź</option>
+                </select>
             </div>
-            <div class="form-group" style="flex: 2 1 240px;">
-                <label>Specjalizacja</label>
+            <div class="col-6">
+                <label for="service">Specjalizacja</label>
                 <select id="service"></select>
             </div>
         </div>
 
-        <div class="flex-row">
-            <div class="form-group" style="flex: 2 1 240px;">
-                <label>Preferowany lekarz</label>
+        <div class="grid-row">
+            <div class="col-6">
+                <label for="doctorName">Preferowany lekarz (opcjonalnie)</label>
                 <input type="text" id="doctorName" value="Wszyscy" placeholder="np. Kowalski lub Wszyscy">
             </div>
-            <div class="form-group">
-                <label>Data od</label>
+            <div class="col-3">
+                <label for="startDate">Data od</label>
                 <input type="date" id="startDate">
             </div>
-            <div class="form-group">
-                <label>Data do (opcjonalnie)</label>
+            <div class="col-3">
+                <label for="endDate">Data do (opcjonalnie)</label>
                 <input type="date" id="endDate">
             </div>
         </div>
 
-        <button class="btn-add" onclick="addTask()">Aktywuj Radar</button>
+        <button class="btn-add" onclick="addTask()">
+            ➕ Dodaj do listy Radarów
+        </button>
     </div>
 
-    <h2>Aktywne Radary (Lista zadań)</h2>
-    <div class="task-list" id="taskList"></div>
+    <!-- Sekcja 2: Konfiguracja czasu pracy Radaru -->
+    <div class="section-card">
+        <h2>Konfiguracja czasu pracy Radaru</h2>
 
-    <h2>Konfiguracja czasu pracy Radaru (Czas Polski)</h2>
-    <div class="copilot-card">
-        <div class="flex-row" style="margin-bottom: 0;">
-            <div class="form-group">
-                <label>Częstotliwość</label>
-                <select id="scanInterval" onchange="updateScheduleSettings()">
+        <div class="grid-row">
+            <div class="col-4">
+                <label for="radarInterval">Częstotliwość sprawdzania</label>
+                <select id="radarInterval" onchange="updateScheduleUI()">
+                    <option value="5">Co 5 minut (intensywnie)</option>
                     <option value="10">Co 10 minut</option>
-                    <option value="15" selected>Co 15 minut</option>
+                    <option value="15">Co 15 minut (zalecane)</option>
                     <option value="20">Co 20 minut</option>
-                    <option value="30">Co 30 minut</option>
-                    <option value="60">Co 60 minut</option>
+                    <option value="30" selected>Co 30 minut (oszczędnie)</option>
+                    <option value="60">Co 60 minut (1 godz.)</option>
                 </select>
             </div>
-            <div class="form-group">
+
+            <div class="col-4">
                 <label>Tryb pracy</label>
-                <select id="scanMode" onchange="updateScheduleSettings()">
-                    <option value="window" selected>Wybrane godziny</option>
-                    <option value="24h">Całą dobę (24/7)</option>
-                </select>
+                <div class="toggle-row">
+                    <span id="allDayLabel">Wybrane godziny</span>
+                    <input type="checkbox" id="radarAllDay" onchange="updateScheduleUI()" style="width: 20px; height: 20px; cursor: pointer;">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Start (Od godz.)</label>
-                <select id="hourStart" onchange="updateScheduleSettings()"></select>
-            </div>
-            <div class="form-group">
-                <label>Koniec (Do godz.)</label>
-                <select id="hourEnd" onchange="updateScheduleSettings()"></select>
+
+            <div class="col-4" id="hoursContainer">
+                <label>Godziny w Polsce (Od – Do)</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <select id="radarStartHour" onchange="updateScheduleUI()"></select>
+                    <span>–</span>
+                    <select id="radarEndHour" onchange="updateScheduleUI()"></select>
+                </div>
             </div>
         </div>
+
         <div class="cron-preview">
-            <span id="scheduleSummary">Podsumowanie czasu pracy...</span>
-            <div class="cron-badge-wrapper">
-                <span>Kod GitHub (UTC):</span>
-                <span class="cron-badge" id="cronPreviewText">*/15 * * * *</span>
-            </div>
+            <span id="tzInfoText">Strefa: Czas polski (automatyczna obsługa czasu letniego i zimowego)</span>
+            <div>Cron (UTC): <code id="cronPreviewCode">*/30 5-21 * * *</code></div>
         </div>
     </div>
 
-    <hr style="margin: 32px 0 20px 0; border: 0; border-top: 1px solid var(--border-subtle);">
-    
-    <button id="syncBtn" class="btn-sync" onclick="syncToGithub()">Zapisz i zaktualizuj system</button>
-    <button id="loadBtn" class="btn-load" onclick="loadFromGithub()">Wczytaj dane z chmury (GitHub)</button>
+    <!-- Sekcja 3: Lista aktywnych zadań -->
+    <div class="section-card">
+        <h2>Lista monitorowanych wizyt (<span id="taskCount">0</span>)</h2>
+        <div class="task-list" id="taskList"></div>
+    </div>
+
+    <!-- Przyciski synchronizacji z chmurą -->
+    <div class="action-group">
+        <button id="syncBtn" class="btn-sync" onclick="syncToGithub()">
+            ☁️ Zapisz i zaktualizuj system w chmurze (GitHub)
+        </button>
+        <button id="loadBtn" class="btn-load" onclick="loadFromGithub()">
+            ⬇️ Wczytaj aktualną konfigurację z chmury (GitHub)
+        </button>
+    </div>
 
     <div id="status"></div>
 
-    <div class="footer-tools">
-        <button class="btn-reset-token" onclick="resetGithubToken()">🔑 Zmień / Zresetuj Token GitHub</button>
+    <!-- Stopka z zarządzaniem tokenem -->
+    <div class="footer-bar">
+        <span>Repozytorium: <b>kopek-beep/medicover</b> • Czas lokalny PL (Europe/Warsaw)</span>
+        <button class="btn-token" onclick="resetGithubToken()">
+            🔑 Zmień / Resetuj token GitHub (PAT)
+        </button>
     </div>
 </div>
 
 <script>
+    // ==========================================
+    // 0. OBSŁUGA MOTYWU (JASNY/CIEMNY)
+    // ==========================================
     const toggleSwitch = document.getElementById('checkbox_theme');
-    try {
-        const theme = localStorage.getItem('theme');
-        if (theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            if (theme === 'dark') toggleSwitch.checked = true;
-        }
-    } catch (e) {}
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    toggleSwitch.checked = (savedTheme === 'dark');
 
     toggleSwitch.addEventListener('change', (e) => {
-        const t = e.target.checked ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', t);
-        localStorage.setItem('theme', t);
+        const theme = e.target.checked ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
     });
 
-    const GITHUB_REPO = "kopek-beep/medicover"; 
+    // ==========================================
+    // 1. KONFIGURACJA GITHUB I KODOWANIA UTF-8
+    // ==========================================
+    const GITHUB_REPO = "kopek-beep/medicover";
+    const WORKFLOW_PATH = ".github/workflows/checker.yml";
 
+    function utf8ToBase64(str) {
+        const bytes = new TextEncoder().encode(str);
+        let binary = "";
+        bytes.forEach(b => binary += String.fromCharCode(b));
+        return btoa(binary);
+    }
+
+    function base64ToUtf8(b64) {
+        const binary = atob(b64.replace(/\s/g, ''));
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        return new TextDecoder().decode(bytes);
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // ==========================================
+    // 2. BAZA SPECJALIZACJI (DOROŚLI + DZIECI)
+    // ==========================================
     const wszystkieSpecjalizacje = {
-        "176": "Alergolog dorośli", "178": "Alergolog dorośli odczulanie", "11682": "Badanie dna oka - dorośli", "76796": "Badanie dna oka - dzieci", "2": "Chirurg dorośli", "1190": "Choroby zakaźne dorośli", "3": "Dermatolog dorośli", "99": "Diabetolog", "182": "Dietetyk dorośli", "5": "Endokrynolog dorośli", "27962": "Endokrynolog dorośli - porada telefoniczna", "46066": "Ginekolog - kwalifikacja do założenia wkładki", "4800": "Ginekolog - prowadzenie ciąży", "64948": "Ginekolog - założenie wkładki", "4798": "Ginekolog dorośli", "94448": "Ginekologia - awaryjna antykoncepcja - porada tel. u położnej", "89834": "Ginekologia - badania w ciąży - porada telefoniczna u położnej", "46068": "Ginekologia - infekcja intymna u położnej", "10244": "Ginekologia - pobranie wymazu", "116730": "Ginekologia - porada poporodowa u położnej - porada telefoniczna", "116732": "Ginekologia - porada poporodowa u położnej", "72380": "Ginekologia - przygotowanie do ciąży u położnej", "10864": "Hematolog - Szpital", "47068": "Higienizacja 4w1", "112": "Higienizacja standardowa", "9": "Internista", "19046": "Internista - porada telefoniczna", "63748": "Invisalign", "39836": "Invisalign - leczenie", "10": "Kardiolog dorośli", "87430": "Kwalifikacja i szczepienie dorośli – specjalista med.", "192": "Laryngolog dorośli", "96": "Logopeda dorośli", "16234": "Medicover Express - przeziębienie, grypa", "62742": "Medicover Express - szcz. grypa - dorośli - specjalista med.", "16236": "Medicover Express - szczepienia dorośli", "486": "Medicover Express - szczepienia grypa", "9976": "Medycyna podróży - dorośli", "1586": "Medycyna Rodzinna - dorośli", "27964": "Medycyna Rodzinna - dorośli - porada telefoniczna", "3004": "Mykologia - pobranie u pielęgniarki", "16": "Neurolog dorośli", "198": "Okulista dorośli", "200": "Okulista dziecięcy", "19054": "Okulistyka - badanie wzroku", "114": "Ortodonta", "28766": "Ortodonta - leczenie", "163": "Ortopeda dorośli", "6254": "Pobranie HPV / Cytologia", "105898": "Położna - infekcje pęcherza moczowego", "105900": "Położna - infekcje pęcherza moczowego - porada telefoniczna", "97064": "Położna - wizyta profilaktyczna", "27158": "Poradnia Bólu Pleców i Układu Ruchu - dorośli", "20056": "Poradnia Leczenia Boreliozy", "28770": "Protetyk - leczenie", "24": "Psychiatra dorośli", "25": "Psycholog dorośli", "48914": "Psycholog dorośli - porada telefoniczna", "41": "Pulmonolog dorośli", "52110": "Punkt Pobrań - ciężarne", "52106": "Punkt Pobrań - dorośli", "23504": "Stomatolog - leczenie", "22890": "Stomatolog - przegląd", "30": "Urolog dorośli", "76798": "Urologia - pobranie wymazu u mężczyzn przez pielęgniarkę"
+        // Dorośli i ogólne
+        "176": "Alergolog dorośli",
+        "178": "Alergolog dorośli odczulanie",
+        "11682": "Badanie dna oka - dorośli",
+        "2": "Chirurg dorośli",
+        "1190": "Choroby zakaźne dorośli",
+        "3": "Dermatolog dorośli",
+        "99": "Diabetolog",
+        "182": "Dietetyk dorośli",
+        "5": "Endokrynolog dorośli",
+        "27962": "Endokrynolog dorośli - porada telefoniczna",
+        "46066": "Ginekolog - kwalifikacja do założenia wkładki",
+        "4800": "Ginekolog - prowadzenie ciąży",
+        "64948": "Ginekolog - założenie wkładki",
+        "4798": "Ginekolog dorośli",
+        "94448": "Ginekologia - awaryjna antykoncepcja - porada tel. u położnej",
+        "89834": "Ginekologia - badania w ciąży - porada telefoniczna u położnej",
+        "46068": "Ginekologia - infekcja intymna u położnej",
+        "10244": "Ginekologia - pobranie wymazu",
+        "116730": "Ginekologia - porada poporodowa u położnej - porada telefoniczna",
+        "116732": "Ginekologia - porada poporodowa u położnej",
+        "72380": "Ginekologia - przygotowanie do ciąży u położnej",
+        "10864": "Hematolog - Szpital",
+        "47068": "Higienizacja 4w1",
+        "112": "Higienizacja standardowa",
+        "9": "Internista",
+        "19046": "Internista - porada telefoniczna",
+        "63748": "Invisalign",
+        "39836": "Invisalign - leczenie",
+        "10": "Kardiolog dorośli",
+        "87430": "Kwalifikacja i szczepienie dorośli – specjalista med.",
+        "192": "Laryngolog dorośli",
+        "96": "Logopeda dorośli",
+        "16234": "Medicover Express - przeziębienie, grypa",
+        "62742": "Medicover Express - szcz. grypa - dorośli - specjalista med.",
+        "16236": "Medicover Express - szczepienia dorośli",
+        "486": "Medicover Express - szczepienia grypa",
+        "9976": "Medycyna podróży - dorośli",
+        "1586": "Medycyna Rodzinna - dorośli",
+        "27964": "Medycyna Rodzinna - dorośli - porada telefoniczna",
+        "3004": "Mykologia - pobranie u pielęgniarki",
+        "16": "Neurolog dorośli",
+        "198": "Okulista dorośli",
+        "19054": "Okulistyka - badanie wzroku",
+        "114": "Ortodonta",
+        "28766": "Ortodonta - leczenie",
+        "163": "Ortopeda dorośli",
+        "6254": "Pobranie HPV / Cytologia",
+        "105898": "Położna - infekcje pęcherza moczowego",
+        "105900": "Położna - infekcje pęcherza moczowego - porada telefoniczna",
+        "97064": "Położna - wizyta profilaktyczna",
+        "27158": "Poradnia Bólu Pleców i Układu Ruchu - dorośli",
+        "20056": "Poradnia Leczenia Boreliozy",
+        "28770": "Protetyk - leczenie",
+        "24": "Psychiatra dorośli",
+        "25": "Psycholog dorośli",
+        "48914": "Psycholog dorośli - porada telefoniczna",
+        "41": "Pulmonolog dorośli",
+        "52110": "Punkt Pobrań - ciężarne",
+        "52106": "Punkt Pobrań - dorośli",
+        "23504": "Stomatolog - leczenie",
+        "22890": "Stomatolog - przegląd",
+        "30": "Urolog dorośli",
+        "76798": "Urologia - pobranie wymazu u mężczyzn przez pielęgniarkę",
+
+        // Specjalizacje dziecięce (Adam i Szymon)
+        "15": "Pediatra",
+        "19048": "Pediatra - porada telefoniczna",
+        "52": "Pediatra - bilans zdrowia dziecka",
+        "87432": "Kwalifikacja i szczepienie dzieci – specjalista med.",
+        "16238": "Medicover Express - przeziębienie, grypa - dzieci",
+        "177": "Alergolog dziecięcy",
+        "76796": "Badanie dna oka - dzieci",
+        "139": "Chirurg dziecięcy",
+        "50": "Dermatolog dziecięcy",
+        "183": "Dietetyk dziecięcy",
+        "67": "Endokrynolog dziecięcy",
+        "75": "Gastroenterolog dziecięcy",
+        "79": "Hematolog dziecięcy",
+        "83": "Kardiolog dziecięcy",
+        "193": "Laryngolog dziecięcy",
+        "97": "Logopeda dziecięcy",
+        "89": "Nefrolog dziecięcy",
+        "137": "Neurolog dziecięcy",
+        "200": "Okulista dziecięcy",
+        "164": "Ortopeda dziecięcy",
+        "133": "Psychiatra dziecięcy",
+        "27": "Psycholog dziecięcy",
+        "80": "Pulmonolog dziecięcy",
+        "52108": "Punkt Pobrań - dzieci",
+        "116": "Stomatolog dziecięcy (Pedodonta)",
+        "31": "Urolog dziecięcy",
+        "65": "USG dzieci"
     };
 
     const dostepneDlaOsoby = {
         "KAMIL": ["176", "178", "11682", "2", "1190", "3", "99", "182", "5", "27962", "10864", "47068", "112", "9", "19046", "63748", "39836", "10", "87430", "192", "96", "16234", "62742", "16236", "486", "9976", "1586", "27964", "3004", "16", "198", "19054", "114", "28766", "163", "27158", "20056", "28770", "24", "25", "48914", "41", "52106", "23504", "22890", "30", "76798"],
         "MONIKA": ["176", "178", "11682", "2", "1190", "3", "99", "182", "5", "27962", "46066", "4800", "64948", "4798", "94448", "89834", "46068", "10244", "116730", "116732", "72380", "10864", "47068", "112", "9", "19046", "63748", "39836", "10", "87430", "192", "96", "16234", "62742", "16236", "486", "9976", "1586", "27964", "3004", "16", "198", "19054", "114", "28766", "163", "6254", "105898", "105900", "97064", "27158", "20056", "28770", "24", "25", "48914", "41", "52110", "52106", "23504", "22890"],
-        "ADAM": ["200", "76796"],
-        "SZYMON": ["200", "76796"]
+        "ADAM": ["15", "19048", "52", "87432", "16238", "177", "76796", "139", "50", "183", "67", "75", "79", "83", "193", "97", "89", "137", "200", "164", "133", "27", "80", "52108", "116", "22890", "23504", "114", "28766", "31", "65"],
+        "SZYMON": ["15", "19048", "52", "87432", "16238", "177", "76796", "139", "50", "183", "67", "75", "79", "83", "193", "97", "89", "137", "200", "164", "133", "27", "80", "52108", "116", "22890", "23504", "114", "28766", "31", "65"]
     };
 
     const userTheme = {
-        "KAMIL": { color: "#0f6cbd" },  
-        "MONIKA": { color: "#c239b3" }, 
-        "ADAM": { color: "#107c41" },   
-        "SZYMON": { color: "#d83b01" }  
+        "KAMIL": { color: "#2563eb" },
+        "MONIKA": { color: "#db2777" },
+        "ADAM": { color: "#16a34a" },
+        "SZYMON": { color: "#ea580c" }
     };
 
     const personSelect = document.getElementById('person');
@@ -511,412 +909,609 @@
 
     function getTodayString() {
         const today = new Date();
-        return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
     }
 
-    document.getElementById('startDate').value = getTodayString();
+    function ustawDzisiejszaDate() {
+        document.getElementById('startDate').value = getTodayString();
+    }
 
     function odswiezSpecjalizacje() {
-        const osoba = personSelect.value;
-        const isChild = (osoba === "ADAM" || osoba === "SZYMON");
+        const wybranaOsoba = personSelect.value;
+        const dostepneID = dostepneDlaOsoby[wybranaOsoba] || [];
         serviceSelect.innerHTML = '';
-        personSelect.style.borderLeftColor = userTheme[osoba].color;
+        personSelect.style.borderLeftColor = (userTheme[wybranaOsoba] || userTheme.KAMIL).color;
 
-        (dostepneDlaOsoby[osoba] || [])
-            .filter(id => {
-                const nazwa = (wszystkieSpecjalizacje[id] || "").toLowerCase();
-                return isChild ? !nazwa.includes("dorośli") : (!nazwa.includes("dzieci") && !nazwa.includes("dziecięcy"));
-            })
-            .map(id => ({ id, nazwa: wszystkieSpecjalizacje[id] }))
-            .sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl'))
-            .forEach(opcja => {
-                const opt = document.createElement('option');
-                opt.value = opcja.id;
-                opt.text = opcja.nazwa;
-                serviceSelect.appendChild(opt);
-            });
+        const opcje = dostepneID.map(id => ({
+            id: id,
+            nazwa: wszystkieSpecjalizacje[id] || `ID: ${id}`
+        }));
+
+        opcje.sort((a, b) => a.nazwa.localeCompare(b.nazwa, 'pl'));
+        opcje.forEach(opcja => {
+            const option = document.createElement('option');
+            option.value = opcja.id;
+            option.textContent = opcja.nazwa;
+            serviceSelect.appendChild(option);
+        });
     }
 
     personSelect.addEventListener('change', odswiezSpecjalizacje);
-    odswiezSpecjalizacje();
 
-    const hourStartSelect = document.getElementById('hourStart');
-    const hourEndSelect = document.getElementById('hourEnd');
-    const scanIntervalSelect = document.getElementById('scanInterval');
-    const scanModeSelect = document.getElementById('scanMode');
+    // ==========================================
+    // 3. HARMONOGRAM I KONWERSJA CZASU PL -> UTC
+    // ==========================================
+    let radarSchedule = JSON.parse(localStorage.getItem('medicover_schedule')) || {
+        interval: 30,
+        allDay: false,
+        startHour: 7,
+        endHour: 23
+    };
 
-    for (let h = 0; h < 24; h++) {
-        const label = String(h).padStart(2, '0') + ":00";
-        const o1 = document.createElement('option'); o1.value = h; o1.text = label; hourStartSelect.appendChild(o1);
-        const o2 = document.createElement('option'); o2.value = h; o2.text = String(h).padStart(2, '0') + ":59"; hourEndSelect.appendChild(o2);
-    }
+    function initScheduleSelects() {
+        const startSel = document.getElementById('radarStartHour');
+        const endSel = document.getElementById('radarEndHour');
+        startSel.innerHTML = '';
+        endSel.innerHTML = '';
 
-    function initSchedule() {
-        let saved = { interval: "15", mode: "window", start: 7, end: 23 };
-        try {
-            const p = JSON.parse(localStorage.getItem('medicover_schedule'));
-            if (p && typeof p === 'object') saved = p;
-        } catch (e) {}
-        scanIntervalSelect.value = ["10", "15", "20", "30", "60"].includes(saved.interval) ? saved.interval : "15";
-        scanModeSelect.value = saved.mode || "window";
-        hourStartSelect.value = saved.start ?? 7;
-        hourEndSelect.value = saved.end ?? 23;
-        updateScheduleSettings();
-    }
-
-    function buildCronExpression() {
-        const interval = scanIntervalSelect.value;
-        const mode = scanModeSelect.value;
-        const startPL = parseInt(hourStartSelect.value, 10) || 0;
-        const endPL = parseInt(hourEndSelect.value, 10) || 0;
-
-        const minPart = (interval === "60") ? "0" : `*/${interval}`;
-        if (mode === "24h") return `${minPart} * * * *`;
-
-        const plHours = [];
-        let curr = startPL;
-        while (true) {
-            plHours.push(curr);
-            if (curr === endPL) break;
-            curr = (curr + 1) % 24;
-            if (plHours.length >= 24) break;
+        for (let h = 0; h < 24; h++) {
+            const label = `${String(h).padStart(2, '0')}:00`;
+            startSel.add(new Option(label, h));
+            endSel.add(new Option(label, h));
         }
 
-        if (plHours.length === 24) return `${minPart} * * * *`;
-
-        const offset = -Math.round(new Date().getTimezoneOffset() / 60);
-        const utcHours = plHours.map(h => (h - offset + 24) % 24);
-        return `${minPart} ${utcHours.join(',')} * * *`;
+        document.getElementById('radarInterval').value = radarSchedule.interval;
+        document.getElementById('radarAllDay').checked = radarSchedule.allDay;
+        startSel.value = radarSchedule.startHour;
+        endSel.value = radarSchedule.endHour;
+        updateScheduleUI();
     }
 
-    function updateScheduleSettings() {
-        const mode = scanModeSelect.value;
-        hourStartSelect.disabled = (mode === "24h");
-        hourEndSelect.disabled = (mode === "24h");
+    // Wyznacza aktualne przesunięcie Polski (Europe/Warsaw) względem UTC w godzinach (+1 lub +2)
+    function getPolandUtcOffsetHours() {
+        const now = new Date();
+        const utcDate = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
+        const plDate = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Warsaw' }));
+        return Math.round((plDate - utcDate) / (1000 * 60 * 60));
+    }
 
-        const interval = scanIntervalSelect.value;
-        const startPL = parseInt(hourStartSelect.value, 10);
-        const endPL = parseInt(hourEndSelect.value, 10);
+    function buildCronExpression(schedule) {
+        const step = parseInt(schedule.interval, 10) || 30;
+        const minPart = step === 60 ? "0" : `*/${step}`;
 
-        localStorage.setItem('medicover_schedule', JSON.stringify({ interval, mode, start: startPL, end: endPL }));
-        document.getElementById('cronPreviewText').textContent = buildCronExpression();
+        if (schedule.allDay) {
+            return `${minPart} * * * *`;
+        }
 
-        const offset = -Math.round(new Date().getTimezoneOffset() / 60);
-        if (mode === "24h") {
-            document.getElementById('scheduleSummary').innerHTML = `Skanowanie <b>24/7</b> co <b>${interval} min</b>.`;
+        const offset = getPolandUtcOffsetHours();
+        const startPL = parseInt(schedule.startHour, 10);
+        const endPL = parseInt(schedule.endHour, 10);
+
+        const startUTC = (startPL - offset + 24) % 24;
+        const endUTC = (endPL - offset + 24) % 24;
+
+        let hourPart = "*";
+        if (startUTC === endUTC) {
+            hourPart = `${startUTC}`;
+        } else if (startUTC < endUTC) {
+            hourPart = `${startUTC}-${endUTC}`;
         } else {
-            document.getElementById('scheduleSummary').innerHTML = `Aktywne od <b>${String(startPL).padStart(2,'0')}:00</b> do <b>${String(endPL).padStart(2,'0')}:59</b> (UTC+${offset}), co <b>${interval} min</b>.`;
+            // Przejście przez północ w UTC (np. 07:00 - 02:00 PL -> 05:00 - 00:00 UTC -> 0,5-23)
+            const firstRange = endUTC === 0 ? "0" : `0-${endUTC}`;
+            const secondRange = startUTC === 23 ? "23" : `${startUTC}-23`;
+            hourPart = `${firstRange},${secondRange}`;
         }
+
+        return `${minPart} ${hourPart} * * *`;
     }
 
-    function parseCronFromGithub(cronStr) {
-        const parts = cronStr.trim().split(/\s+/);
-        if (parts.length < 2) return;
-        const minPart = parts[0];
-        const hourPart = parts[1];
+    function updateScheduleUI() {
+        const interval = parseInt(document.getElementById('radarInterval').value, 10);
+        const allDay = document.getElementById('radarAllDay').checked;
+        const startHour = parseInt(document.getElementById('radarStartHour').value, 10);
+        const endHour = parseInt(document.getElementById('radarEndHour').value, 10);
 
-        let interval = "15";
-        if (minPart === "0") interval = "60";
-        else if (minPart.includes("/")) {
-            const clean = minPart.split("/")[1].trim();
-            if (["10", "15", "20", "30", "60"].includes(clean)) interval = clean;
-        }
-        scanIntervalSelect.value = interval;
+        radarSchedule = { interval, allDay, startHour, endHour };
+        localStorage.setItem('medicover_schedule', JSON.stringify(radarSchedule));
 
-        if (hourPart === "*") {
-            scanModeSelect.value = "24h";
-        } else {
-            scanModeSelect.value = "window";
-            const offset = -Math.round(new Date().getTimezoneOffset() / 60);
-            let utcHours = [];
-            if (hourPart.includes(",")) utcHours = hourPart.split(",").map(Number);
-            else if (!isNaN(parseInt(hourPart, 10))) utcHours = [parseInt(hourPart, 10)];
+        document.getElementById('allDayLabel').textContent = allDay ? "Cała doba (24/7)" : "Wybrane godziny";
+        document.getElementById('radarStartHour').disabled = allDay;
+        document.getElementById('radarEndHour').disabled = allDay;
+        document.getElementById('hoursContainer').style.opacity = allDay ? "0.5" : "1";
 
-            if (utcHours.length > 0) {
-                const plHours = utcHours.map(h => (h + offset + 24) % 24);
-                hourStartSelect.value = plHours[0];
-                hourEndSelect.value = plHours[plHours.length - 1];
-            }
-        }
-        updateScheduleSettings();
+        const offset = getPolandUtcOffsetHours();
+        const cron = buildCronExpression(radarSchedule);
+        document.getElementById('cronPreviewCode').textContent = cron;
+        document.getElementById('tzInfoText').textContent =
+            `Strefa PL (UTC+${offset}) • Skrypt Python dodatkowo weryfikuje czas Europe/Warsaw (odporny na zmianę czasu zimowego/letniego)`;
     }
 
-    initSchedule();
-
-    let tasks = [];
-    try {
-        tasks = JSON.parse(localStorage.getItem('medicover_tasks')) || [];
-    } catch (e) { tasks = []; }
+    // ==========================================
+    // 4. ZARZĄDZANIE ZADANIAMI
+    // ==========================================
+    let tasks = JSON.parse(localStorage.getItem('medicover_tasks')) || [];
 
     function renderTasks() {
         const list = document.getElementById('taskList');
+        const countEl = document.getElementById('taskCount');
+        const activeCount = tasks.filter(t => !t.paused).length;
+        countEl.textContent = `${activeCount} aktywne / ${tasks.length} łącznie`;
         list.innerHTML = '';
+
         if (tasks.length === 0) {
-            list.innerHTML = `<div class="empty-state">Radar wyłączony.<br>Dodaj specjalizację powyżej, aby rozpocząć monitorowanie.</div>`;
+            list.innerHTML = `
+                <div class="empty-state">
+                    Brak skonfigurowanych zadań.<br>Dodaj specjalizację powyżej lub wczytaj konfigurację z GitHuba.
+                </div>`;
             localStorage.setItem('medicover_tasks', JSON.stringify(tasks));
             return;
         }
+
         tasks.forEach((task, index) => {
-            const theme = userTheme[task.person] || userTheme["KAMIL"];
-            const isPaused = !!task.paused;
+            const theme = userTheme[task.person] || userTheme.KAMIL;
             const div = document.createElement('div');
-            div.className = 'task-item' + (isPaused ? ' paused' : '');
+            div.className = `task-item${task.paused ? ' paused' : ''}`;
             div.style.setProperty('--task-color', theme.color);
-            
+
             const cityName = task.region === "199" ? "Łódź" : task.region;
             const docName = (task.doctorName && task.doctorName.toLowerCase() !== "wszyscy") ? task.doctorName : "Wszyscy";
-            
+            const specName = wszystkieSpecjalizacje[task.service] || `ID: ${task.service}`;
+
             let dateRangeText = "od dziś (bez limitu)";
-            if (task.startDate && task.endDate) dateRangeText = `${task.startDate} do ${task.endDate}`;
-            else if (task.startDate) dateRangeText = `od ${task.startDate}`;
+            if (task.startDate && task.endDate) {
+                dateRangeText = `${task.startDate} do ${task.endDate}`;
+            } else if (task.startDate) {
+                dateRangeText = `od ${task.startDate}`;
+            } else if (task.endDate) {
+                dateRangeText = `do ${task.endDate}`;
+            }
 
             div.innerHTML = `
                 <div class="task-info">
-                    <span class="task-tag" style="background-color: ${theme.color};">${task.person}</span>
+                    <span class="task-tag" style="background-color: ${theme.color};">${escapeHtml(task.person)}</span>
                     <div class="task-details">
-                        <div>Miasto: <b>${cityName}</b> &nbsp;&bull;&nbsp; Specjalizacja: <b>${wszystkieSpecjalizacje[task.service] || task.service}</b> ${isPaused ? '<span class="paused-badge">Wstrzymany</span>' : ''}</div>
-                        <div style="font-size: 12.5px; margin-top: 3px; color: var(--text-secondary);">Lekarz: <b>${docName}</b> &nbsp;&bull;&nbsp; Termin: <b>${dateRangeText}</b></div>
+                        <div>Specjalizacja: <b>${escapeHtml(specName)}</b> • Miasto: <b>${escapeHtml(cityName)}</b></div>
+                        <div style="font-size: 12.5px; margin-top: 3px;">
+                            Lekarz: <b>${escapeHtml(docName)}</b> • Termin: <b>${escapeHtml(dateRangeText)}</b>
+                            ${task.paused ? ' • <b style="color: var(--warning);">[WSTRZYMANE]</b>' : ''}
+                        </div>
                     </div>
                 </div>
                 <div class="task-actions">
-                    <button class="btn-pause ${isPaused ? 'paused' : 'active'}" onclick="togglePauseTask(${index})">${isPaused ? '▶️ Wznów' : '⏸️ Aktywny'}</button>
-                    <button class="btn-delete" onclick="removeTask(${index})">🗑️</button>
+                    <button class="btn-icon" onclick="togglePauseTask(${index})" title="${task.paused ? 'Wznów zadanie' : 'Wstrzymaj zadanie'}">
+                        ${task.paused ? '▶️ Wznów' : '⏸️ Pauza'}
+                    </button>
+                    <button class="btn-icon delete" onclick="removeTask(${index})" title="Usuń zadanie">
+                        🗑️ Usuń
+                    </button>
                 </div>
             `;
             list.appendChild(div);
         });
+
         localStorage.setItem('medicover_tasks', JSON.stringify(tasks));
     }
 
     function addTask() {
         const person = document.getElementById('person').value;
-        const region = document.getElementById('region').value; 
+        const region = document.getElementById('region').value;
         const service = document.getElementById('service').value;
-        let doctorInput = document.getElementById('doctorName').value.trim();
+
+        let doctorInput = document.getElementById('doctorName').value.trim().replace(/"/g, '');
         const doctorName = (doctorInput === "" || doctorInput.toLowerCase() === "wszyscy") ? "Wszyscy" : doctorInput;
+
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
 
-        if (tasks.some(t => t.person === person && t.service === service && (t.doctorName || "Wszyscy") === doctorName)) {
-            alert("Identyczne zadanie już istnieje!"); return;
+        if (startDate && endDate && startDate > endDate) {
+            alert("Data początkowa nie może być późniejsza niż data końcowa!");
+            return;
+        }
+
+        const isDuplicate = tasks.some(t =>
+            t.person === person &&
+            t.service === service &&
+            (t.doctorName || "Wszyscy").toLowerCase() === doctorName.toLowerCase() &&
+            (t.startDate || "") === startDate &&
+            (t.endDate || "") === endDate
+        );
+
+        if (isDuplicate) {
+            alert("Identyczne zadanie znajduje się już na liście!");
+            return;
         }
 
         tasks.push({ person, region, service, doctorName, startDate, endDate, paused: false });
         renderTasks();
+
         document.getElementById('doctorName').value = "Wszyscy";
-        document.getElementById('startDate').value = getTodayString();
+        ustawDzisiejszaDate();
         document.getElementById('endDate').value = "";
     }
 
-    function togglePauseTask(i) { tasks[i].paused = !tasks[i].paused; renderTasks(); }
-    function removeTask(i) { tasks.splice(i, 1); renderTasks(); }
+    function togglePauseTask(index) {
+        tasks[index].paused = !tasks[index].paused;
+        renderTasks();
+    }
 
+    function removeTask(index) {
+        tasks.splice(index, 1);
+        renderTasks();
+    }
+
+    // ==========================================
+    // 5. GENERATOR PLIKU WORKFLOW YAML
+    // ==========================================
     function generateYaml() {
-        const cronExpr = buildCronExpression();
-        let yaml = `name: Medicover Slot Checker\n\non:\n  schedule:\n    - cron: '${cronExpr}'\n  workflow_dispatch:\n\npermissions:\n  contents: write\n\njobs:\n`;
-        yaml += `  check-slots:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n`;
-        yaml += `      - uses: actions/checkout@v4\n      - uses: actions/setup-python@v5\n        with:\n          python-version: '3.12'\n`;
+        const activeTasks = tasks.filter(t => !t.paused);
+        const configMetadata = JSON.stringify({
+            schedule: radarSchedule,
+            tasks: tasks
+        });
+
+        const cronExpr = buildCronExpression(radarSchedule);
+        const hoursEnv = radarSchedule.allDay
+            ? "ALL"
+            : `${radarSchedule.startHour}-${radarSchedule.endHour}`;
+
+        let yaml = `# RADAR_CONFIG: ${configMetadata}\n`;
+        yaml += `name: Medicover Slot Checker\n\n`;
+        yaml += `on:\n`;
+        if (activeTasks.length > 0) {
+            yaml += `  schedule:\n`;
+            yaml += `    - cron: '${cronExpr}'\n`;
+        }
+        yaml += `  workflow_dispatch:\n\n`;
+        yaml += `jobs:\n`;
+        yaml += `  check-slots:\n`;
+        yaml += `    runs-on: ubuntu-latest\n`;
+        yaml += `    timeout-minutes: 10\n`;
+        yaml += `    steps:\n`;
+
+        if (activeTasks.length === 0) {
+            yaml += `      - name: Radar wstrzymany\n`;
+            yaml += `        run: echo "Brak aktywnych zadań na liście Radaru."\n`;
+            return yaml;
+        }
+
+        yaml += `      - uses: actions/checkout@v4\n`;
+        yaml += `      - uses: actions/setup-python@v5\n`;
+        yaml += `        with:\n`;
+        yaml += `          python-version: '3.12'\n`;
         yaml += `      - run: pip install uv && uv sync\n`;
-        yaml += `      - name: Przywrocenie sesji\n        env:\n          MEDICOVER_SESSION: \${{ secrets.MEDICOVER_SESSION }}\n`;
+        yaml += `      - name: Przywrocenie sesji bazowej\n`;
+        yaml += `        env:\n`;
+        yaml += `          MEDICOVER_SESSION: \${{ secrets.MEDICOVER_SESSION }}\n`;
         yaml += `        run: mkdir -p data && echo "$MEDICOVER_SESSION" | base64 -d | tar -xz -C data\n`;
-        yaml += `      - name: Szukaj wizyt\n        env:\n`;
+        yaml += `      - name: Przywrocenie pamieci podrecznej (token i historia wizyt)\n`;
+        yaml += `        uses: actions/cache/restore@v4\n`;
+        yaml += `        with:\n`;
+        yaml += `          path: |\n`;
+        yaml += `            data/medicover_token.json\n`;
+        yaml += `            data/seen_appointments.json\n`;
+        yaml += `          key: medicover-state-\${{ github.run_id }}\n`;
+        yaml += `          restore-keys: |\n`;
+        yaml += `            medicover-state-\n`;
+        yaml += `      - name: Szukaj wizyt\n`;
+        yaml += `        env:\n`;
         yaml += `          MEDICOVER_USER: \${{ secrets.MEDICOVER_USER }}\n`;
         yaml += `          MEDICOVER_PASS: \${{ secrets.MEDICOVER_PASS }}\n`;
         yaml += `          NOTIFIERS_TELEGRAM_TOKEN: \${{ secrets.NOTIFIERS_TELEGRAM_TOKEN }}\n`;
         yaml += `          NOTIFIERS_TELEGRAM_CHAT_ID: \${{ secrets.NOTIFIERS_TELEGRAM_CHAT_ID }}\n`;
+        yaml += `          RADAR_ACTIVE_HOURS: "${hoursEnv}"\n`;
         yaml += `        run: |\n`;
 
-        if (!tasks.some(t => !t.paused)) yaml += `          echo "Wszystkie zadania sa wstrzymane."\n`;
+        activeTasks.forEach((t, index) => {
+            const nazwaSpec = wszystkieSpecjalizacje[t.service] || `ID ${t.service}`;
+            const safeDoc = (t.doctorName || "").replace(/"/g, '');
+            let cmd = `          uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service}`;
 
-        tasks.forEach((t, index) => {
-            const nazwaLekarza = wszystkieSpecjalizacje[t.service] || "Lekarz";
-            const prefix = t.paused ? "          # PAUSED: " : "          ";
-            let cmd = `${prefix}uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service}`;
-            if (t.doctorName && t.doctorName.toLowerCase() !== "wszyscy") cmd += ` --doctor-name "${t.doctorName}"`;
-            if (t.startDate) cmd += ` -f "${t.startDate}"`;
-            if (t.endDate) cmd += ` -e "${t.endDate}"`;
-            yaml += `${cmd} -n telegram -t "[${t.person}] ${nazwaLekarza}"\n`;
-            if (!t.paused && index < tasks.length - 1) yaml += `          sleep 5\n`;
+            if (safeDoc && safeDoc.toLowerCase() !== "wszyscy") {
+                cmd += ` --doctor-name "${safeDoc}"`;
+            }
+            if (t.startDate) {
+                cmd += ` -f "${t.startDate}"`;
+            }
+            if (t.endDate) {
+                cmd += ` -e "${t.endDate}"`;
+            }
+            cmd += ` -n telegram -t "[${t.person}] ${nazwaSpec}"\n`;
+            yaml += cmd;
+
+            if (index < activeTasks.length - 1) {
+                yaml += `          sleep 3\n`;
+            }
         });
 
-        yaml += `      - name: Zapisz pamiec ogloszonych wizyt (Anty-Spam)\n        if: always()\n        run: |\n`;
-        yaml += `          if [ -f data/seen_slots.json ]; then\n`;
-        yaml += `            git config user.name "github-actions[bot]"\n`;
-        yaml += `            git config user.email "github-actions[bot]@users.noreply.github.com"\n`;
-        yaml += `            git add -f data/seen_slots.json\n`;
-        yaml += `            git diff --staged --quiet || (git commit -m "Aktualizacja pamieci wizyt [skip ci]" && git pull --rebase && git push)\n`;
-        yaml += `          fi\n`;
+        yaml += `      - name: Zapis pamieci podrecznej\n`;
+        yaml += `        if: always()\n`;
+        yaml += `        uses: actions/cache/save@v4\n`;
+        yaml += `        with:\n`;
+        yaml += `          path: |\n`;
+        yaml += `            data/medicover_token.json\n`;
+        yaml += `            data/seen_appointments.json\n`;
+        yaml += `          key: medicover-state-\${{ github.run_id }}\n`;
+
         return yaml;
+    }
+
+    // ==========================================
+    // 6. KOMUNIKACJA Z GITHUB API
+    // ==========================================
+    function showStatus(msg, colorVar = "var(--primary)") {
+        const statusEl = document.getElementById('status');
+        statusEl.classList.add('visible');
+        statusEl.style.color = colorVar;
+        statusEl.innerHTML = msg;
     }
 
     async function getGithubToken() {
         let token = localStorage.getItem("medicover_gh_token");
         if (!token) {
-            token = prompt("🔐 Wklej swój GitHub Personal Access Token (PAT):");
-            if (token) localStorage.setItem("medicover_gh_token", token.trim());
+            token = prompt("🔐 Podaj swój GitHub Personal Access Token (PAT) z uprawnieniami 'repo' oraz 'workflow':");
+            if (token && token.trim()) {
+                token = token.trim();
+                localStorage.setItem("medicover_gh_token", token);
+            }
         }
-        return token ? token.trim() : null;
+        return token;
     }
 
     function resetGithubToken() {
-        localStorage.removeItem("medicover_gh_token");
-        const t = prompt("🔑 Wklej nowy GitHub Personal Access Token (PAT):");
-        if (t && t.trim()) {
-            localStorage.setItem("medicover_gh_token", t.trim());
-            checkLastRunStatus();
-            alert("Token zaktualizowany!");
+        const current = localStorage.getItem("medicover_gh_token");
+        const nextToken = prompt(
+            "🔑 Wpisz nowy GitHub Personal Access Token (lub zostaw puste, aby usunąć zapisany token z przeglądarki):",
+            ""
+        );
+        if (nextToken === null) return;
+        if (nextToken.trim() === "") {
+            localStorage.removeItem("medicover_gh_token");
+            showStatus("🗑️ Token GitHub został usunięty z pamięci przeglądarki.", "var(--text-secondary)");
+        } else {
+            localStorage.setItem("medicover_gh_token", nextToken.trim());
+            showStatus("✅ Nowy token GitHub został zapisany.", "var(--success)");
+            fetchLastRunStatus();
         }
     }
 
-    let fastPollingTimeout = null;
-
-    async function checkLastRunStatus() {
+    async function fetchLastRunStatus() {
         const token = localStorage.getItem("medicover_gh_token");
-        const dot = document.getElementById('runDot');
-        const text = document.getElementById('runStatusText');
-        if (!token) { text.textContent = "Status chmury: Brak tokenu"; return; }
+        const lastRunEl = document.getElementById('lastRunText');
+        if (!token) {
+            lastRunEl.textContent = "🔒 Podaj token GitHub przy zapisie/odczycie, aby widzieć status uruchomień.";
+            return;
+        }
+
+        lastRunEl.textContent = "⏳ Pobieranie statusu z GitHub Actions...";
+        const url = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/runs?per_page=1`;
+        const headers = {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/vnd.github+json"
+        };
 
         try {
-            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/runs?per_page=1`, {
-                headers: { "Authorization": `token ${token.trim()}`, "Accept": "application/vnd.github.v3+json" },
-                cache: "no-store"
-            });
-            if (!res.ok) { dot.className = "status-dot error"; text.textContent = `Błąd pobierania statusu (${res.status})`; return; }
-            const data = await res.json();
-            if (!data.workflow_runs || data.workflow_runs.length === 0) { dot.className = "status-dot"; text.textContent = "Brak uruchomień bota."; return; }
-
-            const run = data.workflow_runs[0];
-            const diffMin = Math.max(0, Math.round((new Date() - new Date(run.updated_at)) / 60000));
-            const timeAgo = diffMin === 0 ? "przed chwilą" : `${diffMin} min temu`;
-
-            if (run.status === "in_progress" || run.status === "queued") {
-                dot.className = "status-dot running";
-                text.innerHTML = `<b>Skanowanie w toku...</b> (${timeAgo})`;
-                clearTimeout(fastPollingTimeout);
-                fastPollingTimeout = setTimeout(checkLastRunStatus, 10000);
-            } else if (run.conclusion === "success") {
-                dot.className = "status-dot success";
-                text.innerHTML = `Ostatni skan: <b>${timeAgo}</b> &bull; Status: <b style="color:#107c41;">Sukces</b>`;
-            } else {
-                dot.className = "status-dot error";
-                text.innerHTML = `Ostatni skan: <b>${timeAgo}</b> &bull; Status: <b style="color:#d13438;">Błąd (${run.conclusion})</b>`;
+            const res = await fetch(url, { headers });
+            if (!res.ok) {
+                lastRunEl.textContent = `⚠️ Nie udało się pobrać statusu (Kod: ${res.status})`;
+                return;
             }
-        } catch (err) { dot.className = "status-dot error"; text.textContent = "Błąd połączenia z API GitHub."; }
+            const data = await res.json();
+            const run = (data.workflow_runs || [])[0];
+            if (!run) {
+                lastRunEl.textContent = "ℹ️ Brak zarejestrowanych uruchomień tego workflow.";
+                return;
+            }
+
+            const runDate = new Date(run.updated_at || run.created_at);
+            const dateStr = runDate.toLocaleString('pl-PL', {
+                timeZone: 'Europe/Warsaw',
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+
+            let badge = "⏳ W trakcie...";
+            if (run.status === "completed") {
+                badge = run.conclusion === "success" ? "✅ Sukces" : `❌ Błąd (${run.conclusion})`;
+            }
+            const eventLabel = run.event === "workflow_dispatch" ? "Ręcznie" : "Harmonogram";
+            lastRunEl.textContent = `Ostatnie sprawdzenie: ${dateStr} • ${badge} (${eventLabel})`;
+        } catch (err) {
+            lastRunEl.textContent = `❌ Błąd sieci podczas sprawdzania statusu.`;
+        }
     }
 
     async function triggerWorkflowNow() {
         const token = await getGithubToken();
         if (!token) return;
-        try {
-            const repoRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}`, { headers: { "Authorization": `token ${token}` } });
-            if (!repoRes.ok) { alert("Błąd dostępu do repozytorium (sprawdź token)"); return; }
-            const branch = (await repoRes.json()).default_branch || "main";
 
-            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/dispatches`, {
-                method: "POST",
-                headers: { "Authorization": `token ${token}`, "Content-Type": "application/json" },
-                body: JSON.stringify({ ref: branch })
-            });
-            if (res.status === 204 || res.ok) {
-                document.getElementById('runDot').className = "status-dot running";
-                document.getElementById('runStatusText').innerHTML = "<b>Zlecono skanowanie!</b> Maszyna startuje...";
-                clearTimeout(fastPollingTimeout);
-                fastPollingTimeout = setTimeout(checkLastRunStatus, 6000);
-            } else {
-                alert("GitHub odrzucił polecenie. Upewnij się, że plik checker.yml ma workflow_dispatch.");
+        const runBtn = document.getElementById('runNowBtn');
+        runBtn.classList.add('syncing');
+        showStatus("⚡ Wysyłanie żądania natychmiastowego uruchomienia Radaru...", "var(--primary)");
+
+        const headers = {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json"
+        };
+
+        try {
+            // Pobranie domyślnej gałęzi repozytorium (main / master)
+            const repoRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}`, { headers });
+            let defaultBranch = "main";
+            if (repoRes.ok) {
+                const repoData = await repoRes.json();
+                defaultBranch = repoData.default_branch || "main";
             }
-        } catch (e) { alert("Błąd sieci: " + e.message); }
+
+            const dispatchUrl = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/dispatches`;
+            const res = await fetch(dispatchUrl, {
+                method: "POST",
+                headers,
+                body: JSON.stringify({ ref: defaultBranch })
+            });
+
+            if (res.status === 204 || res.ok) {
+                showStatus("🚀 Radar został uruchomiony na żądanie! Za ~15-30 sekund odśwież status.", "var(--success)");
+                setTimeout(fetchLastRunStatus, 6000);
+            } else {
+                const errData = await res.json().catch(() => ({}));
+                showStatus(`❌ Nie udało się uruchomić: ${errData.message || res.status}`, "var(--danger)");
+            }
+        } catch (error) {
+            showStatus(`❌ Błąd połączenia: ${error.message}`, "var(--danger)");
+        } finally {
+            runBtn.classList.remove('syncing');
+        }
     }
 
     async function syncToGithub() {
-        if (tasks.length === 0) { alert("Dodaj przynajmniej jedno zadanie!"); return; }
+        const syncBtn = document.getElementById('syncBtn');
         const token = await getGithubToken();
         if (!token) return;
 
-        const statusEl = document.getElementById('status');
-        const syncBtn = document.getElementById('syncBtn');
-        statusEl.style.color = "var(--primary-copilot)";
-        statusEl.innerHTML = "☁️ Zapisywanie konfiguracji na GitHubie...";
+        showStatus("☁️ Zapisywanie konfiguracji i harmonogramu w chmurze GitHub...", "var(--primary)");
         syncBtn.classList.add('syncing');
 
-        const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/.github/workflows/checker.yml`;
-        const headers = { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" };
+        const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${WORKFLOW_PATH}`;
+        const headers = {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json"
+        };
 
         try {
             let sha = "";
             const getRes = await fetch(url, { headers });
-            if (getRes.ok) sha = (await getRes.json()).sha;
+            if (getRes.ok) {
+                sha = (await getRes.json()).sha;
+            }
 
-            const body = { message: "Aktualizacja MediRadar", content: btoa(unescape(encodeURIComponent(generateYaml()))) };
+            const yamlContent = generateYaml();
+            const body = {
+                message: `Aktualizacja Radaru (${tasks.filter(t => !t.paused).length} aktywnych zadan)`,
+                content: utf8ToBase64(yamlContent)
+            };
             if (sha) body.sha = sha;
 
             const putRes = await fetch(url, { method: "PUT", headers, body: JSON.stringify(body) });
+
             if (putRes.ok) {
-                statusEl.style.color = "#107c41";
-                statusEl.innerHTML = "✨ Sukces! System został zaktualizowany w chmurze.";
-                checkLastRunStatus();
+                const activeCount = tasks.filter(t => !t.paused).length;
+                if (activeCount === 0) {
+                    showStatus("⏸️ Zapisano! Brak aktywnych zadań – harmonogram Cron został wstrzymany.", "var(--warning)");
+                } else {
+                    showStatus("✨ Sukces! Konfiguracja zadań i harmonogram zostały zapisane na GitHubie.", "var(--success)");
+                }
+                fetchLastRunStatus();
             } else {
-                statusEl.style.color = "#d13438";
-                statusEl.innerHTML = `❌ Błąd zapisywania: ${(await putRes.json()).message}`;
-                if (putRes.status === 401) localStorage.removeItem("medicover_gh_token");
+                const err = await putRes.json().catch(() => ({}));
+                showStatus(`❌ Błąd zapisu (${putRes.status}): ${err.message || 'Sprawdź uprawnienia tokena (repo + workflow)'}`, "var(--danger)");
             }
         } catch (error) {
-            statusEl.style.color = "#d13438";
-            statusEl.innerHTML = `❌ Błąd sieci: ${error.message}`;
-        } finally { syncBtn.classList.remove('syncing'); }
+            showStatus(`❌ Błąd połączenia: ${error.message}`, "var(--danger)");
+        } finally {
+            syncBtn.classList.remove('syncing');
+        }
     }
 
     async function loadFromGithub() {
+        const loadBtn = document.getElementById('loadBtn');
         const token = await getGithubToken();
         if (!token) return;
-        const statusEl = document.getElementById('status');
-        statusEl.style.color = "var(--text-secondary)";
-        statusEl.innerHTML = "⬇️ Pobieranie konfiguracji...";
+
+        showStatus("⬇️ Pobieranie konfiguracji z GitHuba...", "var(--text-secondary)");
+        loadBtn.classList.add('syncing');
+
+        const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${WORKFLOW_PATH}`;
+        const headers = {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/vnd.github+json"
+        };
 
         try {
-            const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/contents/.github/workflows/checker.yml`, {
-                headers: { "Authorization": `token ${token}`, "Accept": "application/vnd.github.v3+json" }
-            });
-            if (res.ok) {
-                const content = decodeURIComponent(escape(atob((await res.json()).content)));
-                const cronMatch = content.match(/cron:\s*'([^']+)'/);
-                if (cronMatch) parseCronFromGithub(cronMatch[1]);
+            const getRes = await fetch(url, { headers });
+            if (getRes.ok) {
+                const data = await getRes.json();
+                const decodedContent = base64ToUtf8(data.content);
+                const lines = decodedContent.split('\n');
 
-                tasks = [];
-                content.split('\n').forEach(line => {
-                    if (line.includes('find-appointment')) {
-                        const isPaused = line.trim().startsWith('# PAUSED:');
-                        const r = line.match(/-r\s+(\d+)/);
-                        const s = line.match(/-s\s+(\d+)/);
-                        const p = line.match(/-t\s+"\[(.*?)\]/);
-                        const d = line.match(/--doctor-name\s+"([^"]+)"/);
-                        const f = line.match(/-f\s+"([^"]+)"/);
-                        const e = line.match(/-e\s+"([^"]+)"/);
-                        if (r && s && p) {
-                            tasks.push({
-                                region: r[1], service: s[1], person: p[1],
-                                doctorName: d ? d[1] : "Wszyscy",
-                                startDate: f ? f[1] : "", endDate: e ? e[1] : "",
-                                paused: isPaused
-                            });
+                // 1. Próba odczytu pełnych metadanych z komentarza # RADAR_CONFIG:
+                const metaLine = lines.find(l => l.startsWith('# RADAR_CONFIG:'));
+                let loadedFromMeta = false;
+
+                if (metaLine) {
+                    try {
+                        const jsonStr = metaLine.replace('# RADAR_CONFIG:', '').trim();
+                        const parsed = JSON.parse(jsonStr);
+                        if (parsed.schedule) {
+                            radarSchedule = parsed.schedule;
+                            initScheduleSelects();
+                        }
+                        if (Array.isArray(parsed.tasks)) {
+                            tasks = parsed.tasks;
+                            loadedFromMeta = true;
+                        }
+                    } catch (e) {
+                        console.warn("Nie udało się odczytać metadanych RADAR_CONFIG, używam parsera linii YAML.");
+                    }
+                }
+
+                // 2. Fallback: Parsowanie komend find-appointment dla starszych plików YAML
+                if (!loadedFromMeta) {
+                    tasks = [];
+                    for (let line of lines) {
+                        if (line.includes('find-appointment')) {
+                            const regionMatch = line.match(/-r\s+(\d+)/);
+                            const serviceMatch = line.match(/-s\s+(\d+)/);
+                            const personMatch = line.match(/-t\s+"\[([^\]]+)\]/);
+                            const docMatch = line.match(/--doctor-name\s+"([^"]+)"/);
+                            const startMatch = line.match(/-f\s+"([^"]+)"/);
+                            const endMatch = line.match(/-e\s+"([^"]+)"/);
+
+                            if (regionMatch && serviceMatch && personMatch) {
+                                tasks.push({
+                                    region: regionMatch[1],
+                                    service: serviceMatch[1],
+                                    person: personMatch[1],
+                                    doctorName: docMatch ? docMatch[1] : "Wszyscy",
+                                    startDate: startMatch ? startMatch[1] : "",
+                                    endDate: endMatch ? endMatch[1] : "",
+                                    paused: false
+                                });
+                            }
                         }
                     }
-                });
+                }
+
                 renderTasks();
-                checkLastRunStatus();
-                statusEl.style.color = "#107c41";
-                statusEl.innerHTML = "✨ Sukces! Wczytano konfigurację z chmury.";
+                showStatus("✅ Wczytano konfigurację i harmonogram z chmury GitHub.", "var(--success)");
+                fetchLastRunStatus();
+            } else if (getRes.status === 404) {
+                tasks = [];
+                renderTasks();
+                showStatus("ℹ️ Plik checker.yml jeszcze nie istnieje na GitHubie. Dodaj zadania i kliknij Zapisz.", "var(--warning)");
             } else {
-                statusEl.style.color = "#d13438";
-                statusEl.innerHTML = "❌ Brak pliku workflow na GitHubie.";
+                const err = await getRes.json().catch(() => ({}));
+                showStatus(`❌ Błąd pobierania (${getRes.status}): ${err.message || ''}`, "var(--danger)");
             }
-        } catch (err) { statusEl.style.color = "#d13438"; statusEl.innerHTML = "❌ Błąd ładowania."; }
+        } catch (error) {
+            showStatus(`❌ Błąd połączenia: ${error.message}`, "var(--danger)");
+        } finally {
+            loadBtn.classList.remove('syncing');
+        }
     }
 
+    // Inicjalizacja przy starcie strony
+    odswiezSpecjalizacje();
+    ustawDzisiejszaDate();
+    initScheduleSelects();
     renderTasks();
-    checkLastRunStatus();
-    setInterval(checkLastRunStatus, 30000);
+    if (localStorage.getItem("medicover_gh_token")) {
+        fetchLastRunStatus();
+    }
 </script>
-
 </body>
 </html>
