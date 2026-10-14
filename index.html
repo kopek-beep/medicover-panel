@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
            ========================================== */
         :root {
             --bg-page: #f5f3ef;
-            --bg-card: rgba(255, 255, 255, 0.86);
+            --bg-card: rgba(255, 255, 255, 0.88);
             --bg-element: #ffffff;
             --bg-subtle: #ebe8e1;
             --text-main: #1f1f1f;
@@ -36,7 +36,7 @@
 
         [data-theme="dark"] {
             --bg-page: #111318;
-            --bg-card: rgba(26, 29, 36, 0.88);
+            --bg-card: rgba(26, 29, 36, 0.90);
             --bg-element: #222631;
             --bg-subtle: #181b22;
             --text-main: #f3f4f6;
@@ -57,9 +57,7 @@
             --warning: #f59e0b;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             font-family: "Segoe UI Variable Display", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
@@ -74,7 +72,6 @@
             transition: background-color 0.25s ease, color 0.25s ease;
         }
 
-        /* Subtelne tło Copilot Aura */
         body::before, body::after {
             content: '';
             position: fixed;
@@ -88,13 +85,11 @@
             pointer-events: none;
         }
         body::before {
-            top: -10%;
-            left: -10%;
+            top: -10%; left: -10%;
             background: radial-gradient(circle, var(--aurora-1) 0%, var(--aurora-3) 50%, transparent 75%);
         }
         body::after {
-            bottom: -10%;
-            right: -10%;
+            bottom: -10%; right: -10%;
             background: radial-gradient(circle, var(--aurora-2) 0%, transparent 70%);
         }
 
@@ -110,7 +105,6 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Nagłówek (bez nakładania się na telefonie) */
         .header-bar {
             display: flex;
             justify-content: space-between;
@@ -133,7 +127,6 @@
             gap: 12px;
         }
 
-        /* Przełącznik motywu */
         .theme-switch-wrapper {
             display: flex;
             align-items: center;
@@ -146,11 +139,7 @@
             height: 28px;
             margin: 0;
         }
-        .theme-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .theme-switch input { opacity: 0; width: 0; height: 0; }
         .slider {
             position: absolute;
             cursor: pointer;
@@ -167,10 +156,8 @@
             align-items: center;
             justify-content: center;
             font-size: 13px;
-            height: 22px;
-            width: 22px;
-            left: 3px;
-            bottom: 2px;
+            height: 22px; width: 22px;
+            left: 3px; bottom: 2px;
             background-color: var(--bg-element);
             transition: .3s;
             border-radius: 50%;
@@ -181,7 +168,6 @@
             content: "🌙";
         }
 
-        /* Pasek Statusu Live (Ostatnie odświeżenie + Uruchom Teraz) */
         .live-status-bar {
             display: flex;
             justify-content: space-between;
@@ -215,7 +201,6 @@
             flex-wrap: wrap;
         }
 
-        /* Sekcje i karty wewnętrzne */
         .section-card {
             background: var(--bg-element);
             border: 1px solid var(--border-color);
@@ -239,14 +224,12 @@
         h2::before {
             content: '';
             display: inline-block;
-            width: 8px;
-            height: 8px;
+            width: 8px; height: 8px;
             background: var(--accent-grad);
             border-radius: 50%;
             flex-shrink: 0;
         }
 
-        /* Formularze */
         .grid-row {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
@@ -285,17 +268,10 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
         }
-        select:disabled, input:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
+        select:disabled, input:disabled { opacity: 0.55; cursor: not-allowed; }
 
-        select#person {
-            border-left-width: 6px;
-            font-weight: 700;
-        }
+        select#person { border-left-width: 6px; font-weight: 700; }
 
-        /* Przełącznik 24/7 w harmonogramie */
         .toggle-row {
             display: flex;
             align-items: center;
@@ -306,10 +282,7 @@
             border: 1.5px solid var(--input-border);
             height: 45px;
         }
-        .toggle-row span {
-            font-size: 14px;
-            font-weight: 600;
-        }
+        .toggle-row span { font-size: 14px; font-weight: 600; }
 
         .cron-preview {
             margin-top: 12px;
@@ -334,7 +307,6 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Przyciski */
         button {
             font-family: inherit;
             border: none;
@@ -360,10 +332,7 @@
             font-weight: 700;
             margin-top: 4px;
         }
-        .btn-add:hover {
-            background: var(--primary);
-            color: #fff;
-        }
+        .btn-add:hover { background: var(--primary); color: #fff; }
 
         .btn-run-now {
             background: var(--bg-element);
@@ -372,26 +341,15 @@
             padding: 9px 14px;
             font-size: 13px;
         }
-        .btn-run-now:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-        .btn-run-now.primary-Trigger {
+        .btn-run-now:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-run-now.primary-trigger {
             background: var(--btn-primary-grad);
             color: #fff;
             border: none;
         }
-        .btn-run-now.primary-Trigger:hover {
-            filter: brightness(1.1);
-            color: #fff;
-        }
+        .btn-run-now.primary-trigger:hover { filter: brightness(1.1); color: #fff; }
 
-        /* Lista zadań */
-        .task-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .task-list { display: flex; flex-direction: column; gap: 12px; }
         .task-item {
             display: flex;
             justify-content: space-between;
@@ -412,16 +370,8 @@
             width: 5px;
             background-color: var(--task-color, var(--primary));
         }
-        .task-item.paused {
-            opacity: 0.55;
-        }
-        .task-info {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex: 1;
-            min-width: 0;
-        }
+        .task-item.paused { opacity: 0.55; }
+        .task-info { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
         .task-tag {
             display: inline-flex;
             align-items: center;
@@ -436,47 +386,22 @@
             flex-shrink: 0;
             min-width: 74px;
         }
-        .task-details {
-            font-size: 13.5px;
-            color: var(--text-secondary);
-            line-height: 1.45;
-            word-break: break-word;
-        }
-        .task-details b {
-            color: var(--text-main);
-        }
-        .task-actions {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-shrink: 0;
-        }
+        .task-details { font-size: 13.5px; color: var(--text-secondary); line-height: 1.45; word-break: break-word; }
+        .task-details b { color: var(--text-main); }
+        .task-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
         .btn-icon {
             background: transparent;
-            padding: 8px;
+            padding: 8px 10px;
             border-radius: 8px;
             color: var(--text-secondary);
             border: 1px solid transparent;
+            font-size: 13px;
         }
-        .btn-icon:hover {
-            background: var(--bg-subtle);
-            color: var(--text-main);
-        }
-        .btn-icon.delete {
-            color: var(--danger);
-        }
-        .btn-icon.delete:hover {
-            background: rgba(220, 38, 38, 0.1);
-            border-color: rgba(220, 38, 38, 0.25);
-        }
+        .btn-icon:hover { background: var(--bg-subtle); color: var(--text-main); }
+        .btn-icon.delete { color: var(--danger); }
+        .btn-icon.delete:hover { background: rgba(220, 38, 38, 0.1); border-color: rgba(220, 38, 38, 0.25); }
 
-        /* Główne przyciski synchronizacji */
-        .action-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 24px;
-        }
+        .action-group { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
         .btn-sync {
             width: 100%;
             padding: 16px;
@@ -486,9 +411,7 @@
             color: #fff;
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.25);
         }
-        .btn-sync:hover {
-            filter: brightness(1.08);
-        }
+        .btn-sync:hover { filter: brightness(1.08); }
         .btn-load {
             width: 100%;
             padding: 14px;
@@ -496,10 +419,7 @@
             color: var(--text-main);
             border: 1.5px dashed var(--input-border);
         }
-        .btn-load:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
+        .btn-load:hover { border-color: var(--primary); color: var(--primary); }
 
         #status {
             margin-top: 18px;
@@ -510,9 +430,7 @@
             border-radius: var(--radius-sm);
             display: none;
         }
-        #status.visible {
-            display: block;
-        }
+        #status.visible { display: block; }
 
         .footer-bar {
             margin-top: 28px;
@@ -534,11 +452,7 @@
             font-size: 12px;
             font-weight: 600;
         }
-        .btn-token:hover {
-            color: var(--text-main);
-            border-color: var(--input-border);
-            background: var(--bg-subtle);
-        }
+        .btn-token:hover { color: var(--text-main); border-color: var(--input-border); background: var(--bg-subtle); }
 
         .syncing { opacity: 0.6; pointer-events: none; }
 
@@ -564,33 +478,15 @@
             .live-status-bar { flex-direction: column; align-items: stretch; }
             .live-actions { width: 100%; }
             .live-actions button { flex: 1; }
-            .task-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-            .task-info {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-                width: 100%;
-            }
-            .task-actions {
-                width: 100%;
-                justify-content: flex-end;
-                border-top: 1px solid var(--border-color);
-                padding-top: 8px;
-            }
-            .footer-bar {
-                flex-direction: column;
-                text-align: center;
-            }
+            .task-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .task-info { flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; }
+            .task-actions { width: 100%; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 8px; }
+            .footer-bar { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- Nagłówek z przełącznikiem motywu -->
     <div class="header-bar">
         <h1>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -604,7 +500,7 @@
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="url(#copilotGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
                 <circle cx="12" cy="12" r="3" fill="url(#copilotGrad)"/>
             </svg>
-            MediRadar Copilot
+            MediRadar Panel
         </h1>
 
         <div class="theme-switch-wrapper">
@@ -625,8 +521,8 @@
             <button class="btn-run-now" onclick="fetchLastRunStatus()" title="Odśwież informację o ostatnim uruchomieniu">
                 🔄 Sprawdź status
             </button>
-            <button id="runNowBtn" class="btn-run-now primary-Trigger" onclick="triggerWorkflowNow()">
-                ⚡ Uruchom TERAZ
+            <button id="runNowBtn" class="btn-run-now primary-trigger" onclick="triggerWorkflowNow()">
+                ⚡ Odśwież TERAZ
             </button>
         </div>
     </div>
@@ -695,7 +591,7 @@
             </div>
 
             <div class="col-4">
-                <label>Tryb pracy</label>
+                <label>Tryb pracy (24/7)</label>
                 <div class="toggle-row">
                     <span id="allDayLabel">Wybrane godziny</span>
                     <input type="checkbox" id="radarAllDay" onchange="updateScheduleUI()" style="width: 20px; height: 20px; cursor: pointer;">
@@ -713,14 +609,14 @@
         </div>
 
         <div class="cron-preview">
-            <span id="tzInfoText">Strefa: Czas polski (automatyczna obsługa czasu letniego i zimowego)</span>
-            <div>Cron (UTC): <code id="cronPreviewCode">*/30 5-21 * * *</code></div>
+            <span id="tzInfoText">Strefa: Czas polski (pełna obsługa czasu letniego UTC+2 i zimowego UTC+1)</span>
+            <div>Cron (UTC): <code id="cronPreviewCode">*/30 5-22 * * *</code></div>
         </div>
     </div>
 
     <!-- Sekcja 3: Lista aktywnych zadań -->
     <div class="section-card">
-        <h2>Lista monitorowanych wizyt (<span id="taskCount">0</span>)</h2>
+        <h2>Aktywne Radary (<span id="taskCount">0</span>)</h2>
         <div class="task-list" id="taskList"></div>
     </div>
 
@@ -730,7 +626,7 @@
             ☁️ Zapisz i zaktualizuj system w chmurze (GitHub)
         </button>
         <button id="loadBtn" class="btn-load" onclick="loadFromGithub()">
-            ⬇️ Wczytaj aktualną konfigurację z chmury (GitHub)
+            ⬇️ Wczytaj dane z chmury (GitHub)
         </button>
     </div>
 
@@ -738,7 +634,7 @@
 
     <!-- Stopka z zarządzaniem tokenem -->
     <div class="footer-bar">
-        <span>Repozytorium: <b>kopek-beep/medicover</b> • Czas lokalny PL (Europe/Warsaw)</span>
+        <span>Repozytorium: <b>kopek-beep/medicover</b> • Strefa: <b>Europe/Warsaw</b></span>
         <button class="btn-token" onclick="resetGithubToken()">
             🔑 Zmień / Resetuj token GitHub (PAT)
         </button>
@@ -943,6 +839,7 @@
 
     // ==========================================
     // 3. HARMONOGRAM I KONWERSJA CZASU PL -> UTC
+    //    (ODPORNA NA ZMIANĘ CZASU LETNI/ZIMOWY)
     // ==========================================
     let radarSchedule = JSON.parse(localStorage.getItem('medicover_schedule')) || {
         interval: 30,
@@ -970,7 +867,6 @@
         updateScheduleUI();
     }
 
-    // Wyznacza aktualne przesunięcie Polski (Europe/Warsaw) względem UTC w godzinach (+1 lub +2)
     function getPolandUtcOffsetHours() {
         const now = new Date();
         const utcDate = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
@@ -978,6 +874,8 @@
         return Math.round((plDate - utcDate) / (1000 * 60 * 60));
     }
 
+    // Wylicza wyrażenie Cron UTC obejmujące zarówno czas letni (UTC+2), jak i zimowy (UTC+1),
+    // natomiast dokładne odcięcie godzin realizuje strażnik Europe/Warsaw w Pythonie.
     function buildCronExpression(schedule) {
         const step = parseInt(schedule.interval, 10) || 30;
         const minPart = step === 60 ? "0" : `*/${step}`;
@@ -986,26 +884,54 @@
             return `${minPart} * * * *`;
         }
 
-        const offset = getPolandUtcOffsetHours();
         const startPL = parseInt(schedule.startHour, 10);
         const endPL = parseInt(schedule.endHour, 10);
 
-        const startUTC = (startPL - offset + 24) % 24;
-        const endUTC = (endPL - offset + 24) % 24;
-
-        let hourPart = "*";
-        if (startUTC === endUTC) {
-            hourPart = `${startUTC}`;
-        } else if (startUTC < endUTC) {
-            hourPart = `${startUTC}-${endUTC}`;
-        } else {
-            // Przejście przez północ w UTC (np. 07:00 - 02:00 PL -> 05:00 - 00:00 UTC -> 0,5-23)
-            const firstRange = endUTC === 0 ? "0" : `0-${endUTC}`;
-            const secondRange = startUTC === 23 ? "23" : `${startUTC}-23`;
-            hourPart = `${firstRange},${secondRange}`;
+        // Zbieramy zbiór godzin w Polsce
+        const plHours = [];
+        let h = startPL;
+        while (true) {
+            plHours.push(h);
+            if (h === endPL) break;
+            h = (h + 1) % 24;
+            if (plHours.length >= 24) break;
         }
 
-        return `${minPart} ${hourPart} * * *`;
+        // Jeśli zakres pokrywa min. 23 godziny, upraszczamy do '*'
+        if (plHours.length >= 23) {
+            return `${minPart} * * * *`;
+        }
+
+        // Wyznaczamy godziny UTC dla czasu letniego (UTC+2) oraz zimowego (UTC+1)
+        const utcHoursSet = new Set();
+        plHours.forEach(ph => {
+            utcHoursSet.add((ph - 2 + 24) % 24); // Czas letni (CEST)
+            utcHoursSet.add((ph - 1 + 24) % 24); // Czas zimowy (CET)
+        });
+
+        if (utcHoursSet.size >= 24) {
+            return `${minPart} * * * *`;
+        }
+
+        const sortedUtc = Array.from(utcHoursSet).sort((a, b) => a - b);
+
+        // Kompresja posortowanych godzin UTC do przedziałów Crona (np. 0-1,5-23)
+        const ranges = [];
+        let rangeStart = sortedUtc[0];
+        let prev = sortedUtc[0];
+
+        for (let i = 1; i <= sortedUtc.length; i++) {
+            const curr = sortedUtc[i];
+            if (curr === prev + 1) {
+                prev = curr;
+            } else {
+                ranges.push(rangeStart === prev ? `${rangeStart}` : `${rangeStart}-${prev}`);
+                rangeStart = curr;
+                prev = curr;
+            }
+        }
+
+        return `${minPart} ${ranges.join(',')} * * *`;
     }
 
     function updateScheduleUI() {
@@ -1026,7 +952,7 @@
         const cron = buildCronExpression(radarSchedule);
         document.getElementById('cronPreviewCode').textContent = cron;
         document.getElementById('tzInfoText').textContent =
-            `Strefa PL (UTC+${offset}) • Skrypt Python dodatkowo weryfikuje czas Europe/Warsaw (odporny na zmianę czasu zimowego/letniego)`;
+            `Obecnie w PL: UTC+${offset} • Gotowy na zmianę czasu zimowego/letniego (25.10) bez ponownego zapisu`;
     }
 
     // ==========================================
@@ -1058,7 +984,7 @@
 
             const cityName = task.region === "199" ? "Łódź" : task.region;
             const docName = (task.doctorName && task.doctorName.toLowerCase() !== "wszyscy") ? task.doctorName : "Wszyscy";
-            const specName = wszystkieSpecjalizacje[task.service] || `ID: ${task.service}`;
+            const specName = wszystkieSpecjalizacje[task.service] || task.serviceName || `ID: ${task.service}`;
 
             let dateRangeText = "od dziś (bez limitu)";
             if (task.startDate && task.endDate) {
@@ -1099,6 +1025,7 @@
         const person = document.getElementById('person').value;
         const region = document.getElementById('region').value;
         const service = document.getElementById('service').value;
+        const serviceName = wszystkieSpecjalizacje[service] || `ID: ${service}`;
 
         let doctorInput = document.getElementById('doctorName').value.trim().replace(/"/g, '');
         const doctorName = (doctorInput === "" || doctorInput.toLowerCase() === "wszyscy") ? "Wszyscy" : doctorInput;
@@ -1124,7 +1051,7 @@
             return;
         }
 
-        tasks.push({ person, region, service, doctorName, startDate, endDate, paused: false });
+        tasks.push({ person, region, service, serviceName, doctorName, startDate, endDate, paused: false });
         renderTasks();
 
         document.getElementById('doctorName').value = "Wszyscy";
@@ -1143,13 +1070,18 @@
     }
 
     // ==========================================
-    // 5. GENERATOR PLIKU WORKFLOW YAML
+    // 5. GENEROWANIE YAML (TRYB OPTIMUM - BATCH)
     // ==========================================
     function generateYaml() {
-        const activeTasks = tasks.filter(t => !t.paused);
+        const enrichedTasks = tasks.map(t => ({
+            ...t,
+            serviceName: wszystkieSpecjalizacje[t.service] || t.serviceName || `Specjalizacja ${t.service}`
+        }));
+
+        const activeTasks = enrichedTasks.filter(t => !t.paused);
         const configMetadata = JSON.stringify({
             schedule: radarSchedule,
-            tasks: tasks
+            tasks: enrichedTasks
         });
 
         const cronExpr = buildCronExpression(radarSchedule);
@@ -1177,6 +1109,9 @@
             return yaml;
         }
 
+        // Kodujemy zadania w Base64, aby uniknąć problemów ze znakami specjalnymi i cudzysłowami w YAML
+        const tasksBase64 = utf8ToBase64(JSON.stringify(activeTasks));
+
         yaml += `      - uses: actions/checkout@v4\n`;
         yaml += `      - uses: actions/setup-python@v5\n`;
         yaml += `        with:\n`;
@@ -1186,46 +1121,25 @@
         yaml += `        env:\n`;
         yaml += `          MEDICOVER_SESSION: \${{ secrets.MEDICOVER_SESSION }}\n`;
         yaml += `        run: mkdir -p data && echo "$MEDICOVER_SESSION" | base64 -d | tar -xz -C data\n`;
-        yaml += `      - name: Przywrocenie pamieci podrecznej (token i historia wizyt)\n`;
+        yaml += `      - name: Przywrocenie pamieci podrecznej\n`;
         yaml += `        uses: actions/cache/restore@v4\n`;
         yaml += `        with:\n`;
         yaml += `          path: |\n`;
         yaml += `            data/medicover_token.json\n`;
         yaml += `            data/seen_appointments.json\n`;
-        yaml += `          key: medicover-state-\${{ github.run_id }}\n`;
+        yaml += `          key: medicover-state-\${{ github.run_id }}-\${{ github.run_attempt }}\n`;
         yaml += `          restore-keys: |\n`;
         yaml += `            medicover-state-\n`;
-        yaml += `      - name: Szukaj wizyt\n`;
+        yaml += `      - name: Szukaj wizyt (Optimum Batch Mode)\n`;
         yaml += `        env:\n`;
         yaml += `          MEDICOVER_USER: \${{ secrets.MEDICOVER_USER }}\n`;
         yaml += `          MEDICOVER_PASS: \${{ secrets.MEDICOVER_PASS }}\n`;
         yaml += `          NOTIFIERS_TELEGRAM_TOKEN: \${{ secrets.NOTIFIERS_TELEGRAM_TOKEN }}\n`;
         yaml += `          NOTIFIERS_TELEGRAM_CHAT_ID: \${{ secrets.NOTIFIERS_TELEGRAM_CHAT_ID }}\n`;
         yaml += `          RADAR_ACTIVE_HOURS: "${hoursEnv}"\n`;
+        yaml += `          RADAR_TASKS_B64: "${tasksBase64}"\n`;
         yaml += `        run: |\n`;
-
-        activeTasks.forEach((t, index) => {
-            const nazwaSpec = wszystkieSpecjalizacje[t.service] || `ID ${t.service}`;
-            const safeDoc = (t.doctorName || "").replace(/"/g, '');
-            let cmd = `          uv run python medichaser.py find-appointment -r ${t.region} -s ${t.service}`;
-
-            if (safeDoc && safeDoc.toLowerCase() !== "wszyscy") {
-                cmd += ` --doctor-name "${safeDoc}"`;
-            }
-            if (t.startDate) {
-                cmd += ` -f "${t.startDate}"`;
-            }
-            if (t.endDate) {
-                cmd += ` -e "${t.endDate}"`;
-            }
-            cmd += ` -n telegram -t "[${t.person}] ${nazwaSpec}"\n`;
-            yaml += cmd;
-
-            if (index < activeTasks.length - 1) {
-                yaml += `          sleep 3\n`;
-            }
-        });
-
+        yaml += `          uv run python medichaser.py batch-check\n`;
         yaml += `      - name: Zapis pamieci podrecznej\n`;
         yaml += `        if: always()\n`;
         yaml += `        uses: actions/cache/save@v4\n`;
@@ -1233,7 +1147,7 @@
         yaml += `          path: |\n`;
         yaml += `            data/medicover_token.json\n`;
         yaml += `            data/seen_appointments.json\n`;
-        yaml += `          key: medicover-state-\${{ github.run_id }}\n`;
+        yaml += `          key: medicover-state-\${{ github.run_id }}-\${{ github.run_attempt }}\n`;
 
         return yaml;
     }
@@ -1261,7 +1175,6 @@
     }
 
     function resetGithubToken() {
-        const current = localStorage.getItem("medicover_gh_token");
         const nextToken = prompt(
             "🔑 Wpisz nowy GitHub Personal Access Token (lub zostaw puste, aby usunąć zapisany token z przeglądarki):",
             ""
@@ -1287,10 +1200,7 @@
 
         lastRunEl.textContent = "⏳ Pobieranie statusu z GitHub Actions...";
         const url = `https://api.github.com/repos/${GITHUB_REPO}/actions/workflows/checker.yml/runs?per_page=1`;
-        const headers = {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github+json"
-        };
+        const headers = { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" };
 
         try {
             const res = await fetch(url, { headers });
@@ -1301,7 +1211,7 @@
             const data = await res.json();
             const run = (data.workflow_runs || [])[0];
             if (!run) {
-                lastRunEl.textContent = "ℹ️ Brak zarejestrowanych uruchomień tego workflow.";
+                lastRunEl.textContent = "ℹ️ Brak zarejestrowanych uruchomień.";
                 return;
             }
 
@@ -1316,7 +1226,7 @@
             if (run.status === "completed") {
                 badge = run.conclusion === "success" ? "✅ Sukces" : `❌ Błąd (${run.conclusion})`;
             }
-            const eventLabel = run.event === "workflow_dispatch" ? "Ręcznie" : "Harmonogram";
+            const eventLabel = run.event === "workflow_dispatch" ? "Na żądanie" : "Harmonogram";
             lastRunEl.textContent = `Ostatnie sprawdzenie: ${dateStr} • ${badge} (${eventLabel})`;
         } catch (err) {
             lastRunEl.textContent = `❌ Błąd sieci podczas sprawdzania statusu.`;
@@ -1338,7 +1248,6 @@
         };
 
         try {
-            // Pobranie domyślnej gałęzi repozytorium (main / master)
             const repoRes = await fetch(`https://api.github.com/repos/${GITHUB_REPO}`, { headers });
             let defaultBranch = "main";
             if (repoRes.ok) {
@@ -1354,7 +1263,7 @@
             });
 
             if (res.status === 204 || res.ok) {
-                showStatus("🚀 Radar został uruchomiony na żądanie! Za ~15-30 sekund odśwież status.", "var(--success)");
+                showStatus("🚀 Radar został uruchomiony na żądanie! Za ~15-30 sekund kliknij „Sprawdź status”.", "var(--success)");
                 setTimeout(fetchLastRunStatus, 6000);
             } else {
                 const errData = await res.json().catch(() => ({}));
@@ -1385,13 +1294,11 @@
         try {
             let sha = "";
             const getRes = await fetch(url, { headers });
-            if (getRes.ok) {
-                sha = (await getRes.json()).sha;
-            }
+            if (getRes.ok) { sha = (await getRes.json()).sha; }
 
             const yamlContent = generateYaml();
             const body = {
-                message: `Aktualizacja Radaru (${tasks.filter(t => !t.paused).length} aktywnych zadan)`,
+                message: `Aktualizacja Radaru (${tasks.filter(t => !t.paused).length} aktywnych zadań)`,
                 content: utf8ToBase64(yamlContent)
             };
             if (sha) body.sha = sha;
@@ -1408,7 +1315,8 @@
                 fetchLastRunStatus();
             } else {
                 const err = await putRes.json().catch(() => ({}));
-                showStatus(`❌ Błąd zapisu (${putRes.status}): ${err.message || 'Sprawdź uprawnienia tokena (repo + workflow)'}`, "var(--danger)");
+                if (putRes.status === 401) localStorage.removeItem("medicover_gh_token");
+                showStatus(`❌ Błąd zapisu (${putRes.status}): ${err.message || ''}`, "var(--danger)");
             }
         } catch (error) {
             showStatus(`❌ Błąd połączenia: ${error.message}`, "var(--danger)");
@@ -1426,10 +1334,7 @@
         loadBtn.classList.add('syncing');
 
         const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${WORKFLOW_PATH}`;
-        const headers = {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/vnd.github+json"
-        };
+        const headers = { "Authorization": `Bearer ${token}`, "Accept": "application/vnd.github+json" };
 
         try {
             const getRes = await fetch(url, { headers });
@@ -1438,7 +1343,7 @@
                 const decodedContent = base64ToUtf8(data.content);
                 const lines = decodedContent.split('\n');
 
-                // 1. Próba odczytu pełnych metadanych z komentarza # RADAR_CONFIG:
+                // 1. Odczyt pełnych metadanych z komentarza # RADAR_CONFIG:
                 const metaLine = lines.find(l => l.startsWith('# RADAR_CONFIG:'));
                 let loadedFromMeta = false;
 
@@ -1455,11 +1360,11 @@
                             loadedFromMeta = true;
                         }
                     } catch (e) {
-                        console.warn("Nie udało się odczytać metadanych RADAR_CONFIG, używam parsera linii YAML.");
+                        console.warn("Nie udało się odczytać RADAR_CONFIG.");
                     }
                 }
 
-                // 2. Fallback: Parsowanie komend find-appointment dla starszych plików YAML
+                // 2. Fallback dla starszych plików YAML (parsowanie pojedynczych linii find-appointment)
                 if (!loadedFromMeta) {
                     tasks = [];
                     for (let line of lines) {
@@ -1472,9 +1377,11 @@
                             const endMatch = line.match(/-e\s+"([^"]+)"/);
 
                             if (regionMatch && serviceMatch && personMatch) {
+                                const sId = serviceMatch[1];
                                 tasks.push({
                                     region: regionMatch[1],
-                                    service: serviceMatch[1],
+                                    service: sId,
+                                    serviceName: wszystkieSpecjalizacje[sId] || `ID: ${sId}`,
                                     person: personMatch[1],
                                     doctorName: docMatch ? docMatch[1] : "Wszyscy",
                                     startDate: startMatch ? startMatch[1] : "",
@@ -1492,9 +1399,10 @@
             } else if (getRes.status === 404) {
                 tasks = [];
                 renderTasks();
-                showStatus("ℹ️ Plik checker.yml jeszcze nie istnieje na GitHubie. Dodaj zadania i kliknij Zapisz.", "var(--warning)");
+                showStatus("ℹ️ Plik checker.yml jeszcze nie istnieje na GitHubie.", "var(--warning)");
             } else {
                 const err = await getRes.json().catch(() => ({}));
+                if (getRes.status === 401) localStorage.removeItem("medicover_gh_token");
                 showStatus(`❌ Błąd pobierania (${getRes.status}): ${err.message || ''}`, "var(--danger)");
             }
         } catch (error) {
@@ -1504,7 +1412,6 @@
         }
     }
 
-    // Inicjalizacja przy starcie strony
     odswiezSpecjalizacje();
     ustawDzisiejszaDate();
     initScheduleSelects();
